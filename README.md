@@ -1,2 +1,2 @@
-# project-log-server
+# Project Log Server
 Project Risk and Issue Tracking
