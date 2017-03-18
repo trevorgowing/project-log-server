@@ -1,6 +1,6 @@
 package com.trevorgowing.projectlog.common.persistence;
 
-import org.apache.log4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -13,14 +13,14 @@ import javax.validation.ConstraintValidatorContext;
  * <li>A Date Range's start date cannot be null.
  * </ol>
  */
+@Slf4j
 public class DateRangeConstraintValidator implements ConstraintValidator<ValidatedDateRange, DateRange> {
 
     private static final String VIOLATION_TEMPLATE = "{za.co.bsg.ems.constraints.DateRange.message}";
-    private Logger logger = Logger.getLogger(getClass());
 
     @Override
     public void initialize(ValidatedDateRange constraintAnnotation) {
-        logger.debug("DateRangeValidator Initialised");
+        log.debug("DateRangeValidator Initialised");
     }
 
     @Override

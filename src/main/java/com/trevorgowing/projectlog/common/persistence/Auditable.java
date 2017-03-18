@@ -3,7 +3,7 @@ package com.trevorgowing.projectlog.common.persistence;
 import org.springframework.data.domain.Persistable;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 public interface Auditable<U, ID extends Serializable> extends Persistable<ID> {
 
@@ -26,14 +26,14 @@ public interface Auditable<U, ID extends Serializable> extends Persistable<ID> {
      *
      * @return the createdDate
      */
-    LocalDateTime getCreatedDate();
+    Instant getCreatedDate();
 
     /**
      * Sets the creation date of the entity.
      *
      * @param createdDate the creation date to set
      */
-    void setCreatedDate(final LocalDateTime createdDate);
+    void setCreatedDate(final Instant createdDate);
 
     /**
      * Returns the user who modified the entity lastly.
@@ -54,13 +54,13 @@ public interface Auditable<U, ID extends Serializable> extends Persistable<ID> {
      *
      * @return the lastModifiedDate
      */
-    LocalDateTime getLastModifiedDate();
+    Instant getLastModifiedDate();
 
     /**
      * Sets the date of the last modification.
      *
      * @param lastModifiedDate the date of the last modification to set
      */
-    void setLastModifiedDate(final LocalDateTime lastModifiedDate);
+    void setLastModifiedDate(final Instant lastModifiedDate);
 
 }

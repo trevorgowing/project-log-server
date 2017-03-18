@@ -1,34 +1,33 @@
 package com.trevorgowing.projectlog.common.persistence;
 
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.ManyToOne;
-import javax.persistence.MappedSuperclass;
+import javax.persistence.*;
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @MappedSuperclass
+@NoArgsConstructor
 public abstract class AbstractAuditable<U, PK extends Serializable> extends AbstractPersistable<PK>
         implements Auditable<U, PK> {
 
-    @ManyToOne
+    private static final long serialVersionUID = 6786219322987115149L;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     private U createdBy;
 
     @Basic(optional = false)
     @Column(nullable = false)
     @CreatedDate
-    private LocalDateTime createdDate = LocalDateTime.now();
+    private Instant createdDate = Instant.now();
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private U lastModifiedBy;
 
-    @Basic
-    @Column
     @LastModifiedDate
-    private LocalDateTime lastModifiedDate;
+    private Instant lastModifiedDate;
 
     @Override
     public U getCreatedBy() {
@@ -41,12 +40,12 @@ public abstract class AbstractAuditable<U, PK extends Serializable> extends Abst
     }
 
     @Override
-    public LocalDateTime getCreatedDate() {
+    public Instant getCreatedDate() {
         return createdDate;
     }
 
     @Override
-    public void setCreatedDate(LocalDateTime createdDate) {
+    public void setCreatedDate(Instant createdDate) {
         this.createdDate = createdDate;
     }
 
@@ -61,12 +60,12 @@ public abstract class AbstractAuditable<U, PK extends Serializable> extends Abst
     }
 
     @Override
-    public LocalDateTime getLastModifiedDate() {
+    public Instant getLastModifiedDate() {
         return lastModifiedDate;
     }
 
     @Override
-    public void setLastModifiedDate(LocalDateTime lastModifiedDate) {
+    public void setLastModifiedDate(Instant lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
     }
 }
