@@ -1,7 +1,11 @@
+import java.time.LocalDate
+import java.time.LocalTime
+
 plugins {
     id "application"
     id "java"
     id "org.springframework.boot" version "1.5.2.RELEASE"
+    id "org.flywaydb.flyway" version "4.1.2"
 }
 
 repositories {
@@ -9,12 +13,18 @@ repositories {
 }
 
 dependencies {
+    compile "org.flywaydb:flyway-core:4.1.2"
     compile 'mysql:mysql-connector-java'
     compile "org.hibernate:hibernate-core:5.2.8.Final"
     compile "org.projectlombok:lombok:1.16.14"
     compile "org.springframework.boot:spring-boot-starter-web"
     compile "org.springframework.boot:spring-boot-starter-data-jpa"
     testCompile "org.springframework.boot:spring-boot-starter-test"
+}
+
+flyway {
+    baselineVersion = "2017.03.19.18.14.33.897"
+    outOfOrder = true
 }
 
 jar {
@@ -27,3 +37,17 @@ targetCompatibility = 1.8
 
 mainClassName = "com.trevorgowing.projectlog.Application"
 
+/**
+ * Create a flyway sql migration in the default location, with a version of timestamp now and default description.
+ */
+task createSqlMigration {
+    doLast {
+        String version = LocalDate.now().toString().replace('-', '.').concat('.')
+                .concat(LocalTime.now().toString().replace(':', '.'))
+        String fileName = 'V'.concat(version).concat('__').concat("description").concat(".sql")
+        String filePath = "src/main/resources/db/migration/".concat(fileName)
+        new File(filePath).createNewFile() ? println(filePath.concat(" migration created successfully"))
+                : println("Failed to create migration ".concat(filePath))
+
+    }
+}

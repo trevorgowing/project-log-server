@@ -15,17 +15,20 @@ public abstract class AbstractAuditable<U, PK extends Serializable> extends Abst
 
     private static final long serialVersionUID = 6786219322987115149L;
 
+    @JoinColumn(name = "app_created_by_id")
     @ManyToOne(fetch = FetchType.LAZY)
     private U createdBy;
 
     @Basic(optional = false)
-    @Column(nullable = false)
+    @Column(nullable = false, name = "app_created_date")
     @CreatedDate
     private Instant createdDate = Instant.now();
 
+    @JoinColumn(name = "app_last_modified_by_id")
     @ManyToOne(fetch = FetchType.LAZY)
     private U lastModifiedBy;
 
+    @Column(name = "app_last_modified_date")
     @LastModifiedDate
     private Instant lastModifiedDate;
 
