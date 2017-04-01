@@ -1,9 +1,7 @@
 package com.trevorgowing.projectlog.user;
 
 import com.trevorgowing.projectlog.common.persistence.AbstractAuditable;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -13,8 +11,10 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "users")
 @NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
+@Builder
 public class User extends AbstractAuditable<User, Long> {
 
     private static final long serialVersionUID = 2138197451190291396L;
