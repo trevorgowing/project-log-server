@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
 import static com.trevorgowing.projectlog.common.converters.ObjectToJSON.convertToJSON;
@@ -59,10 +60,10 @@ public class UserControllerUnitTests extends AbstractControllerUnitTests {
     public void testGetUsersWithExistingUsers_shouldDelegateToUserRepositoryAndReturnUsers() throws Exception {
         // Set up fixture
         UserDTO userOne = UserDTO.builder()
-                .email("userone@trevorgowing.com")
-                .password("useronepassword")
-                .firstName("userone")
-                .lastName("gowing")
+                .email(IRRELEVANT_USER_EMAIL)
+                .password(IRRELEVANT_USER_PASSWORD)
+                .firstName(IRRELEVANT_USER_FIRST_NAME)
+                .lastName(IRRELEVANT_USER_LAST_NAME)
                 .build();
 
         UserDTO userTwo = UserDTO.builder()
@@ -92,5 +93,55 @@ public class UserControllerUnitTests extends AbstractControllerUnitTests {
 
         // Verify behaviour
         assertThat(actualUsers, is(expectedUsers));
+    }
+
+    @Test(expected = UserNotFoundException.class)
+    public void testGetUserWithNoExistingUser_shouldThrowUserNotFoundException() {
+        // Set up expectations
+        when(userRepository.findUserDTOById(IRRELEVANT_USER_ID))
+                .thenReturn(Optional.empty());
+
+        // Exercise SUT
+        given()
+                .contentType(ContentType.JSON)
+        .when()
+                .get(UserConstants.USERS_URL_PATH + "/" + IRRELEVANT_USER_ID)
+        .then()
+                .log().all()
+                .statusCode(HttpStatus.NOT_FOUND.value());
+
+        // Exercise SUT
+        userController.getUser(IRRELEVANT_USER_ID);
+    }
+
+    @Test
+    public void testGetUserWithExistingUser_shouldReturnUser() throws Exception {
+        // Set up fixture
+        UserDTO expectedUser = UserDTO.builder()
+                .email(IRRELEVANT_USER_EMAIL)
+                .password(IRRELEVANT_USER_PASSWORD)
+                .firstName(IRRELEVANT_USER_FIRST_NAME)
+                .lastName(IRRELEVANT_USER_LAST_NAME)
+                .build();
+
+        // Set up expectations
+        when(userRepository.findUserDTOById(IRRELEVANT_USER_ID))
+                .thenReturn(Optional.of(expectedUser));
+
+        // Exercise SUT
+        given()
+                .contentType(ContentType.JSON)
+        .when()
+                .get(UserConstants.USERS_URL_PATH + "/" + IRRELEVANT_USER_ID)
+        .then()
+                .log().all()
+                .statusCode(HttpStatus.OK.value())
+                .contentType(ContentType.JSON)
+                .body(sameBeanAs(convertToJSON(expectedUser)));
+
+        UserDTO actualUserDTO = userController.getUser(IRRELEVANT_USER_ID);
+
+        // Verify behaviour
+        assertThat(actualUserDTO, sameBeanAs(expectedUser));
     }
 }
