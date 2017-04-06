@@ -12,9 +12,13 @@ import java.util.List;
 @RequestMapping(UserConstants.USERS_URL_PATH)
 class UserController {
 
+    private final UserDTOFactory userDTOFactory;
+    private final UserCRUDService userCRUDService;
     private final UserRepository userRepository;
 
-    UserController(UserRepository userRepository) {
+    UserController(UserDTOFactory userDTOFactory, UserCRUDService userCRUDService, UserRepository userRepository) {
+        this.userDTOFactory = userDTOFactory;
+        this.userCRUDService = userCRUDService;
         this.userRepository = userRepository;
     }
 
@@ -35,5 +39,19 @@ class UserController {
     @ResponseStatus(code = HttpStatus.NOT_FOUND, reason = UserNotFoundException.REASON)
     public void handleUserNotFoundException(UserNotFoundException userNotFoundException) {
         log.warn(userNotFoundException.getMessage(), userNotFoundException);
+    }
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    UserResponseDTO postUser(@RequestBody UserRequestDTO userRequestDTO) {
+        User user = userCRUDService.createUser(userRequestDTO.getEmail(), userRequestDTO.getPassword(),
+                userRequestDTO.getFirstName(), userRequestDTO.getLastName());
+        return userDTOFactory.createUserResponseDTO(user);
+    }
+
+    @ExceptionHandler(DuplicateUserException.class)
+    @ResponseStatus(code = HttpStatus.CONFLICT, reason = DuplicateUserException.REASON)
+    public void handleDuplicateUserException(DuplicateUserException duplicateUserException) {
+        log.warn(duplicateUserException.getMessage(), duplicateUserException);
     }
 }

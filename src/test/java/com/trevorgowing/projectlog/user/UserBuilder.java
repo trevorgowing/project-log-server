@@ -25,7 +25,7 @@ public class UserBuilder extends AbstractEntityBuilder<User> {
 
     @Override
     public User build() {
-        User user = User.completeUser(id, email, password, firstName, lastName);
+        User user = User.identifiedUser(id, email, password, firstName, lastName);
         user.setCreatedBy(createdBy);
         user.setCreatedDate(createdDate);
         user.setLastModifiedBy(lastModifiedBy);

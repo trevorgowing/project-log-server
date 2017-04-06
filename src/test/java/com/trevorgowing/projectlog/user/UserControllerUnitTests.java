@@ -14,6 +14,8 @@ import java.util.Optional;
 
 import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
 import static com.trevorgowing.projectlog.common.converters.ObjectToJSON.convertToJSON;
+import static com.trevorgowing.projectlog.user.DuplicateUserExceptionBuilder.aDuplicateUserException;
+import static com.trevorgowing.projectlog.user.UserBuilder.aUser;
 import static com.trevorgowing.projectlog.user.UserResponseDTOBuilder.aUserResponseDTO;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static java.util.Arrays.asList;
@@ -24,6 +26,10 @@ import static org.mockito.Mockito.when;
 
 public class UserControllerUnitTests extends AbstractControllerUnitTests {
 
+    @Mock
+    private UserDTOFactory userDTOFactory;
+    @Mock
+    private UserCRUDService userCRUDService;
     @Mock
     private UserRepository userRepository;
 
@@ -111,7 +117,6 @@ public class UserControllerUnitTests extends AbstractControllerUnitTests {
                 .log().all()
                 .statusCode(HttpStatus.NOT_FOUND.value());
 
-        // Exercise SUT
         userController.getUser(IRRELEVANT_USER_ID);
     }
 
@@ -144,5 +149,85 @@ public class UserControllerUnitTests extends AbstractControllerUnitTests {
 
         // Verify behaviour
         assertThat(actualUserResponseDTO, sameBeanAs(expectedUser));
+    }
+
+    @Test(expected = DuplicateUserException.class)
+    public void testPostUserWithDuplicateEmail_shouldThrowDuplicateUserException() throws Exception {
+        // Set up fixture
+        UserRequestDTO userRequestDTO = aUserResponseDTO()
+                .email(IRRELEVANT_USER_EMAIL)
+                .password(IRRELEVANT_USER_PASSWORD)
+                .firstName(IRRELEVANT_USER_FIRST_NAME)
+                .lastName(IRRELEVANT_USER_LAST_NAME)
+                .build();
+
+        DuplicateUserException duplicateUserException = aDuplicateUserException()
+                .withEmail(IRRELEVANT_USER_EMAIL)
+                .build();
+
+        // Set up expectations
+        when(userCRUDService.createUser(IRRELEVANT_USER_EMAIL, IRRELEVANT_USER_PASSWORD, IRRELEVANT_USER_FIRST_NAME,
+                IRRELEVANT_USER_LAST_NAME)).thenThrow(duplicateUserException);
+
+        // Exercise SUT
+        given()
+                .contentType(ContentType.JSON)
+                .body(convertToJSON(userRequestDTO))
+        .when()
+                .post(UserConstants.USERS_URL_PATH)
+        .then()
+                .log().all()
+                .statusCode(HttpStatus.CONFLICT.value());
+
+        userController.postUser(userRequestDTO);
+    }
+
+    @Test
+    public void testPostUserWithUniqueUser_shouldDelegateToUserCRUDServiceToCreateUserAndUserDTOFactoryToBuildResponse()
+            throws Exception {
+        // Set up fixture
+        UserRequestDTO userRequestDTO = aUserResponseDTO()
+                .email(IRRELEVANT_USER_EMAIL)
+                .password(IRRELEVANT_USER_PASSWORD)
+                .firstName(IRRELEVANT_USER_FIRST_NAME)
+                .lastName(IRRELEVANT_USER_LAST_NAME)
+                .build();
+
+        User user = aUser()
+                .id(IRRELEVANT_USER_ID)
+                .email(IRRELEVANT_USER_EMAIL)
+                .password(IRRELEVANT_USER_PASSWORD)
+                .firstName(IRRELEVANT_USER_FIRST_NAME)
+                .lastName(IRRELEVANT_USER_LAST_NAME)
+                .build();
+
+        UserResponseDTO expectedUserResponseDTO = aUserResponseDTO()
+                .id(IRRELEVANT_USER_ID)
+                .email(IRRELEVANT_USER_EMAIL)
+                .password(IRRELEVANT_USER_PASSWORD)
+                .firstName(IRRELEVANT_USER_FIRST_NAME)
+                .lastName(IRRELEVANT_USER_LAST_NAME)
+                .build();
+
+        // Set up expectations
+        when(userCRUDService.createUser(IRRELEVANT_USER_EMAIL, IRRELEVANT_USER_PASSWORD, IRRELEVANT_USER_FIRST_NAME,
+                IRRELEVANT_USER_LAST_NAME)).thenReturn(user);
+        when(userDTOFactory.createUserResponseDTO(user))
+                .thenReturn(expectedUserResponseDTO);
+
+        // Exercise SUT
+        given()
+                .contentType(ContentType.JSON)
+                .body(convertToJSON(userRequestDTO))
+        .when()
+                .post(UserConstants.USERS_URL_PATH)
+        .then()
+                .log().all()
+                .statusCode(HttpStatus.CREATED.value());
+
+        UserResponseDTO actualUserResponseDTO = userController.postUser(userRequestDTO);
+
+        // Verify behaviour
+        assertThat(actualUserResponseDTO, is(expectedUserResponseDTO));
     }
 }

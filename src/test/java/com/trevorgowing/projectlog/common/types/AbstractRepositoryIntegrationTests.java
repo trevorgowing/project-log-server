@@ -6,7 +6,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 @DataJpaTest
-public abstract class AbstractRepositoryIntegrationTests extends AbstractTests {
+public abstract class AbstractRepositoryIntegrationTests extends AbstractSpringTests {
 
     @PersistenceContext
     protected EntityManager entityManager;

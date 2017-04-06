@@ -1,9 +1,9 @@
 package com.trevorgowing.projectlog.common.types;
 
 import org.junit.runner.RunWith;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.mockito.runners.MockitoJUnitRunner;
 
-@RunWith(SpringRunner.class)
+@RunWith(MockitoJUnitRunner.class)
 public abstract class AbstractTests {
 
     protected static final long IRRELEVANT_USER_ID = 1L;
