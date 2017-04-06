@@ -1,9 +1,10 @@
 package com.trevorgowing.projectlog.common.persisters;
 
 import com.trevorgowing.projectlog.common.persistence.AbstractPersistable;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+
+import javax.persistence.EntityManager;
 
 public abstract class AbstractEntityPersister<E extends AbstractPersistable> {
 
-    public abstract E deepPersist(E entityToPersist, TestEntityManager entityManager);
+    public abstract E deepPersist(E entityToPersist, EntityManager entityManager);
 }

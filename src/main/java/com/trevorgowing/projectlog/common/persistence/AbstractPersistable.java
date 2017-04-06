@@ -2,7 +2,6 @@ package com.trevorgowing.projectlog.common.persistence;
 
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.ToString;
 import org.springframework.data.domain.Persistable;
 
@@ -14,7 +13,6 @@ import java.util.Objects;
 @NoArgsConstructor
 @EqualsAndHashCode
 @ToString
-@Setter
 public abstract class AbstractPersistable<PK extends Serializable> implements Persistable<PK> {
 
     private static final long serialVersionUID = 5662590973333935284L;
@@ -24,6 +22,10 @@ public abstract class AbstractPersistable<PK extends Serializable> implements Pe
     @Column(nullable = false, unique = true)
     @GeneratedValue
     private PK id;
+
+    public AbstractPersistable(PK id) {
+        this.id = id;
+    }
 
     @Override
     public PK getId() {

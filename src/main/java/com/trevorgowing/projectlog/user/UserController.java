@@ -20,13 +20,13 @@ class UserController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    List<UserDTO> getUsers() {
+    List<UserResponseDTO> getUsers() {
         return userRepository.findUserDTOs();
     }
 
     @GetMapping(path = UserConstants.USER_ID_PARAMETER_URL_PATH)
     @ResponseStatus(HttpStatus.OK)
-    UserDTO getUser(@PathVariable long userId) {
+    UserResponseDTO getUser(@PathVariable long userId) {
         return userRepository.findUserDTOById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
     }

@@ -32,6 +32,10 @@ public abstract class AbstractAuditable<U, PK extends Serializable> extends Abst
     @LastModifiedDate
     private Instant lastModifiedDate;
 
+    public AbstractAuditable(PK id) {
+        super(id);
+    }
+
     @Override
     public U getCreatedBy() {
         return createdBy;

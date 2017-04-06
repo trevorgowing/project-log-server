@@ -14,6 +14,7 @@ import java.util.Optional;
 
 import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
 import static com.trevorgowing.projectlog.common.converters.ObjectToJSON.convertToJSON;
+import static com.trevorgowing.projectlog.user.UserResponseDTOBuilder.aUserResponseDTO;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -48,9 +49,9 @@ public class UserControllerUnitTests extends AbstractControllerUnitTests {
                 .log().all()
                 .statusCode(HttpStatus.OK.value())
                 .contentType(ContentType.JSON)
-                .body(sameBeanAs(convertToJSON(Collections.<UserDTO>emptyList())));
+                .body(sameBeanAs(convertToJSON(Collections.<UserResponseDTO>emptyList())));
 
-        List<UserDTO> actualUsers = userController.getUsers();
+        List<UserResponseDTO> actualUsers = userController.getUsers();
 
         // Verify behaviour
         assertThat(actualUsers, is(empty()));
@@ -59,21 +60,21 @@ public class UserControllerUnitTests extends AbstractControllerUnitTests {
     @Test
     public void testGetUsersWithExistingUsers_shouldDelegateToUserRepositoryAndReturnUsers() throws Exception {
         // Set up fixture
-        UserDTO userOne = UserDTO.builder()
+        UserResponseDTO userOne = aUserResponseDTO()
                 .email(IRRELEVANT_USER_EMAIL)
                 .password(IRRELEVANT_USER_PASSWORD)
                 .firstName(IRRELEVANT_USER_FIRST_NAME)
                 .lastName(IRRELEVANT_USER_LAST_NAME)
                 .build();
 
-        UserDTO userTwo = UserDTO.builder()
+        UserResponseDTO userTwo = aUserResponseDTO()
                 .email("usertwo@trevorgowing.com")
                 .password("usertwopassword")
                 .firstName("usertwo")
                 .lastName("gowing")
                 .build();
 
-        List<UserDTO> expectedUsers = asList(userOne, userTwo);
+        List<UserResponseDTO> expectedUsers = asList(userOne, userTwo);
 
         // Set up expectations
         when(userRepository.findUserDTOs()).thenReturn(expectedUsers);
@@ -89,7 +90,7 @@ public class UserControllerUnitTests extends AbstractControllerUnitTests {
                 .contentType(ContentType.JSON)
                 .body(sameBeanAs(convertToJSON(expectedUsers)));
 
-        List<UserDTO> actualUsers = userController.getUsers();
+        List<UserResponseDTO> actualUsers = userController.getUsers();
 
         // Verify behaviour
         assertThat(actualUsers, is(expectedUsers));
@@ -117,7 +118,7 @@ public class UserControllerUnitTests extends AbstractControllerUnitTests {
     @Test
     public void testGetUserWithExistingUser_shouldReturnUser() throws Exception {
         // Set up fixture
-        UserDTO expectedUser = UserDTO.builder()
+        UserResponseDTO expectedUser = aUserResponseDTO()
                 .email(IRRELEVANT_USER_EMAIL)
                 .password(IRRELEVANT_USER_PASSWORD)
                 .firstName(IRRELEVANT_USER_FIRST_NAME)
@@ -139,9 +140,9 @@ public class UserControllerUnitTests extends AbstractControllerUnitTests {
                 .contentType(ContentType.JSON)
                 .body(sameBeanAs(convertToJSON(expectedUser)));
 
-        UserDTO actualUserDTO = userController.getUser(IRRELEVANT_USER_ID);
+        UserResponseDTO actualUserResponseDTO = userController.getUser(IRRELEVANT_USER_ID);
 
         // Verify behaviour
-        assertThat(actualUserDTO, sameBeanAs(expectedUser));
+        assertThat(actualUserResponseDTO, sameBeanAs(expectedUser));
     }
 }
