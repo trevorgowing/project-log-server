@@ -31,8 +31,6 @@ public class UserControllerUnitTests extends AbstractControllerUnitTests {
     private UserDTOFactory userDTOFactory;
     @Mock
     private UserCRUDService userCRUDService;
-    @Mock
-    private UserRepository userRepository;
 
     @InjectMocks
     private UserController userController;
@@ -45,7 +43,7 @@ public class UserControllerUnitTests extends AbstractControllerUnitTests {
     @Test
     public void testGetUsersWithNoExistingUsers_shouldDelegateToUserRepositoryAndReturnEmptyCollection() throws Exception {
         // Set up expectations
-        when(userRepository.findUserDTOs()).thenReturn(Collections.emptyList());
+        when(userCRUDService.findUserDTOs()).thenReturn(Collections.emptyList());
 
         // Exercise SUT
         given()
@@ -84,7 +82,7 @@ public class UserControllerUnitTests extends AbstractControllerUnitTests {
         List<UserResponseDTO> expectedUsers = asList(userOne, userTwo);
 
         // Set up expectations
-        when(userRepository.findUserDTOs()).thenReturn(expectedUsers);
+        when(userCRUDService.findUserDTOs()).thenReturn(expectedUsers);
 
         // Exercise SUT
         given()
@@ -106,7 +104,7 @@ public class UserControllerUnitTests extends AbstractControllerUnitTests {
     @Test(expected = UserNotFoundException.class)
     public void testGetUserWithNoExistingUser_shouldThrowUserNotFoundException() {
         // Set up expectations
-        when(userRepository.findUserDTOById(IRRELEVANT_USER_ID))
+        when(userCRUDService.findUserDTOById(IRRELEVANT_USER_ID))
                 .thenReturn(Optional.empty());
 
         // Exercise SUT
@@ -132,7 +130,7 @@ public class UserControllerUnitTests extends AbstractControllerUnitTests {
                 .build();
 
         // Set up expectations
-        when(userRepository.findUserDTOById(IRRELEVANT_USER_ID))
+        when(userCRUDService.findUserDTOById(IRRELEVANT_USER_ID))
                 .thenReturn(Optional.of(expectedUser));
 
         // Exercise SUT

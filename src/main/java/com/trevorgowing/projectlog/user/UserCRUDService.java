@@ -2,6 +2,9 @@ package com.trevorgowing.projectlog.user;
 
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Optional;
+
 import static com.trevorgowing.projectlog.user.User.unidentifiedUser;
 
 @Service
@@ -11,6 +14,14 @@ class UserCRUDService {
 
     UserCRUDService(UserRepository userRepository) {
         this.userRepository = userRepository;
+    }
+
+    List<UserResponseDTO> findUserDTOs() {
+        return userRepository.findUserDTOs();
+    }
+
+    Optional<UserResponseDTO> findUserDTOById(long userId) {
+        return userRepository.findUserDTOById(userId);
     }
 
     User createUser(String email, String password, String firstName, String lastName) {

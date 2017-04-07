@@ -15,24 +15,22 @@ class UserController {
 
     private final UserDTOFactory userDTOFactory;
     private final UserCRUDService userCRUDService;
-    private final UserRepository userRepository;
 
-    UserController(UserDTOFactory userDTOFactory, UserCRUDService userCRUDService, UserRepository userRepository) {
+    UserController(UserDTOFactory userDTOFactory, UserCRUDService userCRUDService) {
         this.userDTOFactory = userDTOFactory;
         this.userCRUDService = userCRUDService;
-        this.userRepository = userRepository;
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseStatus(HttpStatus.OK)
     List<UserResponseDTO> getUsers() {
-        return userRepository.findUserDTOs();
+        return userCRUDService.findUserDTOs();
     }
 
     @GetMapping(path = UserConstants.USER_ID_PARAMETER_URL_PATH, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseStatus(HttpStatus.OK)
     UserResponseDTO getUser(@PathVariable long userId) {
-        return userRepository.findUserDTOById(userId)
+        return userCRUDService.findUserDTOById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
     }
 

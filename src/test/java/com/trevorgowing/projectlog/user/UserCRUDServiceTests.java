@@ -5,6 +5,10 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
 import static com.trevorgowing.projectlog.user.UserBuilder.aUser;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -18,6 +22,38 @@ public class UserCRUDServiceTests extends AbstractTests {
 
     @InjectMocks
     private UserCRUDService userCRUDService;
+
+    @Test
+    public void testFindUserDTOs_shouldDelegateToUserRepositoryToFindUserDTOs() {
+        // Set up fixture
+        List<UserResponseDTO> expectedUserResponseDTOs = Collections.emptyList();
+
+        // Set up expectations
+        when(userRepository.findUserDTOs())
+                .thenReturn(expectedUserResponseDTOs);
+
+        // Exercise SUT
+        List<UserResponseDTO> actualUserResponseDTOs = userCRUDService.findUserDTOs();
+
+        // Verify behaviour
+        assertThat(actualUserResponseDTOs, is(expectedUserResponseDTOs));
+    }
+
+    @Test
+    public void testFindUserDTOById_shouldDelegateToUserRepositoryToFindUser() {
+        // Set up fixture
+        Optional<UserResponseDTO> expectedOptionalUserReponseDTO = Optional.empty();
+
+        // Set up expectations
+        when(userRepository.findUserDTOById(IRRELEVANT_USER_ID))
+                .thenReturn(expectedOptionalUserReponseDTO);
+
+        // Exercise SUT
+        Optional<UserResponseDTO> actualOptionalUserResponseDTO = userCRUDService.findUserDTOById(IRRELEVANT_USER_ID);
+
+        // Verify behaviour
+        assertThat(actualOptionalUserResponseDTO, is(expectedOptionalUserReponseDTO));
+    }
 
     @Test
     public void testCreateUser_shouldReturnPersistAndReturnNewManagedUser() throws Exception {
