@@ -2,13 +2,13 @@ package com.trevorgowing.projectlog.user;
 
 import org.springframework.stereotype.Service;
 
-import static com.trevorgowing.projectlog.user.UserResponseDTO.completeUserResponseDTO;
+import static com.trevorgowing.projectlog.user.IdentifiedUserDTO.completeIdentifiedUserDTO;
 
 @Service
 class UserDTOFactory {
 
-    UserResponseDTO createUserResponseDTO(User user) {
-        return completeUserResponseDTO(user.getId(), user.getEmail(), user.getPassword(), user.getFirstName(),
+    IdentifiedUserDTO createIdentifiedUserDTO(User user) {
+        return completeIdentifiedUserDTO(user.getId(), user.getEmail(), user.getPassword(), user.getFirstName(),
                 user.getLastName());
     }
 }

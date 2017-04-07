@@ -6,7 +6,11 @@ class UserNotFoundException extends RuntimeException {
 
     static final String REASON = "User not found for id";
 
-    UserNotFoundException(long userId) {
+    private UserNotFoundException(long userId) {
         super(REASON + ": " + userId);
+    }
+
+    static UserNotFoundException identifiedUserNotFoundException(long userId) {
+        return new UserNotFoundException(userId);
     }
 }

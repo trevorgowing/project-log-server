@@ -5,16 +5,16 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
+import static com.trevorgowing.projectlog.user.IdentifiedUserDTOBuilder.anIdentifiedUserDTO;
 import static com.trevorgowing.projectlog.user.UserBuilder.aUser;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class UserCRUDServiceUnitTests extends AbstractTests {
 
@@ -25,39 +25,75 @@ public class UserCRUDServiceUnitTests extends AbstractTests {
     private UserCRUDService userCRUDService;
 
     @Test
-    public void testFindUserDTOs_shouldDelegateToUserRepositoryToFindUserDTOs() {
+    public void testFindIdentifiedUserDTOs_shouldDelegateToUserRepositoryAndReturnIdentifiedUserDTOs() {
         // Set up fixture
-        List<UserResponseDTO> expectedUserResponseDTOs = Collections.emptyList();
+        List<IdentifiedUserDTO> expectedIdentifiedUserDTOs = Collections.emptyList();
 
         // Set up expectations
-        when(userRepository.findUserDTOs())
-                .thenReturn(expectedUserResponseDTOs);
+        when(userRepository.findIdentifiedUserDTOs())
+                .thenReturn(expectedIdentifiedUserDTOs);
 
         // Exercise SUT
-        List<UserResponseDTO> actualUserResponseDTOs = userCRUDService.findUserDTOs();
+        List<IdentifiedUserDTO> actualIdentifiedUserDTOs = userCRUDService.findIdentifiedUserDTOs();
 
         // Verify behaviour
-        assertThat(actualUserResponseDTOs, is(expectedUserResponseDTOs));
+        assertThat(actualIdentifiedUserDTOs, is(expectedIdentifiedUserDTOs));
+    }
+
+    @Test(expected = UserNotFoundException.class)
+    public void testFindIdentifiedUserDTOByIdWithNoMatchingUser_shouldDelegateToUserRepositoryAndThrowUserNotFoundException() {
+        // Set up expectations
+        when(userRepository.findIdentifiedUserDTOById(IRRELEVANT_USER_ID))
+                .thenReturn(null);
+
+        // Exercise SUT
+        userCRUDService.findIdentifiedUserDTOById(IRRELEVANT_USER_ID);
     }
 
     @Test
-    public void testFindUserDTOById_shouldDelegateToUserRepositoryToFindUser() {
+    public void testFindIdentifiedUserDTOByIdWithMatchingUser_shouldDelegateToUserRepositoryAndReturnIdentifiedUserDTO() {
         // Set up fixture
-        Optional<UserResponseDTO> expectedOptionalUserReponseDTO = Optional.empty();
+        IdentifiedUserDTO expectedIdentifiedUserDTO = anIdentifiedUserDTO()
+                .id(IRRELEVANT_USER_ID)
+                .email(IRRELEVANT_USER_EMAIL)
+                .password(IRRELEVANT_USER_PASSWORD)
+                .firstName(IRRELEVANT_USER_FIRST_NAME)
+                .lastName(IRRELEVANT_USER_LAST_NAME)
+                .build();
 
         // Set up expectations
-        when(userRepository.findUserDTOById(IRRELEVANT_USER_ID))
-                .thenReturn(expectedOptionalUserReponseDTO);
+        when(userRepository.findIdentifiedUserDTOById(IRRELEVANT_USER_ID)).thenReturn(expectedIdentifiedUserDTO);
 
-        // Exercise SUT
-        Optional<UserResponseDTO> actualOptionalUserResponseDTO = userCRUDService.findUserDTOById(IRRELEVANT_USER_ID);
+        //Exercise SUT
+        IdentifiedUserDTO actualIdentifiedUserDTO = userCRUDService.findIdentifiedUserDTOById(IRRELEVANT_USER_ID);
 
         // Verify behaviour
-        assertThat(actualOptionalUserResponseDTO, is(expectedOptionalUserReponseDTO));
+        assertThat(actualIdentifiedUserDTO, is(expectedIdentifiedUserDTO));
+    }
+
+    @Test(expected = DuplicateEmailException.class)
+    public void testCreateUserWithDuplicateEmail_shouldDelegateToUserRepositoryAndThrowDuplicateEmailException()
+            throws Exception {
+        // Set up fixture
+        User unidentifiedUser = aUser()
+                .email(IRRELEVANT_USER_EMAIL)
+                .password(IRRELEVANT_USER_PASSWORD)
+                .firstName(IRRELEVANT_USER_FIRST_NAME)
+                .lastName(IRRELEVANT_USER_LAST_NAME)
+                .build();
+
+        // Set up expectations
+        when(userRepository.save(unidentifiedUser))
+                .thenThrow(new DataIntegrityViolationException(IRRELEVANT_MESSAGE));
+
+        // Exercise SUT
+        userCRUDService.createUser(IRRELEVANT_USER_EMAIL, IRRELEVANT_USER_PASSWORD,
+                IRRELEVANT_USER_FIRST_NAME, IRRELEVANT_USER_LAST_NAME);
     }
 
     @Test
-    public void testCreateUser_shouldReturnPersistAndReturnNewManagedUser() throws Exception {
+    public void testCreateUserWithValidUser_shouldDelegateToUserRepositoryToSaveCreatedUserAndReturnManagedUser()
+            throws Exception {
         // Set up fixture
         User unidentifiedUser = aUser()
                 .email(IRRELEVANT_USER_EMAIL)
@@ -87,7 +123,7 @@ public class UserCRUDServiceUnitTests extends AbstractTests {
     }
 
     @Test(expected = UserNotFoundException.class)
-    public void testUpdateUserWithNoExistingUser_shouldDelegateToUserRepositoryAndThrowUserNotFoundException() {
+    public void testUpdateUserWithNoMatchingUser_shouldDelegateToUserRepositoryAndThrowUserNotFoundException() {
         // Set up expectations
         when(userRepository.findOne(IRRELEVANT_USER_ID))
                 .thenReturn(null);
@@ -97,9 +133,8 @@ public class UserCRUDServiceUnitTests extends AbstractTests {
                 IRRELEVANT_USER_FIRST_NAME, IRRELEVANT_USER_LAST_NAME);
     }
 
-    @SuppressWarnings("unchecked")
-    @Test(expected = DuplicateUserException.class)
-    public void testUpdateUserWithDuplicateEmail_shouldDeleteGateToUserRepositoryAndThrowDuplicateUserException() {
+    @Test(expected = DuplicateEmailException.class)
+    public void testUpdateUserWithDuplicateEmail_shouldDelegateToUserRepositoryAndThrowDuplicateUserException() {
         // Set up fixture
         User userWithDuplicateEmail = aUser()
                 .id(IRRELEVANT_USER_ID)
@@ -113,7 +148,7 @@ public class UserCRUDServiceUnitTests extends AbstractTests {
         when(userRepository.findOne(IRRELEVANT_USER_ID))
                 .thenReturn(userWithDuplicateEmail);
         when(userRepository.save(userWithDuplicateEmail))
-                .thenThrow(DataIntegrityViolationException.class);
+                .thenThrow(new DataIntegrityViolationException(IRRELEVANT_MESSAGE));
 
         // Exercise SUT
         userCRUDService.updateUser(IRRELEVANT_USER_ID, IRRELEVANT_USER_EMAIL, IRRELEVANT_USER_PASSWORD,
@@ -144,8 +179,17 @@ public class UserCRUDServiceUnitTests extends AbstractTests {
         assertThat(actualUser, is(expectedUser));
     }
 
+    @Test(expected = UserNotFoundException.class)
+    public void testDeleteUserWithNoMatchingUser_shouldDelegateToUserRepositoryAndThrowUserNotFoundException() {
+        // Set up expectations
+        doThrow(new EmptyResultDataAccessException(1)).when(userRepository).delete(IRRELEVANT_USER_ID);
+
+        // Exercise SUT
+        userCRUDService.deleteUser(IRRELEVANT_USER_ID);
+    }
+
     @Test
-    public void testDeleteUser_shouldDelegateToUserRepositoryToDeleteUser() {
+    public void testDeleteUserWithMatchingUser_shouldDelegateToUserRepositoryToDeleteUser() {
         // Set up expectations
         doNothing().when(userRepository).delete(IRRELEVANT_USER_ID);
 

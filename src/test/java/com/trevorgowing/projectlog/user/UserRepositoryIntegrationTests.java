@@ -5,15 +5,13 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
-import java.util.Optional;
 
 import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
+import static com.trevorgowing.projectlog.user.IdentifiedUserDTOBuilder.anIdentifiedUserDTO;
 import static com.trevorgowing.projectlog.user.UserBuilder.aUser;
-import static com.trevorgowing.projectlog.user.UserResponseDTOBuilder.aUserResponseDTO;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 
 public class UserRepositoryIntegrationTests extends AbstractRepositoryIntegrationTests {
 
@@ -26,16 +24,16 @@ public class UserRepositoryIntegrationTests extends AbstractRepositoryIntegratio
     private UserRepository userRepository;
 
     @Test
-    public void testFindUserDTOsWithNoExistingUsers_shouldReturnNoUsers() {
+    public void testFindIdentifiedUserDTOsWithNoExistingUsers_shouldReturnNoIdentifiedUserDTOs() {
         // Exercise SUT
-        List<UserResponseDTO> actualUserResponseDTOS = userRepository.findUserDTOs();
+        List<IdentifiedUserDTO> actualIdentifiedUserDTOS = userRepository.findIdentifiedUserDTOs();
 
         // Verify results
-        assertThat(actualUserResponseDTOS, is(empty()));
+        assertThat(actualIdentifiedUserDTOS, is(empty()));
     }
 
     @Test
-    public void testFindUserDTOsWithExistingUsers_shouldReturnAllUsers() {
+    public void testFindIdentifiedUserDTOsWithExistingUsers_shouldReturnIdentifiedUserDTOs() {
         // Set up fixture
         User userOne = aUser()
                 .email(IRRELEVANT_USER_EMAIL)
@@ -44,7 +42,7 @@ public class UserRepositoryIntegrationTests extends AbstractRepositoryIntegratio
                 .lastName(IRRELEVANT_USER_LAST_NAME)
                 .buildAndPersist(entityManager);
 
-        UserResponseDTO userOneDTO = aUserResponseDTO()
+        IdentifiedUserDTO identifiedUserOneDTO = anIdentifiedUserDTO()
                 .id(userOne.getId())
                 .email(IRRELEVANT_USER_EMAIL)
                 .password(IRRELEVANT_USER_PASSWORD)
@@ -59,7 +57,7 @@ public class UserRepositoryIntegrationTests extends AbstractRepositoryIntegratio
                 .lastName(USER_TWO_LAST_NAME)
                 .buildAndPersist(entityManager);
 
-        UserResponseDTO userTwoDTO = aUserResponseDTO()
+        IdentifiedUserDTO identifiedUserTwoDTO = anIdentifiedUserDTO()
                 .id(userTwo.getId())
                 .email(USER_TWO_EMAIL)
                 .password(USER_TWO_PASSWORD)
@@ -67,23 +65,23 @@ public class UserRepositoryIntegrationTests extends AbstractRepositoryIntegratio
                 .lastName(USER_TWO_LAST_NAME)
                 .build();
 
-        List<UserResponseDTO> expectedUserResponseDTOS = asList(userOneDTO, userTwoDTO);
+        List<IdentifiedUserDTO> expectedIdentifiedUserDTOS = asList(identifiedUserOneDTO, identifiedUserTwoDTO);
 
         // Exercise SUT
-        List<UserResponseDTO> actualUserResponseDTOS = userRepository.findUserDTOs();
+        List<IdentifiedUserDTO> actualIdentifiedUserDTOS = userRepository.findIdentifiedUserDTOs();
 
         // Verify results
-        assertThat(actualUserResponseDTOS, is(expectedUserResponseDTOS));
+        assertThat(actualIdentifiedUserDTOS, is(expectedIdentifiedUserDTOS));
     }
 
     @Test
-    public void testFindUserDTOByUserIdWithNoExistingUser_shouldEmptyOptional() {
-        Optional<UserResponseDTO> optional = userRepository.findUserDTOById(IRRELEVANT_USER_ID);
-        assertThat(optional.isPresent(), is(false));
+    public void testFindIdentifiedUserDTOByUserIdWithNoMatchingUser_shouldReturnNull() {
+        IdentifiedUserDTO identifiedUserDTO = userRepository.findIdentifiedUserDTOById(IRRELEVANT_USER_ID);
+        assertThat(identifiedUserDTO, is(nullValue(IdentifiedUserDTO.class)));
     }
 
     @Test
-    public void testFindUserDTOByIdWithExistingUser_shouldReturnUserMatchingId() {
+    public void testFindUserDTOByIdWithMatchingUser_shouldReturnMatchingUser() {
         // Set up fixture
         User expectedUser = aUser()
                 .email(IRRELEVANT_USER_EMAIL)
@@ -99,7 +97,7 @@ public class UserRepositoryIntegrationTests extends AbstractRepositoryIntegratio
                 .lastName(USER_TWO_LAST_NAME)
                 .buildAndPersist(entityManager);
 
-        UserResponseDTO expectedUserResponseDTO = aUserResponseDTO()
+        IdentifiedUserDTO expectedIdentifiedUserDTO = anIdentifiedUserDTO()
                 .id(expectedUser.getId())
                 .email(IRRELEVANT_USER_EMAIL)
                 .password(IRRELEVANT_USER_PASSWORD)
@@ -108,11 +106,9 @@ public class UserRepositoryIntegrationTests extends AbstractRepositoryIntegratio
                 .build();
 
         // Exercise SUT
-        Optional<UserResponseDTO> actualUserDTOOptional = userRepository.findUserDTOById(expectedUser.getId());
+        IdentifiedUserDTO actualIdentifiedUserDTO = userRepository.findIdentifiedUserDTOById(expectedUser.getId());
 
         // Verify results
-        assertThat(actualUserDTOOptional.isPresent(), is(true));
-        //noinspection OptionalGetWithoutIsPresent
-        assertThat(actualUserDTOOptional.get(), sameBeanAs(expectedUserResponseDTO));
+        assertThat(actualIdentifiedUserDTO, sameBeanAs(expectedIdentifiedUserDTO));
     }
 }

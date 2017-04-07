@@ -23,32 +23,31 @@ class UserController {
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    List<UserResponseDTO> getUsers() {
-        return userCRUDService.findUserDTOs();
+    List<IdentifiedUserDTO> getUsers() {
+        return userCRUDService.findIdentifiedUserDTOs();
     }
 
     @GetMapping(path = UserConstants.USER_ID_PARAMETER_URL_PATH, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    UserResponseDTO getUser(@PathVariable long userId) {
-        return userCRUDService.findUserDTOById(userId)
-                .orElseThrow(() -> new UserNotFoundException(userId));
+    IdentifiedUserDTO getUser(@PathVariable long userId) {
+        return userCRUDService.findIdentifiedUserDTOById(userId);
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    UserResponseDTO postUser(@RequestBody UserRequestDTO userRequestDTO) {
-        User user = userCRUDService.createUser(userRequestDTO.getEmail(), userRequestDTO.getPassword(),
-                userRequestDTO.getFirstName(), userRequestDTO.getLastName());
-        return userDTOFactory.createUserResponseDTO(user);
+    IdentifiedUserDTO postUser(@RequestBody UnidentifiedUserDTO unidentifiedUserDTO) {
+        User user = userCRUDService.createUser(unidentifiedUserDTO.getEmail(), unidentifiedUserDTO.getPassword(),
+                unidentifiedUserDTO.getFirstName(), unidentifiedUserDTO.getLastName());
+        return userDTOFactory.createIdentifiedUserDTO(user);
     }
 
     @PutMapping(path = UserConstants.USER_ID_PARAMETER_URL_PATH, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    UserResponseDTO putUser(@PathVariable long userId, @RequestBody UserResponseDTO userResponseDTO) {
-        User updatedUser = userCRUDService.updateUser(userId, userResponseDTO.getEmail(),
-                userResponseDTO.getPassword(), userResponseDTO.getFirstName(), userResponseDTO.getLastName());
-        return userDTOFactory.createUserResponseDTO(updatedUser);
+    IdentifiedUserDTO putUser(@PathVariable long userId, @RequestBody IdentifiedUserDTO identifiedUserDTO) {
+        User updatedUser = userCRUDService.updateUser(userId, identifiedUserDTO.getEmail(),
+                identifiedUserDTO.getPassword(), identifiedUserDTO.getFirstName(), identifiedUserDTO.getLastName());
+        return userDTOFactory.createIdentifiedUserDTO(updatedUser);
     }
 
     @DeleteMapping(path = UserConstants.USER_ID_PARAMETER_URL_PATH)
@@ -63,9 +62,9 @@ class UserController {
         log.warn(userNotFoundException.getMessage(), userNotFoundException);
     }
 
-    @ExceptionHandler(DuplicateUserException.class)
-    @ResponseStatus(code = HttpStatus.CONFLICT, reason = DuplicateUserException.REASON)
-    public void handleDuplicateUserException(DuplicateUserException duplicateUserException) {
-        log.warn(duplicateUserException.getMessage(), duplicateUserException);
+    @ExceptionHandler(DuplicateEmailException.class)
+    @ResponseStatus(code = HttpStatus.CONFLICT, reason = DuplicateEmailException.REASON)
+    public void handleDuplicateEmailException(DuplicateEmailException duplicateEmailException) {
+        log.warn(duplicateEmailException.getMessage(), duplicateEmailException);
     }
 }

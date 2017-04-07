@@ -1,12 +1,16 @@
 package com.trevorgowing.projectlog.user;
 
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
+import static com.trevorgowing.projectlog.user.DuplicateEmailException.causedDuplicateEmailException;
 import static com.trevorgowing.projectlog.user.User.unidentifiedUser;
+import static com.trevorgowing.projectlog.user.UserNotFoundException.identifiedUserNotFoundException;
+import static java.util.Optional.ofNullable;
 
 @Service
 class UserCRUDService {
@@ -17,21 +21,26 @@ class UserCRUDService {
         this.userRepository = userRepository;
     }
 
-    List<UserResponseDTO> findUserDTOs() {
-        return userRepository.findUserDTOs();
+    List<IdentifiedUserDTO> findIdentifiedUserDTOs() {
+        return userRepository.findIdentifiedUserDTOs();
     }
 
-    Optional<UserResponseDTO> findUserDTOById(long userId) {
-        return userRepository.findUserDTOById(userId);
+    IdentifiedUserDTO findIdentifiedUserDTOById(long userId) {
+        return ofNullable(userRepository.findIdentifiedUserDTOById(userId))
+                .orElseThrow(() -> identifiedUserNotFoundException(userId));
     }
 
     User createUser(String email, String password, String firstName, String lastName) {
-        return userRepository.save(unidentifiedUser(email, password, firstName, lastName));
+        try {
+            return userRepository.save(unidentifiedUser(email, password, firstName, lastName));
+        } catch (DataIntegrityViolationException dataIntegrityViolationException) {
+            throw causedDuplicateEmailException(email, dataIntegrityViolationException);
+        }
     }
 
     User updateUser(long userId, String email, String password, String firstName, String lastName) {
-        Optional<User> optionalUserToUpdate = Optional.ofNullable(userRepository.findOne(userId));
-        User userToUpdate = optionalUserToUpdate.orElseThrow(() -> new UserNotFoundException(userId));
+        Optional<User> optionalUserToUpdate = ofNullable(userRepository.findOne(userId));
+        User userToUpdate = optionalUserToUpdate.orElseThrow(() -> identifiedUserNotFoundException(userId));
 
         userToUpdate.setEmail(email);
         userToUpdate.setPassword(password);
@@ -40,12 +49,16 @@ class UserCRUDService {
 
         try {
             return userRepository.save(userToUpdate);
-        } catch (DataIntegrityViolationException constraintViolationException) {
-            throw new DuplicateUserException(email);
+        } catch (DataIntegrityViolationException dataIntegrityViolationException) {
+            throw causedDuplicateEmailException(email, dataIntegrityViolationException);
         }
     }
 
     void deleteUser(long userId) {
-        userRepository.delete(userId);
+        try {
+            userRepository.delete(userId);
+        } catch (EmptyResultDataAccessException emptyResultDataAccessException) {
+            throw identifiedUserNotFoundException(userId);
+        }
     }
 }

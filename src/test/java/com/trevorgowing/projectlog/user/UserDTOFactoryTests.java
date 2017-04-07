@@ -4,8 +4,8 @@ import com.trevorgowing.projectlog.common.types.AbstractTests;
 import org.junit.Test;
 
 import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
+import static com.trevorgowing.projectlog.user.IdentifiedUserDTOBuilder.anIdentifiedUserDTO;
 import static com.trevorgowing.projectlog.user.UserBuilder.aUser;
-import static com.trevorgowing.projectlog.user.UserResponseDTOBuilder.aUserResponseDTO;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class UserDTOFactoryTests extends AbstractTests {
@@ -13,7 +13,7 @@ public class UserDTOFactoryTests extends AbstractTests {
     private final UserDTOFactory userDTOFactory = new UserDTOFactory();
 
     @Test
-    public void testCreateUserResponseDTO_shouldReturnNewUserResponseDTO() throws Exception {
+    public void testCreateIdentifiedUserDTO_shouldCreateIdentifiedUserDTOFromGivenUser() throws Exception {
         // Set up fixture
         User user = aUser()
                 .id(IRRELEVANT_USER_ID)
@@ -23,7 +23,7 @@ public class UserDTOFactoryTests extends AbstractTests {
                 .lastName(IRRELEVANT_USER_LAST_NAME)
                 .build();
 
-        UserResponseDTO expectedUserResponseDTO = aUserResponseDTO()
+        IdentifiedUserDTO expectedIdentifiedUserDTO = anIdentifiedUserDTO()
                 .id(IRRELEVANT_USER_ID)
                 .email(IRRELEVANT_USER_EMAIL)
                 .password(IRRELEVANT_USER_PASSWORD)
@@ -32,9 +32,9 @@ public class UserDTOFactoryTests extends AbstractTests {
                 .build();
 
         // Exercise SUT
-        UserResponseDTO actualUserResponseDTO = userDTOFactory.createUserResponseDTO(user);
+        IdentifiedUserDTO actualIdentifiedUserDTO = userDTOFactory.createIdentifiedUserDTO(user);
 
         // Verify behaviour and state
-        assertThat(actualUserResponseDTO, sameBeanAs(expectedUserResponseDTO));
+        assertThat(actualIdentifiedUserDTO, sameBeanAs(expectedIdentifiedUserDTO));
     }
 }
