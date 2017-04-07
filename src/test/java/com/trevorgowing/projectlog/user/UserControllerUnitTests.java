@@ -16,6 +16,8 @@ import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
 import static com.trevorgowing.projectlog.common.converters.ObjectToJSON.convertToJSON;
 import static com.trevorgowing.projectlog.user.DuplicateUserExceptionBuilder.aDuplicateUserException;
 import static com.trevorgowing.projectlog.user.UserBuilder.aUser;
+import static com.trevorgowing.projectlog.user.UserNotFoundExceptionBuilder.aUserNotFoundException;
+import static com.trevorgowing.projectlog.user.UserRequestDTOBuilder.aUserRequestDTO;
 import static com.trevorgowing.projectlog.user.UserResponseDTOBuilder.aUserResponseDTO;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static java.util.Arrays.asList;
@@ -122,7 +124,7 @@ public class UserControllerUnitTests extends AbstractControllerUnitTests {
     @Test
     public void testGetUserWithExistingUser_shouldReturnUser() throws Exception {
         // Set up fixture
-        UserResponseDTO expectedUser = aUserResponseDTO()
+        UserResponseDTO expectedResponseBody = aUserResponseDTO()
                 .email(IRRELEVANT_USER_EMAIL)
                 .password(IRRELEVANT_USER_PASSWORD)
                 .firstName(IRRELEVANT_USER_FIRST_NAME)
@@ -131,7 +133,7 @@ public class UserControllerUnitTests extends AbstractControllerUnitTests {
 
         // Set up expectations
         when(userCRUDService.findUserDTOById(IRRELEVANT_USER_ID))
-                .thenReturn(Optional.of(expectedUser));
+                .thenReturn(Optional.of(expectedResponseBody));
 
         // Exercise SUT
         given()
@@ -142,18 +144,18 @@ public class UserControllerUnitTests extends AbstractControllerUnitTests {
                 .log().all()
                 .statusCode(HttpStatus.OK.value())
                 .contentType(ContentType.JSON)
-                .body(sameBeanAs(convertToJSON(expectedUser)));
+                .body(sameBeanAs(convertToJSON(expectedResponseBody)));
 
         UserResponseDTO actualUserResponseDTO = userController.getUser(IRRELEVANT_USER_ID);
 
         // Verify behaviour
-        assertThat(actualUserResponseDTO, sameBeanAs(expectedUser));
+        assertThat(actualUserResponseDTO, is(expectedResponseBody));
     }
 
     @Test(expected = DuplicateUserException.class)
     public void testPostUserWithDuplicateEmail_shouldThrowDuplicateUserException() throws Exception {
         // Set up fixture
-        UserRequestDTO userRequestDTO = aUserResponseDTO()
+        UserRequestDTO requestBody = aUserRequestDTO()
                 .email(IRRELEVANT_USER_EMAIL)
                 .password(IRRELEVANT_USER_PASSWORD)
                 .firstName(IRRELEVANT_USER_FIRST_NAME)
@@ -171,21 +173,21 @@ public class UserControllerUnitTests extends AbstractControllerUnitTests {
         // Exercise SUT
         given()
                 .contentType(ContentType.JSON)
-                .body(convertToJSON(userRequestDTO))
+                .body(convertToJSON(requestBody))
         .when()
                 .post(UserConstants.USERS_URL_PATH)
         .then()
                 .log().all()
                 .statusCode(HttpStatus.CONFLICT.value());
 
-        userController.postUser(userRequestDTO);
+        userController.postUser(requestBody);
     }
 
     @Test
     public void testPostUserWithUniqueUser_shouldDelegateToUserCRUDServiceToCreateUserAndUserDTOFactoryToBuildResponse()
             throws Exception {
         // Set up fixture
-        UserRequestDTO userRequestDTO = aUserResponseDTO()
+        UserRequestDTO requestBody = aUserRequestDTO()
                 .email(IRRELEVANT_USER_EMAIL)
                 .password(IRRELEVANT_USER_PASSWORD)
                 .firstName(IRRELEVANT_USER_FIRST_NAME)
@@ -200,7 +202,7 @@ public class UserControllerUnitTests extends AbstractControllerUnitTests {
                 .lastName(IRRELEVANT_USER_LAST_NAME)
                 .build();
 
-        UserResponseDTO expectedUserResponseDTO = aUserResponseDTO()
+        UserResponseDTO expectedResponseBody = aUserResponseDTO()
                 .id(IRRELEVANT_USER_ID)
                 .email(IRRELEVANT_USER_EMAIL)
                 .password(IRRELEVANT_USER_PASSWORD)
@@ -212,23 +214,140 @@ public class UserControllerUnitTests extends AbstractControllerUnitTests {
         when(userCRUDService.createUser(IRRELEVANT_USER_EMAIL, IRRELEVANT_USER_PASSWORD, IRRELEVANT_USER_FIRST_NAME,
                 IRRELEVANT_USER_LAST_NAME)).thenReturn(user);
         when(userDTOFactory.createUserResponseDTO(user))
-                .thenReturn(expectedUserResponseDTO);
+                .thenReturn(expectedResponseBody);
 
         // Exercise SUT
         given()
                 .contentType(ContentType.JSON)
-                .body(convertToJSON(userRequestDTO))
+                .body(convertToJSON(requestBody))
         .when()
                 .post(UserConstants.USERS_URL_PATH)
         .then()
                 .log().all()
                 .contentType(ContentType.JSON)
-                .statusCode(HttpStatus.CREATED.value());
+                .statusCode(HttpStatus.CREATED.value())
+                .body(sameBeanAs(convertToJSON(expectedResponseBody)));
 
-        UserResponseDTO actualUserResponseDTO = userController.postUser(userRequestDTO);
+        UserResponseDTO actualUserResponseDTO = userController.postUser(requestBody);
 
         // Verify behaviour
-        assertThat(actualUserResponseDTO, is(expectedUserResponseDTO));
+        assertThat(actualUserResponseDTO, is(expectedResponseBody));
+    }
+
+    @Test(expected = UserNotFoundException.class)
+    public void testPutUserWithNoExistingUser_shouldThrowUserNotFoundException() throws Exception {
+        // Set up fixture
+        UserResponseDTO requestBody = aUserResponseDTO()
+                .id(IRRELEVANT_USER_ID)
+                .email(IRRELEVANT_USER_EMAIL)
+                .password(IRRELEVANT_USER_PASSWORD)
+                .firstName(IRRELEVANT_USER_FIRST_NAME)
+                .lastName(IRRELEVANT_USER_LAST_NAME)
+                .build();
+
+        UserNotFoundException userNotFoundException = aUserNotFoundException()
+                .id(IRRELEVANT_USER_ID)
+                .build();
+
+        // Set up expectations
+        when(userCRUDService.updateUser(IRRELEVANT_USER_ID, IRRELEVANT_USER_EMAIL, IRRELEVANT_USER_PASSWORD, IRRELEVANT_USER_FIRST_NAME,
+                IRRELEVANT_USER_LAST_NAME)).thenThrow(userNotFoundException);
+
+        // Exercise SUT
+        given()
+                .contentType(ContentType.JSON)
+                .body(convertToJSON(requestBody))
+        .when()
+                .put(UserConstants.USERS_URL_PATH + "/" + IRRELEVANT_USER_ID)
+        .then()
+                .log().all()
+                .statusCode(HttpStatus.NOT_FOUND.value());
+
+        userController.putUser(IRRELEVANT_USER_ID, requestBody);
+    }
+
+    @Test(expected = DuplicateUserException.class)
+    public void testPutUserWithDuplicateEmail_shouldThrowDuplicateUserException() throws Exception {
+        // Set up fixture
+        UserResponseDTO requestBody = aUserResponseDTO()
+                .id(IRRELEVANT_USER_ID)
+                .email(IRRELEVANT_USER_EMAIL)
+                .password(IRRELEVANT_USER_PASSWORD)
+                .firstName(IRRELEVANT_USER_FIRST_NAME)
+                .lastName(IRRELEVANT_USER_LAST_NAME)
+                .build();
+
+        DuplicateUserException duplicateUserException = aDuplicateUserException()
+                .withEmail(IRRELEVANT_USER_EMAIL)
+                .build();
+
+        // Set up expectations
+        when(userCRUDService.updateUser(IRRELEVANT_USER_ID, IRRELEVANT_USER_EMAIL, IRRELEVANT_USER_PASSWORD, IRRELEVANT_USER_FIRST_NAME,
+                IRRELEVANT_USER_LAST_NAME)).thenThrow(duplicateUserException);
+
+        // Exercise SUT
+        given()
+                .contentType(ContentType.JSON)
+                .body(convertToJSON(requestBody))
+        .when()
+                .put(UserConstants.USERS_URL_PATH + "/" + IRRELEVANT_USER_ID)
+        .then()
+                .log().all()
+                .statusCode(HttpStatus.CONFLICT.value());
+
+        userController.putUser(IRRELEVANT_USER_ID, requestBody);
+    }
+
+    @Test
+    public void testPutUserWithUniqueUser_shouldDelegateToUserCRUDServiceToCreateUserAndUserDTOFactoryToBuildResponse()
+            throws Exception {
+        // Set up fixture
+        UserResponseDTO requestBody = aUserResponseDTO()
+                .id(IRRELEVANT_USER_ID)
+                .email(IRRELEVANT_USER_EMAIL)
+                .password(IRRELEVANT_USER_PASSWORD)
+                .firstName(IRRELEVANT_USER_FIRST_NAME)
+                .lastName(IRRELEVANT_USER_LAST_NAME)
+                .build();
+
+        User user = aUser()
+                .id(IRRELEVANT_USER_ID)
+                .email("email")
+                .password("password")
+                .firstName("first.name")
+                .lastName("last.name")
+                .build();
+
+        UserResponseDTO expectedResponseBody = aUserResponseDTO()
+                .id(IRRELEVANT_USER_ID)
+                .email(IRRELEVANT_USER_EMAIL)
+                .password(IRRELEVANT_USER_PASSWORD)
+                .firstName(IRRELEVANT_USER_FIRST_NAME)
+                .lastName(IRRELEVANT_USER_LAST_NAME)
+                .build();
+
+        // Set up expectations
+        when(userCRUDService.updateUser(IRRELEVANT_USER_ID, IRRELEVANT_USER_EMAIL, IRRELEVANT_USER_PASSWORD,
+                IRRELEVANT_USER_FIRST_NAME, IRRELEVANT_USER_LAST_NAME)).thenReturn(user);
+        when(userDTOFactory.createUserResponseDTO(user))
+                .thenReturn(expectedResponseBody);
+
+        // Exercise SUT
+        given()
+                .contentType(ContentType.JSON)
+                .body(convertToJSON(requestBody))
+        .when()
+                .put(UserConstants.USERS_URL_PATH + "/" + IRRELEVANT_USER_ID)
+        .then()
+                .log().all()
+                .contentType(ContentType.JSON)
+                .statusCode(HttpStatus.OK.value())
+                .body(sameBeanAs(convertToJSON(expectedResponseBody)));
+
+        UserResponseDTO actualResponseBody = userController.putUser(IRRELEVANT_USER_ID, requestBody);
+
+        // Verify behaviour
+        assertThat(actualResponseBody, is(expectedResponseBody));
     }
 
     @Test

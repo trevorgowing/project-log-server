@@ -34,12 +34,6 @@ class UserController {
                 .orElseThrow(() -> new UserNotFoundException(userId));
     }
 
-    @ExceptionHandler(UserNotFoundException.class)
-    @ResponseStatus(code = HttpStatus.NOT_FOUND, reason = UserNotFoundException.REASON)
-    public void handleUserNotFoundException(UserNotFoundException userNotFoundException) {
-        log.warn(userNotFoundException.getMessage(), userNotFoundException);
-    }
-
     @PostMapping(consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     UserResponseDTO postUser(@RequestBody UserRequestDTO userRequestDTO) {
@@ -48,15 +42,30 @@ class UserController {
         return userDTOFactory.createUserResponseDTO(user);
     }
 
-    @ExceptionHandler(DuplicateUserException.class)
-    @ResponseStatus(code = HttpStatus.CONFLICT, reason = DuplicateUserException.REASON)
-    public void handleDuplicateUserException(DuplicateUserException duplicateUserException) {
-        log.warn(duplicateUserException.getMessage(), duplicateUserException);
+    @PutMapping(path = UserConstants.USER_ID_PARAMETER_URL_PATH, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    UserResponseDTO putUser(@PathVariable long userId, @RequestBody UserResponseDTO userResponseDTO) {
+        User updatedUser = userCRUDService.updateUser(userId, userResponseDTO.getEmail(),
+                userResponseDTO.getPassword(), userResponseDTO.getFirstName(), userResponseDTO.getLastName());
+        return userDTOFactory.createUserResponseDTO(updatedUser);
     }
 
     @DeleteMapping(path = UserConstants.USER_ID_PARAMETER_URL_PATH)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void deleteUser(@PathVariable long userId) {
         userCRUDService.deleteUser(userId);
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    @ResponseStatus(code = HttpStatus.NOT_FOUND, reason = UserNotFoundException.REASON)
+    public void handleUserNotFoundException(UserNotFoundException userNotFoundException) {
+        log.warn(userNotFoundException.getMessage(), userNotFoundException);
+    }
+
+    @ExceptionHandler(DuplicateUserException.class)
+    @ResponseStatus(code = HttpStatus.CONFLICT, reason = DuplicateUserException.REASON)
+    public void handleDuplicateUserException(DuplicateUserException duplicateUserException) {
+        log.warn(duplicateUserException.getMessage(), duplicateUserException);
     }
 }
