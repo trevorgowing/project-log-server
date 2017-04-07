@@ -16,4 +16,8 @@ class UserCRUDService {
     User createUser(String email, String password, String firstName, String lastName) {
         return userRepository.save(unidentifiedUser(email, password, firstName, lastName));
     }
+
+    void deleteUser(long userId) {
+        userRepository.delete(userId);
+    }
 }

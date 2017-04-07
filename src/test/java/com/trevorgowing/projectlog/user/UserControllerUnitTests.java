@@ -22,6 +22,7 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 public class UserControllerUnitTests extends AbstractControllerUnitTests {
@@ -223,11 +224,29 @@ public class UserControllerUnitTests extends AbstractControllerUnitTests {
                 .post(UserConstants.USERS_URL_PATH)
         .then()
                 .log().all()
+                .contentType(ContentType.JSON)
                 .statusCode(HttpStatus.CREATED.value());
 
         UserResponseDTO actualUserResponseDTO = userController.postUser(userRequestDTO);
 
         // Verify behaviour
         assertThat(actualUserResponseDTO, is(expectedUserResponseDTO));
+    }
+
+    @Test
+    public void testDeleteUser_shouldDelegateToUserCRUDServiceToDeleteUser() {
+        // Set up expectations
+        doNothing().when(userCRUDService).deleteUser(IRRELEVANT_USER_ID);
+
+        // Exercise SUT
+        given()
+                .contentType(ContentType.JSON)
+        .when()
+                .delete(UserConstants.USERS_URL_PATH + "/" + IRRELEVANT_USER_ID)
+        .then()
+                .log().all()
+                .statusCode(HttpStatus.NO_CONTENT.value());
+
+        userController.deleteUser(IRRELEVANT_USER_ID);
     }
 }

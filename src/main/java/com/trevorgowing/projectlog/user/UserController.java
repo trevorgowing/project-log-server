@@ -3,6 +3,7 @@ package com.trevorgowing.projectlog.user;
 import com.trevorgowing.projectlog.user.constant.UserConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,13 +23,13 @@ class UserController {
         this.userRepository = userRepository;
     }
 
-    @GetMapping
+    @GetMapping(produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseStatus(HttpStatus.OK)
     List<UserResponseDTO> getUsers() {
         return userRepository.findUserDTOs();
     }
 
-    @GetMapping(path = UserConstants.USER_ID_PARAMETER_URL_PATH)
+    @GetMapping(path = UserConstants.USER_ID_PARAMETER_URL_PATH, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseStatus(HttpStatus.OK)
     UserResponseDTO getUser(@PathVariable long userId) {
         return userRepository.findUserDTOById(userId)
@@ -41,7 +42,7 @@ class UserController {
         log.warn(userNotFoundException.getMessage(), userNotFoundException);
     }
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     UserResponseDTO postUser(@RequestBody UserRequestDTO userRequestDTO) {
         User user = userCRUDService.createUser(userRequestDTO.getEmail(), userRequestDTO.getPassword(),
@@ -53,5 +54,11 @@ class UserController {
     @ResponseStatus(code = HttpStatus.CONFLICT, reason = DuplicateUserException.REASON)
     public void handleDuplicateUserException(DuplicateUserException duplicateUserException) {
         log.warn(duplicateUserException.getMessage(), duplicateUserException);
+    }
+
+    @DeleteMapping(path = UserConstants.USER_ID_PARAMETER_URL_PATH)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void deleteUser(@PathVariable long userId) {
+        userCRUDService.deleteUser(userId);
     }
 }

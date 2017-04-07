@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import static com.trevorgowing.projectlog.user.UserBuilder.aUser;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 public class UserCRUDServiceTests extends AbstractTests {
@@ -46,5 +47,14 @@ public class UserCRUDServiceTests extends AbstractTests {
 
         // Verify behaviour
         assertThat(actualUser, is(expectedUser));
+    }
+
+    @Test
+    public void testDeleteUser_shouldDelegateToUserRepositoryToDeleteUser() {
+        // Set up expectations
+        doNothing().when(userRepository).delete(IRRELEVANT_USER_ID);
+
+        // Exercise SUT
+        userCRUDService.deleteUser(IRRELEVANT_USER_ID);
     }
 }
