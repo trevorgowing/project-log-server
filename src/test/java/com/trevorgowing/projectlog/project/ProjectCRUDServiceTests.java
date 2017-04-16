@@ -18,8 +18,8 @@ import static org.mockito.Mockito.when;
 public class ProjectCRUDServiceTests extends AbstractTests {
 
     private static final long IRRELEVANT_PROJECT_ID = 1L;
-    private static final String IRRELEVANT_CODE = "irrelevant.project.code";
-    private static final String IRRELEVANT_NAME = "irrelevant.project.name";
+    private static final String IRRELEVANT_PROJECT_CODE = "irrelevant.project.code";
+    private static final String IRRELEVANT_PROJECT_NAME = "irrelevant.project.name";
     private static final IdentifiedUserDTO IRRELEVANT_OWNER = anIdentifiedUserDTO()
             .id(IRRELEVANT_USER_ID)
             .email(IRRELEVANT_USER_EMAIL)
@@ -38,8 +38,8 @@ public class ProjectCRUDServiceTests extends AbstractTests {
         // Set up fixture
         IdentifiedProjectDTO identifiedProjectOneDTO = anIdentifiedProjectDTO()
                 .id(IRRELEVANT_PROJECT_ID)
-                .code(IRRELEVANT_CODE)
-                .name(IRRELEVANT_NAME)
+                .code(IRRELEVANT_PROJECT_CODE)
+                .name(IRRELEVANT_PROJECT_NAME)
                 .owner(IRRELEVANT_OWNER)
                 .startDate(IRRELEVANT_DATE)
                 .endDate(IRRELEVANT_DATE)
@@ -66,10 +66,43 @@ public class ProjectCRUDServiceTests extends AbstractTests {
         when(projectRepository.findIdentifiedProjectDTOs()).thenReturn(expectedIdentifiedProjectDTOs);
 
         // Exercise SUT
-
         List<IdentifiedProjectDTO> actualIdentifiedProjectDTOs = projectCRUDService.getIdentifiedProjectDTOs();
 
         // Verify behaviour
         assertThat(actualIdentifiedProjectDTOs, is(expectedIdentifiedProjectDTOs));
+    }
+
+    @Test(expected = ProjectNotFoundException.class)
+    public void testGetIdentifiedProjectDTOByIdWithNoMatchingProject_shouldThrowProjectNotFoundException() {
+        // Set up expectations
+        when(projectRepository.findIdentifiedProjectDTOById(IRRELEVANT_PROJECT_ID))
+                .thenReturn(null);
+
+        // Exercise SUT
+        projectCRUDService.getIdentifiedProjectDTOById(IRRELEVANT_PROJECT_ID);
+    }
+
+    @Test
+    public void testGetIdentifiedProjectDTOByIdWithMatchingProject_shouldReturnProject() {
+        // Set up fixture
+        IdentifiedProjectDTO expectedIdentifiedProjectDTO = anIdentifiedProjectDTO()
+                .id(IRRELEVANT_PROJECT_ID)
+                .code(IRRELEVANT_PROJECT_CODE)
+                .name(IRRELEVANT_PROJECT_NAME)
+                .owner(IRRELEVANT_OWNER)
+                .startDate(IRRELEVANT_DATE)
+                .endDate(IRRELEVANT_DATE)
+                .build();
+
+        // Set up expectations
+        when(projectRepository.findIdentifiedProjectDTOById(IRRELEVANT_PROJECT_ID))
+                .thenReturn(expectedIdentifiedProjectDTO);
+
+        // Exercise SUT
+        IdentifiedProjectDTO actualIdentifiedProjectDTO = projectCRUDService.getIdentifiedProjectDTOById(
+                IRRELEVANT_PROJECT_ID);
+
+        // Verify behaviour
+        assertThat(actualIdentifiedProjectDTO, is(expectedIdentifiedProjectDTO));
     }
 }

@@ -14,6 +14,7 @@ import java.util.List;
 import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
 import static com.trevorgowing.projectlog.common.converters.ObjectToJSON.convertToJSON;
 import static com.trevorgowing.projectlog.project.IdentifiedProjectDTOBuilder.anIdentifiedProjectDTO;
+import static com.trevorgowing.projectlog.project.ProjectNotFoundException.identifiedProjectNotFoundException;
 import static com.trevorgowing.projectlog.user.IdentifiedUserDTOBuilder.anIdentifiedUserDTO;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static java.util.Arrays.asList;
@@ -25,8 +26,8 @@ import static org.mockito.Mockito.when;
 public class ProjectControllerUnitTests extends AbstractControllerUnitTests {
 
     private static final long IRRELEVANT_PROJECT_ID = 1L;
-    private static final String IRRELEVANT_CODE = "irrelevant.project.code";
-    private static final String IRRELEVANT_NAME = "irrelevant.project.name";
+    private static final String IRRELEVANT_PROJECT_CODE = "irrelevant.project.code";
+    private static final String IRRELEVANT_PROJECT_NAME = "irrelevant.project.name";
     private static final IdentifiedUserDTO IRRELEVANT_OWNER = anIdentifiedUserDTO()
             .id(IRRELEVANT_USER_ID)
             .email(IRRELEVANT_USER_EMAIL)
@@ -72,8 +73,8 @@ public class ProjectControllerUnitTests extends AbstractControllerUnitTests {
         // Set up fixture
         IdentifiedProjectDTO identifiedProjectOneDTO = anIdentifiedProjectDTO()
                 .id(IRRELEVANT_PROJECT_ID)
-                .code(IRRELEVANT_CODE)
-                .name(IRRELEVANT_NAME)
+                .code(IRRELEVANT_PROJECT_CODE)
+                .name(IRRELEVANT_PROJECT_NAME)
                 .owner(IRRELEVANT_OWNER)
                 .startDate(IRRELEVANT_DATE)
                 .endDate(IRRELEVANT_DATE)
@@ -112,5 +113,55 @@ public class ProjectControllerUnitTests extends AbstractControllerUnitTests {
 
         // Verify behaviour
         assertThat(actualIdentifiedProjectDTOs, is(expectedIdentifiedProjectDTOs));
+    }
+
+    @Test(expected = ProjectNotFoundException.class)
+    public void testGetProjectByIdWithNoMatchingProject_shouldRespondWithStatusNotFound() {
+        // Set up expectations
+        when(projectCRUDService.getIdentifiedProjectDTOById(IRRELEVANT_PROJECT_ID))
+                .thenThrow(identifiedProjectNotFoundException(IRRELEVANT_PROJECT_ID));
+
+        // Exercise SUT
+        given()
+                .accept(ContentType.JSON)
+        .when()
+                .get(ProjectConstants.PROJECTS_URL_PATH + "/" + IRRELEVANT_PROJECT_ID)
+        .then()
+                .log().all()
+                .statusCode(HttpStatus.NOT_FOUND.value());
+
+        projectController.getProjectById(IRRELEVANT_PROJECT_ID);
+    }
+
+    @Test
+    public void testGetProjectByIdWithMatchingProject_shouldRespondWithStatusOKAndReturnProject() throws Exception {
+        // Set up fixture
+        IdentifiedProjectDTO expectedIdentifiedProjectDTO = anIdentifiedProjectDTO()
+                .id(IRRELEVANT_PROJECT_ID)
+                .code(IRRELEVANT_PROJECT_CODE)
+                .name(IRRELEVANT_PROJECT_NAME)
+                .owner(IRRELEVANT_OWNER)
+                .startDate(IRRELEVANT_DATE)
+                .endDate(IRRELEVANT_DATE)
+                .build();
+
+        // Set up expectations
+        when(projectCRUDService.getIdentifiedProjectDTOById(IRRELEVANT_PROJECT_ID))
+                .thenReturn(expectedIdentifiedProjectDTO);
+
+        // Exercise SUT
+        given()
+                .accept(ContentType.JSON)
+        .when()
+                .get(ProjectConstants.PROJECTS_URL_PATH + "/" + IRRELEVANT_PROJECT_ID)
+        .then()
+                .log().all()
+                .statusCode(HttpStatus.OK.value())
+                .body(sameBeanAs(convertToJSON(expectedIdentifiedProjectDTO)));
+
+        IdentifiedProjectDTO actualIdentifiedProjectDTO = projectController.getProjectById(IRRELEVANT_PROJECT_ID);
+
+        // Verify behaviour
+        assertThat(actualIdentifiedProjectDTO, is(expectedIdentifiedProjectDTO));
     }
 }

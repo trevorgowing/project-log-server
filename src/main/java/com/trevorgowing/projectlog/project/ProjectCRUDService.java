@@ -4,6 +4,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static com.trevorgowing.projectlog.project.ProjectNotFoundException.identifiedProjectNotFoundException;
+import static java.util.Optional.ofNullable;
+
 @Service
 class ProjectCRUDService {
 
@@ -15,5 +18,10 @@ class ProjectCRUDService {
 
     List<IdentifiedProjectDTO> getIdentifiedProjectDTOs() {
         return projectRepository.findIdentifiedProjectDTOs();
+    }
+
+    IdentifiedProjectDTO getIdentifiedProjectDTOById(long projectId) {
+        return ofNullable(projectRepository.findIdentifiedProjectDTOById(projectId))
+                .orElseThrow(() -> identifiedProjectNotFoundException(projectId));
     }
 }
