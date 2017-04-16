@@ -13,6 +13,11 @@ public class IdentifiedUserDTO extends UnidentifiedUserDTO {
 
     private long id;
 
+    /**
+     * Used in constructor queries {@link UserRepository#findIdentifiedUserDTOs()} and
+     * {@link UserRepository#findIdentifiedUserDTOById(long)}.
+     */
+    @SuppressWarnings("unused")
     public IdentifiedUserDTO(long id, String email, String password, String firstName, String lastName) {
         super(email, password, firstName, lastName);
         this.id = id;
@@ -21,6 +26,11 @@ public class IdentifiedUserDTO extends UnidentifiedUserDTO {
     public static IdentifiedUserDTO completeIdentifiedUserDTO(long id, String email, String password, String firstName,
                                                        String lastName) {
         return new IdentifiedUserDTO(id, email, password, firstName, lastName);
+    }
+
+    public static IdentifiedUserDTO passwordFreeIdentifiedUserDTO(long id, String email, String firstName,
+                                                                  String lastName) {
+        return new IdentifiedUserDTO(id, email, null, firstName, lastName);
     }
 
     @Override

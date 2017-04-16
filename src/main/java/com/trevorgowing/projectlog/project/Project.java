@@ -1,4 +1,3 @@
-
 package com.trevorgowing.projectlog.project;
 
 import com.trevorgowing.projectlog.common.persistence.AbstractAuditable;
@@ -6,16 +5,17 @@ import com.trevorgowing.projectlog.common.persistence.DateRange;
 import com.trevorgowing.projectlog.common.persistence.HasDateRange;
 import com.trevorgowing.projectlog.common.persistence.ValidatedDateRange;
 import com.trevorgowing.projectlog.user.User;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDate;
 
+import static java.util.Optional.ofNullable;
+
 @Entity
 @Table(name = "projects")
 @NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 @Setter
 public class Project extends AbstractAuditable<User, Long> implements HasDateRange {
@@ -37,10 +37,20 @@ public class Project extends AbstractAuditable<User, Long> implements HasDateRan
     @ValidatedDateRange
     private DateRange dateRange;
 
-    @SuppressWarnings("unused")
-    public Project(String code, User owner) {
+    private Project(Long id, String code, String name, User owner, DateRange dateRange) {
+        super(id);
         this.code = code;
+        this.name = name;
         this.owner = owner;
+        this.dateRange = dateRange;
+    }
+
+    public static Project unidentifiedProject(String code, String name, User owner, DateRange dateRange) {
+        return new Project(code, name, owner, dateRange);
+    }
+
+    public static Project identifiedProject(Long id, String code, String name, User owner, DateRange dateRange) {
+        return new Project(id, code, name, owner, dateRange);
     }
 
     @Override
@@ -67,6 +77,6 @@ public class Project extends AbstractAuditable<User, Long> implements HasDateRan
 
     @Override
     public void ensureDateRange() {
-        dateRange = dateRange == null ? new DateRange() : dateRange;
+        dateRange = ofNullable(dateRange).isPresent() ? dateRange : new DateRange();
     }
 }

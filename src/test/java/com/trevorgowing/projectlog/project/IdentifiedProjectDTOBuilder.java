@@ -1,0 +1,53 @@
+package com.trevorgowing.projectlog.project;
+
+import com.trevorgowing.projectlog.common.builders.DomainObjectBuilder;
+import com.trevorgowing.projectlog.user.IdentifiedUserDTO;
+
+import java.time.LocalDate;
+
+import static com.trevorgowing.projectlog.project.IdentifiedProjectDTO.completeIdentifiedProjectDTO;
+
+class IdentifiedProjectDTOBuilder extends AbstractProjectDTOBuilder<IdentifiedProjectDTOBuilder>
+        implements DomainObjectBuilder<IdentifiedProjectDTO> {
+
+    private long id;
+
+    static IdentifiedProjectDTOBuilder anIdentifiedProjectDTO() {
+        return new IdentifiedProjectDTOBuilder();
+    }
+
+    @Override
+    public IdentifiedProjectDTO build() {
+        return completeIdentifiedProjectDTO(id, code, name, owner, startDate, endDate);
+    }
+
+    IdentifiedProjectDTOBuilder id(long id) {
+        this.id = id;
+        return this;
+    }
+
+    IdentifiedProjectDTOBuilder code(String code) {
+        this.code = code;
+        return this;
+    }
+
+    IdentifiedProjectDTOBuilder name(String name) {
+        this.name = name;
+        return this;
+    }
+
+    IdentifiedProjectDTOBuilder owner(IdentifiedUserDTO owner) {
+        this.owner = owner;
+        return this;
+    }
+
+    IdentifiedProjectDTOBuilder startDate(LocalDate startDate) {
+        this.startDate = startDate;
+        return this;
+    }
+
+    IdentifiedProjectDTOBuilder endDate(LocalDate endDate) {
+        this.endDate = endDate;
+        return this;
+    }
+}
