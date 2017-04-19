@@ -5,6 +5,7 @@ import com.trevorgowing.projectlog.user.IdentifiedUserDTO;
 
 import java.time.LocalDate;
 
+@SuppressWarnings("unchecked")
 abstract class AbstractProjectDTOBuilder<DOB extends DomainObjectBuilder> {
 
     String code;

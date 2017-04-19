@@ -2,14 +2,22 @@ package com.trevorgowing.projectlog.project;
 
 import com.trevorgowing.projectlog.common.types.AbstractTests;
 import com.trevorgowing.projectlog.user.IdentifiedUserDTO;
+import com.trevorgowing.projectlog.user.User;
+import com.trevorgowing.projectlog.user.UserCRUDService;
+import com.trevorgowing.projectlog.user.UserNotFoundException;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.dao.DataIntegrityViolationException;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static com.trevorgowing.projectlog.project.IdentifiedProjectDTOBuilder.anIdentifiedProjectDTO;
+import static com.trevorgowing.projectlog.project.ProjectBuilder.aProject;
 import static com.trevorgowing.projectlog.user.IdentifiedUserDTOBuilder.anIdentifiedUserDTO;
+import static com.trevorgowing.projectlog.user.UserBuilder.aUser;
+import static com.trevorgowing.projectlog.user.UserNotFoundException.identifiedUserNotFoundException;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -27,6 +35,8 @@ public class ProjectCRUDServiceTests extends AbstractTests {
             .lastName(IRRELEVANT_USER_LAST_NAME)
             .build();
 
+    @Mock
+    private UserCRUDService userCRUDService;
     @Mock
     private ProjectRepository projectRepository;
 
@@ -104,5 +114,81 @@ public class ProjectCRUDServiceTests extends AbstractTests {
 
         // Verify behaviour
         assertThat(actualIdentifiedProjectDTO, is(expectedIdentifiedProjectDTO));
+    }
+
+    @Test(expected = UserNotFoundException.class)
+    public void testCreateProjectWithNonExistentUser_shouldDelegateToUserCRUDServiceAndThrowUserNotFoundException() {
+        // Set up fixture
+        long nonExistentUserID = IRRELEVANT_USER_ID;
+
+        // Set up expectations
+        when(userCRUDService.findUser(nonExistentUserID))
+                .thenThrow(identifiedUserNotFoundException(IRRELEVANT_USER_ID));
+
+        // Exercise SUT
+        projectCRUDService.createProject(IRRELEVANT_PROJECT_CODE, IRRELEVANT_PROJECT_NAME,
+                nonExistentUserID, IRRELEVANT_DATE, IRRELEVANT_DATE);
+    }
+
+    @Test(expected = DuplicateProjectCodeException.class)
+    public void testCreateProjectWithDuplicateCode_shouldDelegateToProjectRepositoryAndThrowDuplicateProjectCodeException() {
+        // Set up fixture
+        String duplicateCode = IRRELEVANT_PROJECT_CODE;
+
+        User identifiedUser = aUser()
+                .id(IRRELEVANT_USER_ID)
+                .build();
+
+        Project unidentifiedProject = aProject()
+                .code(duplicateCode)
+                .name(IRRELEVANT_PROJECT_NAME)
+                .owner(identifiedUser)
+                .startDate(IRRELEVANT_DATE)
+                .endDate(IRRELEVANT_DATE)
+                .build();
+
+        // Set up expectations
+        when(userCRUDService.findUser(IRRELEVANT_USER_ID))
+                .thenReturn(identifiedUser);
+        when(projectRepository.save(unidentifiedProject))
+                .thenThrow(new DataIntegrityViolationException(IRRELEVANT_MESSAGE));
+
+        // Exercise SUT
+        projectCRUDService.createProject(duplicateCode, IRRELEVANT_PROJECT_NAME,
+                IRRELEVANT_USER_ID, IRRELEVANT_DATE, IRRELEVANT_DATE);
+    }
+
+    @Test
+    public void testCreateProjectWithValidProject_shouldDelegateToProjectRepositoryToSaveCreatedProjectAndReturnManagedProject() {
+        // Set up fixture
+        LocalDate startDate = LocalDate.now().plusDays(1);
+        LocalDate endDate = startDate.plusDays(1);
+
+        Project unidentifiedProject = aProject()
+                .code(IRRELEVANT_PROJECT_CODE)
+                .name(IRRELEVANT_PROJECT_NAME)
+                .owner(aUser().id(IRRELEVANT_USER_ID).build())
+                .startDate(startDate)
+                .endDate(endDate)
+                .build();
+
+        Project expectedProject = aProject()
+                .id(IRRELEVANT_PROJECT_ID)
+                .code(IRRELEVANT_PROJECT_CODE)
+                .name(IRRELEVANT_PROJECT_NAME)
+                .owner(aUser().id(IRRELEVANT_USER_ID).build())
+                .startDate(startDate)
+                .endDate(endDate)
+                .build();
+
+        // Set up expectations
+        when(projectRepository.save(unidentifiedProject)).thenReturn(expectedProject);
+
+        // Exercise SUT
+        Project actualProject = projectCRUDService.createProject(IRRELEVANT_PROJECT_CODE, IRRELEVANT_PROJECT_NAME,
+                IRRELEVANT_USER_ID, startDate, endDate);
+
+        // Verify behaviour
+        assertThat(actualProject, is(expectedProject));
     }
 }

@@ -49,6 +49,11 @@ public class Project extends AbstractAuditable<User, Long> implements HasDateRan
         return new Project(code, name, owner, dateRange);
     }
 
+    public static Project unidentifiedProject(String code, String name, User owner, LocalDate startDate,
+                                              LocalDate endDate) {
+        return new Project(code, name, owner, new DateRange(startDate, endDate));
+    }
+
     public static Project identifiedProject(Long id, String code, String name, User owner, DateRange dateRange) {
         return new Project(id, code, name, owner, dateRange);
     }

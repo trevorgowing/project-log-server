@@ -12,7 +12,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
-import static com.trevorgowing.projectlog.common.converters.ObjectToJSON.convertToJSON;
+import static com.trevorgowing.projectlog.common.converters.ObjectToJSONConverter.convertToJSON;
 import static com.trevorgowing.projectlog.user.DuplicateEmailExceptionBuilder.aDuplicateEmailException;
 import static com.trevorgowing.projectlog.user.IdentifiedUserDTOBuilder.anIdentifiedUserDTO;
 import static com.trevorgowing.projectlog.user.UnidentifiedUserDTOBuilder.anUnidentifiedUserDTO;

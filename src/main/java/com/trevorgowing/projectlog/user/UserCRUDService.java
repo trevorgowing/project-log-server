@@ -13,12 +13,17 @@ import static com.trevorgowing.projectlog.user.UserNotFoundException.identifiedU
 import static java.util.Optional.ofNullable;
 
 @Service
-class UserCRUDService {
+public class UserCRUDService {
 
     private final UserRepository userRepository;
 
     UserCRUDService(UserRepository userRepository) {
         this.userRepository = userRepository;
+    }
+
+    public User findUser(long userId) {
+        return ofNullable(userRepository.findOne(userId))
+                .orElseThrow(() -> identifiedUserNotFoundException(userId));
     }
 
     List<IdentifiedUserDTO> findIdentifiedUserDTOs() {

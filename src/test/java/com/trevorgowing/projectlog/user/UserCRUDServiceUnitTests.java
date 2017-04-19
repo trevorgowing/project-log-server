@@ -24,6 +24,34 @@ public class UserCRUDServiceUnitTests extends AbstractTests {
     @InjectMocks
     private UserCRUDService userCRUDService;
 
+    @Test(expected = UserNotFoundException.class)
+    public void testFindUserWithNoMatchingUser_shouldThrowUserNotFoundException() {
+        // Set up expectations
+        when(userRepository.findOne(IRRELEVANT_USER_ID))
+                .thenReturn(null);
+
+        // Exercise SUT
+        userCRUDService.findUser(IRRELEVANT_USER_ID);
+    }
+
+    @Test
+    public void testFindUserWithMatchingUser_shouldReturnUser() {
+        // Set up fixture
+        User expectedUser = aUser()
+                .id(IRRELEVANT_USER_ID)
+                .build();
+
+        // Set up expectations
+        when(userRepository.findOne(IRRELEVANT_USER_ID))
+                .thenReturn(expectedUser);
+
+        // Exercise SUT
+        User acutalUser = userCRUDService.findUser(IRRELEVANT_USER_ID);
+
+        // Verify behaviour
+        assertThat(acutalUser, is(expectedUser));
+    }
+
     @Test
     public void testFindIdentifiedUserDTOs_shouldDelegateToUserRepositoryAndReturnIdentifiedUserDTOs() {
         // Set up fixture

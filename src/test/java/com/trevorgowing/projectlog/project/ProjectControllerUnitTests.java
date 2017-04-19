@@ -2,20 +2,27 @@ package com.trevorgowing.projectlog.project;
 
 import com.trevorgowing.projectlog.common.types.AbstractControllerUnitTests;
 import com.trevorgowing.projectlog.user.IdentifiedUserDTO;
+import com.trevorgowing.projectlog.user.UserNotFoundException;
 import io.restassured.http.ContentType;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.http.HttpStatus;
 
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 
 import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
-import static com.trevorgowing.projectlog.common.converters.ObjectToJSON.convertToJSON;
+import static com.trevorgowing.projectlog.common.converters.ObjectToJSONConverter.convertToJSON;
+import static com.trevorgowing.projectlog.project.DuplicateProjectCodeException.codedDuplicateCodeException;
 import static com.trevorgowing.projectlog.project.IdentifiedProjectDTOBuilder.anIdentifiedProjectDTO;
+import static com.trevorgowing.projectlog.project.ProjectBuilder.aProject;
 import static com.trevorgowing.projectlog.project.ProjectNotFoundException.identifiedProjectNotFoundException;
+import static com.trevorgowing.projectlog.project.UnidentifiedProjectDTOBuilder.anUnidentifiedProjectDTO;
 import static com.trevorgowing.projectlog.user.IdentifiedUserDTOBuilder.anIdentifiedUserDTO;
+import static com.trevorgowing.projectlog.user.UserBuilder.aUser;
+import static com.trevorgowing.projectlog.user.UserNotFoundException.identifiedUserNotFoundException;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -35,6 +42,8 @@ public class ProjectControllerUnitTests extends AbstractControllerUnitTests {
             .lastName(IRRELEVANT_USER_LAST_NAME)
             .build();
 
+    @Mock
+    private ProjectDTOFactory projectDTOFactory;
     @Mock
     private ProjectCRUDService projectCRUDService;
 
@@ -160,6 +169,126 @@ public class ProjectControllerUnitTests extends AbstractControllerUnitTests {
                 .body(sameBeanAs(convertToJSON(expectedIdentifiedProjectDTO)));
 
         IdentifiedProjectDTO actualIdentifiedProjectDTO = projectController.getProjectById(IRRELEVANT_PROJECT_ID);
+
+        // Verify behaviour
+        assertThat(actualIdentifiedProjectDTO, is(expectedIdentifiedProjectDTO));
+    }
+
+    @Test(expected = DuplicateProjectCodeException.class)
+    public void testPostProjectWithDuplicateCode_shouldRespondWithStatusConflict() throws Exception {
+        // Set up fixture
+        String duplicateProjectCode = IRRELEVANT_PROJECT_CODE;
+        LocalDate startDate = IRRELEVANT_DATE;
+        LocalDate endDate = IRRELEVANT_DATE;
+
+        UnidentifiedProjectDTO unidentifiedProjectDTO = anUnidentifiedProjectDTO()
+                .code(duplicateProjectCode)
+                .name(IRRELEVANT_PROJECT_NAME)
+                .owner(anIdentifiedUserDTO().id(IRRELEVANT_USER_ID).build())
+                .startDate(startDate)
+                .endDate(endDate)
+                .build();
+
+        // Set up expectations
+        when(projectCRUDService.createProject(duplicateProjectCode, IRRELEVANT_PROJECT_NAME,
+                IRRELEVANT_USER_ID, startDate, endDate))
+                .thenThrow(codedDuplicateCodeException(duplicateProjectCode));
+
+        // Exercise SUT
+        given()
+                .accept(ContentType.JSON)
+                .contentType(ContentType.JSON)
+                .body(convertToJSON(unidentifiedProjectDTO))
+        .when()
+                .post(ProjectConstants.PROJECTS_URL_PATH)
+        .then()
+                .log().all()
+                .statusCode(HttpStatus.CONFLICT.value());
+
+        projectController.postProject(unidentifiedProjectDTO);
+    }
+
+    @Test(expected = UserNotFoundException.class)
+    public void testPostProjectWithNonExistentUser_shouldRespondWithStatusConflict() throws Exception {
+        // Set up fixture
+        long nonExistentUserId = 111L;
+
+        UnidentifiedProjectDTO unidentifiedProjectDTO = anUnidentifiedProjectDTO()
+                .code(IRRELEVANT_PROJECT_CODE)
+                .name(IRRELEVANT_PROJECT_NAME)
+                .owner(anIdentifiedUserDTO().id(nonExistentUserId).build())
+                .startDate(IRRELEVANT_DATE)
+                .endDate(IRRELEVANT_DATE)
+                .build();
+
+        // Set up expectations
+        when(projectCRUDService.createProject(IRRELEVANT_PROJECT_CODE, IRRELEVANT_PROJECT_NAME, nonExistentUserId,
+                IRRELEVANT_DATE, IRRELEVANT_DATE))
+                .thenThrow(identifiedUserNotFoundException(nonExistentUserId));
+
+        // Exercise SUT
+        given()
+                .accept(ContentType.JSON)
+                .contentType(ContentType.JSON)
+                .body(convertToJSON(unidentifiedProjectDTO))
+        .when()
+                .post(ProjectConstants.PROJECTS_URL_PATH)
+        .then()
+                .log().all()
+                .statusCode(HttpStatus.CONFLICT.value());
+
+        projectController.postProject(unidentifiedProjectDTO);
+    }
+
+    @Test
+    public void testPostProjectValidProject_shouldRespondWithStatusCreatedAndReturnCreatedProject() throws Exception {
+        // Set up fixture
+        UnidentifiedProjectDTO unidentifiedProjectDTO = anUnidentifiedProjectDTO()
+                .code(IRRELEVANT_PROJECT_CODE)
+                .name(IRRELEVANT_PROJECT_NAME)
+                .owner(anIdentifiedUserDTO().id(IRRELEVANT_USER_ID).build())
+                .startDate(IRRELEVANT_DATE)
+                .endDate(IRRELEVANT_DATE)
+                .build();
+
+        Project project = aProject()
+                .id(IRRELEVANT_PROJECT_ID)
+                .code(IRRELEVANT_PROJECT_CODE)
+                .name(IRRELEVANT_PROJECT_NAME)
+                .owner(aUser().id(IRRELEVANT_USER_ID).build())
+                .startDate(IRRELEVANT_DATE)
+                .endDate(IRRELEVANT_DATE)
+                .build();
+
+        IdentifiedProjectDTO expectedIdentifiedProjectDTO = anIdentifiedProjectDTO()
+                .id(IRRELEVANT_PROJECT_ID)
+                .code(IRRELEVANT_PROJECT_CODE)
+                .name(IRRELEVANT_PROJECT_NAME)
+                .owner(anIdentifiedUserDTO().id(IRRELEVANT_USER_ID).build())
+                .startDate(IRRELEVANT_DATE)
+                .endDate(IRRELEVANT_DATE)
+                .build();
+
+        // Set up expectations
+        when(projectCRUDService.createProject(IRRELEVANT_PROJECT_CODE, IRRELEVANT_PROJECT_NAME, IRRELEVANT_USER_ID, IRRELEVANT_DATE, IRRELEVANT_DATE))
+                .thenReturn(project);
+        when(projectDTOFactory.createIdentifiedProjectDTO(project))
+                .thenReturn(expectedIdentifiedProjectDTO);
+
+        // Exercise SUT
+        given()
+                .accept(ContentType.JSON)
+                .contentType(ContentType.JSON)
+                .body(convertToJSON(unidentifiedProjectDTO))
+        .when()
+                .post(ProjectConstants.PROJECTS_URL_PATH)
+        .then()
+                .log().all()
+                .statusCode(HttpStatus.CREATED.value())
+                .contentType(ContentType.JSON)
+                .body(sameBeanAs(convertToJSON(expectedIdentifiedProjectDTO)));
+
+        IdentifiedProjectDTO actualIdentifiedProjectDTO = projectController.postProject(unidentifiedProjectDTO);
 
         // Verify behaviour
         assertThat(actualIdentifiedProjectDTO, is(expectedIdentifiedProjectDTO));

@@ -15,7 +15,7 @@ repositories {
 }
 
 dependencies {
-    compile 'mysql:mysql-connector-java'
+    compile "mysql:mysql-connector-java"
     compile "org.flywaydb:flyway-core:4.1.2"
     compile "org.projectlombok:lombok:1.16.14"
     compile "org.hibernate:hibernate-core:5.2.8.Final"
@@ -25,6 +25,9 @@ dependencies {
     compile "org.springframework.boot:spring-boot-devtools"
     compile "org.springframework.boot:spring-boot-starter-hateoas"
     compile "org.springframework.boot:spring-boot-starter-actuator"
+
+    compile "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.8.8"
+    compile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.8.6"
 
     testCompile "com.shazam:shazamcrest:0.11"
     testCompile "io.rest-assured:rest-assured:3.0.2"
