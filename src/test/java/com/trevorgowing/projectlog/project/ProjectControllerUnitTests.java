@@ -28,7 +28,7 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class ProjectControllerUnitTests extends AbstractControllerUnitTests {
 
@@ -415,5 +415,38 @@ public class ProjectControllerUnitTests extends AbstractControllerUnitTests {
 
         // Verify behaviour
         assertThat(actualIdentifiedProjectDTO, is(expectedIdentifiedProjectDTO));
+    }
+
+    @Test(expected = ProjectNotFoundException.class)
+    public void testDeleteProjectWithNoMatchingProject_shouldRespondWithStatusNotFound() {
+        // Set up expectations
+        doThrow(identifiedProjectNotFoundException(IRRELEVANT_PROJECT_ID))
+                .when(projectCRUDService).deleteProject(IRRELEVANT_PROJECT_ID);
+
+        // Exercise SUT
+        given()
+        .when()
+                .delete(ProjectConstants.PROJECTS_URL_PATH+ "/" + IRRELEVANT_PROJECT_ID)
+        .then()
+                .log().all()
+                .statusCode(HttpStatus.NOT_FOUND.value());
+
+        projectController.deleteProject(IRRELEVANT_PROJECT_ID);
+    }
+
+    @Test
+    public void testDeleteProjectWithMatchingProject_shouldRespondWithStatusNoContent() {
+        // Set up expectations
+        doNothing().when(projectCRUDService).deleteProject(IRRELEVANT_PROJECT_ID);
+
+        // Exercise SUT
+        given()
+        .when()
+                .delete(ProjectConstants.PROJECTS_URL_PATH + "/" + IRRELEVANT_PROJECT_ID)
+        .then()
+                .log().all()
+                .statusCode(HttpStatus.NO_CONTENT.value());
+
+        projectController.deleteProject(IRRELEVANT_PROJECT_ID);
     }
 }

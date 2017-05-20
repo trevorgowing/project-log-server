@@ -3,6 +3,7 @@ package com.trevorgowing.projectlog.project;
 import com.trevorgowing.projectlog.user.User;
 import com.trevorgowing.projectlog.user.UserCRUDService;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -64,6 +65,14 @@ class ProjectCRUDService {
             return projectRepository.save(projectToUpdate);
         } catch (DataIntegrityViolationException dataIntegrityViolationException) {
             throw codedDuplicateCodeException(code);
+        }
+    }
+
+    void deleteProject(long projectId) {
+        try {
+            projectRepository.delete(projectId);
+        } catch (EmptyResultDataAccessException emptyResultDataAccessException) {
+            throw identifiedProjectNotFoundException(projectId);
         }
     }
 }

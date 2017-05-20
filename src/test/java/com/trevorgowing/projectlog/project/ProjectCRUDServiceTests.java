@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -23,7 +24,7 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.argThat;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class ProjectCRUDServiceTests extends AbstractTests {
 
@@ -325,5 +326,24 @@ public class ProjectCRUDServiceTests extends AbstractTests {
 
         // Verify behaviour
         assertThat(actualProject, is(expectedProject));
+    }
+
+    @Test(expected = ProjectNotFoundException.class)
+    public void testDeleteProjectWithNoMatchingProject_shouldThrowProjectNotFoundException() {
+        // Set up expectations
+        doThrow(new EmptyResultDataAccessException(1))
+                .when(projectRepository).delete(IRRELEVANT_PROJECT_ID);
+
+        // Exercise SUT
+        projectCRUDService.deleteProject(IRRELEVANT_PROJECT_ID);
+    }
+
+    @Test
+    public void testDeleteProjectWithMatchingProject_shouldDelegateToProjectRepositoryToDeleteProject() {
+        // Set up expectations
+        doNothing().when(projectRepository).delete(IRRELEVANT_PROJECT_ID);
+
+        // Exercise SUT
+        projectCRUDService.deleteProject(IRRELEVANT_PROJECT_ID);
     }
 }

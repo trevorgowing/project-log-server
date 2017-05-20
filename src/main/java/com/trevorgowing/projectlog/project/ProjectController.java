@@ -53,6 +53,12 @@ class ProjectController {
          return projectDTOFactory.createIdentifiedProjectDTO(project);
     }
 
+    @DeleteMapping(path = ProjectConstants.PROJECT_ID_VARIABLE_URL_PATH)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void deleteProject(@PathVariable long projectId) {
+        projectCRUDService.deleteProject(projectId);
+    }
+
     @ExceptionHandler(ProjectNotFoundException.class)
     @ResponseStatus(code = HttpStatus.NOT_FOUND, reason = ProjectNotFoundException.REASON)
     public void handleProjectNotFoundException(ProjectNotFoundException projectNotFoundException) {
