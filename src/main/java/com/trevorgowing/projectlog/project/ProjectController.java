@@ -42,6 +42,17 @@ class ProjectController {
         return projectDTOFactory.createIdentifiedProjectDTO(project);
     }
 
+    @PutMapping(path = ProjectConstants.PROJECT_ID_VARIABLE_URL_PATH, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    IdentifiedProjectDTO putProject(@PathVariable long projectId,
+                                    @RequestBody IdentifiedProjectDTO identifiedProjectDTO) {
+        Project project = projectCRUDService.updateProject(projectId, identifiedProjectDTO.getCode(),
+                identifiedProjectDTO.getName(), identifiedProjectDTO.getOwner().getId(),
+                identifiedProjectDTO.getStartDate(), identifiedProjectDTO.getEndDate());
+         return projectDTOFactory.createIdentifiedProjectDTO(project);
+    }
+
     @ExceptionHandler(ProjectNotFoundException.class)
     @ResponseStatus(code = HttpStatus.NOT_FOUND, reason = ProjectNotFoundException.REASON)
     public void handleProjectNotFoundException(ProjectNotFoundException projectNotFoundException) {

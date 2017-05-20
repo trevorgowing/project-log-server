@@ -19,9 +19,14 @@ class ProjectCRUDService {
     private final UserCRUDService userCRUDService;
     private final ProjectRepository projectRepository;
 
-    public ProjectCRUDService(UserCRUDService userCRUDService, ProjectRepository projectRepository) {
+    ProjectCRUDService(UserCRUDService userCRUDService, ProjectRepository projectRepository) {
         this.userCRUDService = userCRUDService;
         this.projectRepository = projectRepository;
+    }
+
+    Project findProject(long projectId) {
+        return ofNullable(projectRepository.findOne(projectId))
+                .orElseThrow(() -> identifiedProjectNotFoundException(projectId));
     }
 
     List<IdentifiedProjectDTO> getIdentifiedProjectDTOs() {
@@ -40,6 +45,23 @@ class ProjectCRUDService {
 
         try {
             return projectRepository.save(project);
+        } catch (DataIntegrityViolationException dataIntegrityViolationException) {
+            throw codedDuplicateCodeException(code);
+        }
+    }
+
+    Project updateProject(long id, String code, String name, long ownerId, LocalDate startDate, LocalDate endDate) {
+        Project projectToUpdate = ofNullable(projectRepository.findOne(id))
+                .orElseThrow(() -> identifiedProjectNotFoundException(id));
+
+        projectToUpdate.setCode(code);
+        projectToUpdate.setName(name);
+        projectToUpdate.setOwner(userCRUDService.findUser(ownerId));
+        projectToUpdate.setStartDate(startDate);
+        projectToUpdate.setEndDate(endDate);
+
+        try {
+            return projectRepository.save(projectToUpdate);
         } catch (DataIntegrityViolationException dataIntegrityViolationException) {
             throw codedDuplicateCodeException(code);
         }

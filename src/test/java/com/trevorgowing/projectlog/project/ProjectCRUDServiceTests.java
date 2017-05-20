@@ -13,6 +13,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import java.time.LocalDate;
 import java.util.List;
 
+import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
 import static com.trevorgowing.projectlog.project.IdentifiedProjectDTOBuilder.anIdentifiedProjectDTO;
 import static com.trevorgowing.projectlog.project.ProjectBuilder.aProject;
 import static com.trevorgowing.projectlog.user.IdentifiedUserDTOBuilder.anIdentifiedUserDTO;
@@ -21,6 +22,7 @@ import static com.trevorgowing.projectlog.user.UserNotFoundException.identifiedU
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.when;
 
 public class ProjectCRUDServiceTests extends AbstractTests {
@@ -42,6 +44,34 @@ public class ProjectCRUDServiceTests extends AbstractTests {
 
     @InjectMocks
     private ProjectCRUDService projectCRUDService;
+
+    @Test(expected = ProjectNotFoundException.class)
+    public void testFindProjectWithNoMatchingProject_shouldThrowProjectNotFoundException() {
+        // Set up expectations
+        when(projectRepository.findOne(IRRELEVANT_PROJECT_ID))
+                .thenReturn(null);
+
+        // Exercise SUT
+        projectCRUDService.findProject(IRRELEVANT_PROJECT_ID);
+    }
+
+    @Test
+    public void testFindProjectWithMatchingProject_shouldReturnProject() {
+        // Set up fixture
+        Project expectedProject = aProject()
+                .id(IRRELEVANT_PROJECT_ID)
+                .build();
+
+        // Set up expectations
+        when(projectRepository.findOne(IRRELEVANT_PROJECT_ID))
+                .thenReturn(expectedProject);
+
+        // Exercise SUT
+        Project actualProject = projectCRUDService.findProject(IRRELEVANT_PROJECT_ID);
+
+        // Verify behaviour
+        assertThat(actualProject, is(expectedProject));
+    }
 
     @Test
     public void testGetIdentifiedProjectDTOs_shouldDelegateToProjectRepositoryAndReturnIdentifiedProjectDTOs() {
@@ -186,6 +216,111 @@ public class ProjectCRUDServiceTests extends AbstractTests {
 
         // Exercise SUT
         Project actualProject = projectCRUDService.createProject(IRRELEVANT_PROJECT_CODE, IRRELEVANT_PROJECT_NAME,
+                IRRELEVANT_USER_ID, startDate, endDate);
+
+        // Verify behaviour
+        assertThat(actualProject, is(expectedProject));
+    }
+
+    @Test(expected = DuplicateProjectCodeException.class)
+    public void testUpdateProjectWithDuplicateCode_shouldDelegateToProjectRepositoryAndThrowDuplicateProjectCodeException() {
+        // Set up fixture
+        String duplicateCode = IRRELEVANT_PROJECT_CODE;
+        String duplicateCodeMessage = IRRELEVANT_MESSAGE;
+
+        User identifiedUser = aUser()
+                .id(IRRELEVANT_USER_ID)
+                .build();
+
+        Project projectPreUpdate = aProject()
+                .id(IRRELEVANT_PROJECT_ID)
+                .code(duplicateCode)
+                .name(IRRELEVANT_PROJECT_NAME)
+                .owner(identifiedUser)
+                .startDate(IRRELEVANT_DATE)
+                .endDate(IRRELEVANT_DATE)
+                .build();
+
+        Project updatedProject = aProject()
+                .id(IRRELEVANT_PROJECT_ID)
+                .code(duplicateCode)
+                .name(IRRELEVANT_PROJECT_NAME)
+                .owner(identifiedUser)
+                .startDate(IRRELEVANT_DATE)
+                .endDate(IRRELEVANT_DATE)
+                .build();
+
+        // Set up expectations
+        when(projectRepository.findOne(IRRELEVANT_PROJECT_ID))
+                .thenReturn(projectPreUpdate);
+        when(userCRUDService.findUser(IRRELEVANT_USER_ID))
+                .thenReturn(identifiedUser);
+        when(projectRepository.save(argThat(sameBeanAs(updatedProject))))
+                .thenThrow(new DataIntegrityViolationException(duplicateCodeMessage));
+
+        // Exercise SUT
+        projectCRUDService.updateProject(IRRELEVANT_PROJECT_ID, duplicateCode, IRRELEVANT_PROJECT_NAME,
+                IRRELEVANT_USER_ID, IRRELEVANT_DATE, IRRELEVANT_DATE);
+    }
+
+    @Test(expected = UserNotFoundException.class)
+    public void testUpdateProjectWithNonExistentUser_shouldDelegateToUserCRUDServiceAndThrowUserNotFoundException() {
+        // Set up fixture
+        long nonExistentUserId = IRRELEVANT_USER_ID;
+
+        Project projectPreUpdate = aProject()
+                .id(IRRELEVANT_PROJECT_ID)
+                .build();
+
+        // Set up expectations
+        when(projectRepository.findOne(IRRELEVANT_PROJECT_ID))
+                .thenReturn(projectPreUpdate);
+        when(userCRUDService.findUser(nonExistentUserId))
+                .thenThrow(identifiedUserNotFoundException(IRRELEVANT_USER_ID));
+
+        // Exercise SUT
+        projectCRUDService.updateProject(IRRELEVANT_PROJECT_ID, IRRELEVANT_PROJECT_CODE, IRRELEVANT_PROJECT_NAME,
+                nonExistentUserId, IRRELEVANT_DATE, IRRELEVANT_DATE);
+    }
+
+    @Test
+    public void testUpdateProjectWithValidProject_shouldDelegateToProjectRepositoryAndReturnUpdatedProject() {
+        // Set up fixture
+        LocalDate startDate = LocalDate.now().plusDays(1);
+        LocalDate endDate = startDate.plusDays(1);
+
+        Project projectPreUpdate = aProject()
+                .id(IRRELEVANT_PROJECT_ID)
+                .code("unchanged_code")
+                .name("unchanged_name")
+                .owner(aUser().build())
+                .startDate(LocalDate.MIN)
+                .endDate(LocalDate.MAX)
+                .build();
+
+        User user = aUser()
+                .id(IRRELEVANT_USER_ID)
+                .build();
+
+        Project expectedProject = aProject()
+                .id(IRRELEVANT_PROJECT_ID)
+                .code(IRRELEVANT_PROJECT_CODE)
+                .name(IRRELEVANT_PROJECT_NAME)
+                .owner(user)
+                .startDate(startDate)
+                .endDate(endDate)
+                .build();
+
+        // Set up expectations
+        when(projectRepository.findOne(IRRELEVANT_PROJECT_ID))
+                .thenReturn(projectPreUpdate);
+        when(userCRUDService.findUser(IRRELEVANT_USER_ID))
+                .thenReturn(user);
+        when(projectRepository.save(argThat(sameBeanAs(expectedProject))))
+                .thenReturn(expectedProject);
+
+        // Exercise SUT
+        Project actualProject = projectCRUDService.updateProject(IRRELEVANT_PROJECT_ID, IRRELEVANT_PROJECT_CODE, IRRELEVANT_PROJECT_NAME,
                 IRRELEVANT_USER_ID, startDate, endDate);
 
         // Verify behaviour

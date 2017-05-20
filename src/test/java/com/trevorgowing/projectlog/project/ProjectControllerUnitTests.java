@@ -241,7 +241,7 @@ public class ProjectControllerUnitTests extends AbstractControllerUnitTests {
     }
 
     @Test
-    public void testPostProjectValidProject_shouldRespondWithStatusCreatedAndReturnCreatedProject() throws Exception {
+    public void testPostProjectWithValidProject_shouldRespondWithStatusCreatedAndReturnCreatedProject() throws Exception {
         // Set up fixture
         UnidentifiedProjectDTO unidentifiedProjectDTO = anUnidentifiedProjectDTO()
                 .code(IRRELEVANT_PROJECT_CODE)
@@ -289,6 +289,129 @@ public class ProjectControllerUnitTests extends AbstractControllerUnitTests {
                 .body(sameBeanAs(convertToJSON(expectedIdentifiedProjectDTO)));
 
         IdentifiedProjectDTO actualIdentifiedProjectDTO = projectController.postProject(unidentifiedProjectDTO);
+
+        // Verify behaviour
+        assertThat(actualIdentifiedProjectDTO, is(expectedIdentifiedProjectDTO));
+    }
+
+    @Test(expected = DuplicateProjectCodeException.class)
+    public void testPutProjectWithDuplicateCode_shouldRespondWithStatusConflict() throws Exception {
+        // Set up fixture
+        String duplicateProjectCode = IRRELEVANT_PROJECT_CODE;
+
+        IdentifiedProjectDTO identifiedProjectDTO = anIdentifiedProjectDTO()
+                .id(IRRELEVANT_PROJECT_ID)
+                .code(duplicateProjectCode)
+                .name(IRRELEVANT_PROJECT_NAME)
+                .owner(anIdentifiedUserDTO().id(IRRELEVANT_USER_ID).build())
+                .startDate(IRRELEVANT_DATE)
+                .endDate(IRRELEVANT_DATE)
+                .build();
+
+        // Set up expectations
+        when(projectCRUDService.updateProject(IRRELEVANT_PROJECT_ID, duplicateProjectCode, IRRELEVANT_PROJECT_NAME,
+                IRRELEVANT_USER_ID, IRRELEVANT_DATE, IRRELEVANT_DATE))
+                .thenThrow(codedDuplicateCodeException(duplicateProjectCode));
+
+        // Exercise SUT
+        given()
+                .accept(ContentType.JSON)
+                .contentType(ContentType.JSON)
+                .body(convertToJSON(identifiedProjectDTO))
+        .when()
+                .put(ProjectConstants.PROJECTS_URL_PATH + "/" + IRRELEVANT_PROJECT_ID)
+        .then()
+                .log().all()
+                .statusCode(HttpStatus.CONFLICT.value());
+
+        projectController.putProject(IRRELEVANT_PROJECT_ID, identifiedProjectDTO);
+    }
+
+    @Test(expected = UserNotFoundException.class)
+    public void testPutProjectWithNonExistentUser_shouldRespondWithStatusConflict() throws Exception {
+        // Set up fixture
+        long nonExistentUserId = IRRELEVANT_USER_ID;
+
+        IdentifiedProjectDTO identifiedProjectDTO = anIdentifiedProjectDTO()
+                .id(IRRELEVANT_PROJECT_ID)
+                .code(IRRELEVANT_PROJECT_CODE)
+                .name(IRRELEVANT_PROJECT_NAME)
+                .owner(anIdentifiedUserDTO().id(nonExistentUserId).build())
+                .startDate(IRRELEVANT_DATE)
+                .endDate(IRRELEVANT_DATE)
+                .build();
+
+        // Set up expectations
+        when(projectCRUDService.updateProject(IRRELEVANT_PROJECT_ID, IRRELEVANT_PROJECT_CODE, IRRELEVANT_PROJECT_NAME,
+                nonExistentUserId, IRRELEVANT_DATE, IRRELEVANT_DATE))
+                .thenThrow(identifiedUserNotFoundException(nonExistentUserId));
+
+        // Exercise SUT
+        given()
+                .accept(ContentType.JSON)
+                .contentType(ContentType.JSON)
+                .body(convertToJSON(identifiedProjectDTO))
+        .when()
+                .put(ProjectConstants.PROJECTS_URL_PATH + "/" + IRRELEVANT_PROJECT_ID)
+        .then()
+                .log().all()
+                .statusCode(HttpStatus.CONFLICT.value());
+
+        projectController.putProject(IRRELEVANT_PROJECT_ID, identifiedProjectDTO);
+    }
+
+    @Test
+    public void testPutProjectWithValidProject_shouldRespondWithStatusOKAndReturnUpdatedProject() throws Exception {
+        // Set up fixture
+        IdentifiedProjectDTO identifiedProjectDTO = anIdentifiedProjectDTO()
+                .id(IRRELEVANT_PROJECT_ID)
+                .code(IRRELEVANT_PROJECT_CODE)
+                .name(IRRELEVANT_PROJECT_NAME)
+                .owner(anIdentifiedUserDTO().id(IRRELEVANT_USER_ID).build())
+                .startDate(IRRELEVANT_DATE)
+                .endDate(IRRELEVANT_DATE)
+                .build();
+
+        Project project = aProject()
+                .id(IRRELEVANT_PROJECT_ID)
+                .code(IRRELEVANT_PROJECT_CODE)
+                .name(IRRELEVANT_PROJECT_NAME)
+                .owner(aUser().id(IRRELEVANT_USER_ID).build())
+                .startDate(IRRELEVANT_DATE)
+                .endDate(IRRELEVANT_DATE)
+                .build();
+
+        IdentifiedProjectDTO expectedIdentifiedProjectDTO = anIdentifiedProjectDTO()
+                .id(IRRELEVANT_PROJECT_ID)
+                .code(IRRELEVANT_PROJECT_CODE)
+                .name(IRRELEVANT_PROJECT_NAME)
+                .owner(anIdentifiedUserDTO().id(IRRELEVANT_USER_ID).build())
+                .startDate(IRRELEVANT_DATE)
+                .endDate(IRRELEVANT_DATE)
+                .build();
+
+        // Set up expectations
+        when(projectCRUDService.updateProject(IRRELEVANT_PROJECT_ID, IRRELEVANT_PROJECT_CODE, IRRELEVANT_PROJECT_NAME,
+                IRRELEVANT_USER_ID, IRRELEVANT_DATE, IRRELEVANT_DATE))
+                .thenReturn(project);
+        when(projectDTOFactory.createIdentifiedProjectDTO(project))
+                .thenReturn(expectedIdentifiedProjectDTO);
+
+        // Exercise SUT
+        given()
+                .accept(ContentType.JSON)
+                .contentType(ContentType.JSON)
+                .body(convertToJSON(identifiedProjectDTO))
+        .when()
+                .put(ProjectConstants.PROJECTS_URL_PATH + "/" + IRRELEVANT_PROJECT_ID)
+        .then()
+                .log().all()
+                .statusCode(HttpStatus.OK.value())
+                .contentType(ContentType.JSON)
+                .body(sameBeanAs(convertToJSON(expectedIdentifiedProjectDTO)));
+
+        IdentifiedProjectDTO actualIdentifiedProjectDTO = projectController.putProject(IRRELEVANT_PROJECT_ID,
+                identifiedProjectDTO);
 
         // Verify behaviour
         assertThat(actualIdentifiedProjectDTO, is(expectedIdentifiedProjectDTO));
