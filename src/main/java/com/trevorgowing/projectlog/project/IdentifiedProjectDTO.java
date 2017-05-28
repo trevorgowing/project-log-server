@@ -11,11 +11,23 @@ import static com.trevorgowing.projectlog.user.IdentifiedUserDTO.passwordFreeIde
 @NoArgsConstructor
 @Getter
 @Setter
-class IdentifiedProjectDTO extends UnidentifiedProjectDTO {
+public class IdentifiedProjectDTO extends UnidentifiedProjectDTO {
 
     private static final long serialVersionUID = 5757020105419667746L;
 
     private long id;
+
+    private IdentifiedProjectDTO(long id, String code, String name, IdentifiedUserDTO owner, LocalDate startDate,
+                                 LocalDate endDate) {
+        super(code, name, owner, startDate, endDate);
+        this.id = id;
+    }
+
+    private IdentifiedProjectDTO(long id, String code, String name) {
+        this.id = id;
+        this.code = code;
+        this.name = name;
+    }
 
     /**
      * Used in constructor query {@link ProjectRepository#findIdentifiedProjectDTOs()}.
@@ -28,15 +40,13 @@ class IdentifiedProjectDTO extends UnidentifiedProjectDTO {
         this.id = id;
     }
 
-    private IdentifiedProjectDTO(long id, String code, String name, IdentifiedUserDTO owner, LocalDate startDate,
-                                 LocalDate endDate) {
-        super(code, name, owner, startDate, endDate);
-        this.id = id;
-    }
-
     public static IdentifiedProjectDTO completeIdentifiedProjectDTO(
             long id, String code, String name, IdentifiedUserDTO owner, LocalDate startDate, LocalDate endDate) {
         return new IdentifiedProjectDTO(id, code, name, owner, startDate, endDate);
+    }
+
+    public static IdentifiedProjectDTO minimalIdentifiedProjectDTO(long id, String code, String name) {
+        return new IdentifiedProjectDTO(id, code, name);
     }
 
     @Override

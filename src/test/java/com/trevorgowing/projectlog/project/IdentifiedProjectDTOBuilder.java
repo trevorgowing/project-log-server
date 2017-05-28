@@ -7,12 +7,12 @@ import java.time.LocalDate;
 
 import static com.trevorgowing.projectlog.project.IdentifiedProjectDTO.completeIdentifiedProjectDTO;
 
-class IdentifiedProjectDTOBuilder extends AbstractProjectDTOBuilder<IdentifiedProjectDTOBuilder>
+public class IdentifiedProjectDTOBuilder extends AbstractProjectDTOBuilder<IdentifiedProjectDTOBuilder>
         implements DomainObjectBuilder<IdentifiedProjectDTO> {
 
     private long id;
 
-    static IdentifiedProjectDTOBuilder anIdentifiedProjectDTO() {
+    public static IdentifiedProjectDTOBuilder anIdentifiedProjectDTO() {
         return new IdentifiedProjectDTOBuilder();
     }
 
@@ -21,32 +21,32 @@ class IdentifiedProjectDTOBuilder extends AbstractProjectDTOBuilder<IdentifiedPr
         return completeIdentifiedProjectDTO(id, code, name, owner, startDate, endDate);
     }
 
-    IdentifiedProjectDTOBuilder id(long id) {
+    public IdentifiedProjectDTOBuilder id(long id) {
         this.id = id;
         return this;
     }
 
-    IdentifiedProjectDTOBuilder code(String code) {
+    public IdentifiedProjectDTOBuilder code(String code) {
         this.code = code;
         return this;
     }
 
-    IdentifiedProjectDTOBuilder name(String name) {
+    public IdentifiedProjectDTOBuilder name(String name) {
         this.name = name;
         return this;
     }
 
-    IdentifiedProjectDTOBuilder owner(IdentifiedUserDTO owner) {
+    public IdentifiedProjectDTOBuilder owner(IdentifiedUserDTO owner) {
         this.owner = owner;
         return this;
     }
 
-    IdentifiedProjectDTOBuilder startDate(LocalDate startDate) {
+    public IdentifiedProjectDTOBuilder startDate(LocalDate startDate) {
         this.startDate = startDate;
         return this;
     }
 
-    IdentifiedProjectDTOBuilder endDate(LocalDate endDate) {
+    public IdentifiedProjectDTOBuilder endDate(LocalDate endDate) {
         this.endDate = endDate;
         return this;
     }

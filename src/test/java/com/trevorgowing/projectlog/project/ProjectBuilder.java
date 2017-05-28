@@ -31,32 +31,32 @@ public class ProjectBuilder extends AbstractEntityBuilder<Project> {
         return new ProjectPersister();
     }
 
-    ProjectBuilder id(Long id) {
+    public ProjectBuilder id(Long id) {
         this.id = id;
         return this;
     }
 
-    ProjectBuilder code(String code) {
+    public ProjectBuilder code(String code) {
         this.code = code;
         return this;
     }
 
-    ProjectBuilder name(String name) {
+    public ProjectBuilder name(String name) {
         this.name = name;
         return this;
     }
 
-    ProjectBuilder owner(User owner) {
+    public ProjectBuilder owner(User owner) {
         this.owner = owner;
         return this;
     }
 
-    ProjectBuilder startDate(LocalDate startDate) {
+    public ProjectBuilder startDate(LocalDate startDate) {
         this.dateRange.setStartDate(startDate);
         return this;
     }
 
-    ProjectBuilder endDate(LocalDate endDate) {
+    public ProjectBuilder endDate(LocalDate endDate) {
         this.dateRange.setEndDate(endDate);
         return this;
     }

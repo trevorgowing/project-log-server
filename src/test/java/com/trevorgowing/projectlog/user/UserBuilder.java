@@ -10,7 +10,7 @@ public class UserBuilder extends AbstractEntityBuilder<User> {
 
     private Long id;
     private String email;
-    private String password;
+    private String password = "Default Password";
     private String firstName;
     private String lastName;
 

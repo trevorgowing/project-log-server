@@ -54,4 +54,8 @@ public class User extends AbstractAuditable<User, Long> {
     public static User identifiedUser(Long id, String email, String password, String firstName, String lastName) {
         return new User(id, email, password, firstName, lastName);
     }
+
+    public String getName() {
+        return firstName + " " + lastName;
+    }
 }

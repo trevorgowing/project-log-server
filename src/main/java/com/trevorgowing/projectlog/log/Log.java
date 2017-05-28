@@ -53,10 +53,16 @@ public abstract class Log extends AbstractAuditable<User, Long> {
     @ManyToOne(optional = false)
     private User owner;
 
-    protected Log(String summary, Impact impact, User owner, Project project) {
+    protected Log(Long id, String summary, String description, Category category, Impact impact, LogStatus status,
+               LocalDate dateClosed, Project project, User owner) {
+        super(id);
         this.summary = summary;
+        this.description = description;
+        this.category = category;
         this.impact = impact;
-        this.owner = owner;
+        this.status = status;
+        this.dateClosed = dateClosed;
         this.project = project;
+        this.owner = owner;
     }
 }
