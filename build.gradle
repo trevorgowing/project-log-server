@@ -2,8 +2,9 @@ import java.time.LocalDate
 import java.time.LocalTime
 
 plugins {
-    id "java"
     id "idea"
+    id "java"
+    id "jacoco"
     id "application"
     id "org.flywaydb.flyway" version "4.1.2"
     id "org.springframework.boot" version "1.5.2.RELEASE"
@@ -49,6 +50,13 @@ flyway {
 jar {
     baseName = 'projectlog'
     version =  '0.0.1'
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+        html.enabled false
+    }
 }
 
 test {
