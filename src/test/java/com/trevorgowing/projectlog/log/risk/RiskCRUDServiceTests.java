@@ -1,10 +1,12 @@
 package com.trevorgowing.projectlog.log.risk;
 
 import com.trevorgowing.projectlog.common.types.AbstractTests;
+import com.trevorgowing.projectlog.log.LogDTO;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.trevorgowing.projectlog.log.risk.IdentifiedRiskDTOBuilder.anIdentifiedRiskDTO;
@@ -22,9 +24,29 @@ public class RiskCRUDServiceTests extends AbstractTests {
     private RiskCRUDService riskCRUDService;
 
     @Test
+    public void testGetLogDTOs_shouldDelegateToRiskRepositoryAndReturnLogDTOs() {
+        // Set up fixture
+        List<IdentifiedRiskDTO> identifiedRiskDTOs = asList(
+                anIdentifiedRiskDTO().id(1).summary("Risk One").build(),
+                anIdentifiedRiskDTO().id(2).summary("Risk Two").build());
+
+        List<LogDTO> expectedLogDTOs = new ArrayList<>(identifiedRiskDTOs);
+
+        // Set up expectations
+        when(riskRepository.findIdentifiedRiskDTOs()).thenReturn(identifiedRiskDTOs);
+
+        // Exercise SUT
+        List<LogDTO> actualLogDTOs = riskCRUDService.getLogDTOs();
+
+        // Verify behaviour
+        assertThat(actualLogDTOs, is(expectedLogDTOs));
+    }
+
+    @Test
     public void testGetIdentifiedRiskDTOs_shouldDelegateToRiskRepositoryAndReturnIdentifiedRiskDTOs() {
         // Set up fixture
-        List<IdentifiedRiskDTO> expectedIdentifiedRiskDTOs = asList(anIdentifiedRiskDTO().id(1).summary("Risk One").build(),
+        List<IdentifiedRiskDTO> expectedIdentifiedRiskDTOs = asList(
+                anIdentifiedRiskDTO().id(1).summary("Risk One").build(),
                 anIdentifiedRiskDTO().id(2).summary("Risk Two").build());
 
         // Set up expectations

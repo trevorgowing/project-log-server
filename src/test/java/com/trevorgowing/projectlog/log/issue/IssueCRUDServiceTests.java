@@ -1,10 +1,12 @@
 package com.trevorgowing.projectlog.log.issue;
 
 import com.trevorgowing.projectlog.common.types.AbstractTests;
+import com.trevorgowing.projectlog.log.LogDTO;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.trevorgowing.projectlog.log.issue.IdentifiedIssueDTOBuilder.anIdentifiedIssueDTO;
@@ -20,6 +22,25 @@ public class IssueCRUDServiceTests extends AbstractTests {
 
     @InjectMocks
     private IssueCRUDService issueCRUDService;
+
+    @Test
+    public void testGetLogDTOs_shouldDelegateToIssueRepositoryAndReturnLogDTOs() {
+        // Set up fixture
+        List<IdentifiedIssueDTO> identifiedIssueDTOs = asList(
+                anIdentifiedIssueDTO().id(1).summary("Issue One").build(),
+                anIdentifiedIssueDTO().id(2).summary("Issue Two").build());
+
+        List<LogDTO> expectedLogDTOs = new ArrayList<>(identifiedIssueDTOs);
+
+        // Set up expectations
+        when(issueRepository.findIdentifiedIssueDTOs()).thenReturn(identifiedIssueDTOs);
+
+        // Exercise SUT
+        List<LogDTO> actualLogDTOs = issueCRUDService.getLogDTOs();
+
+        // Verify behaviour
+        assertThat(actualLogDTOs, is(expectedLogDTOs));
+    }
 
     @Test
     public void testGetIdentifiedIssueDTOs_shouldDelegateToIssueRepositoryAndReturnIdentifiedIssueDTOs() {

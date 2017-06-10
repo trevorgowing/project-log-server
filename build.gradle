@@ -16,10 +16,16 @@ repositories {
 }
 
 dependencies {
-    compile "mysql:mysql-connector-java:6.0.6"
-    compile "org.flywaydb:flyway-core:4.2.0"
     compile "org.projectlombok:lombok:1.16.16"
+    compile 'com.trevorgowing:url-string-builder:1.0.1'
+
+    compile "org.flywaydb:flyway-core:4.2.0"
+    compile "mysql:mysql-connector-java:6.0.6"
     compile "org.hibernate:hibernate-core:5.2.10.Final"
+
+    compile "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.9.0.pr3"
+    compile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.9.0.pr3"
+
     compile "org.springframework.boot:spring-boot-starter-web"
     compile "org.springframework.boot:spring-boot-starter-data-jpa"
 
@@ -27,8 +33,6 @@ dependencies {
     compile "org.springframework.boot:spring-boot-starter-hateoas"
     compile "org.springframework.boot:spring-boot-starter-actuator"
 
-    compile "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.9.0.pr3"
-    compile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.9.0.pr3"
 
     testCompile "com.shazam:shazamcrest:0.11"
     testCompile "io.rest-assured:rest-assured:3.0.2"
