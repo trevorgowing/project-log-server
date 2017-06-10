@@ -19,7 +19,7 @@ import static com.trevorgowing.projectlog.user.UserBuilder.aUser;
 public class RiskBuilder extends AbstractEntityBuilder<Risk> {
 
     private Long id;
-    private String summary = "Default Risk Summary";
+    private String summary = "Default Summary";
     private String description;
     private Category category;
     private Impact impact = MODERATE;
@@ -32,6 +32,11 @@ public class RiskBuilder extends AbstractEntityBuilder<Risk> {
 
     public static RiskBuilder aRisk() {
         return new RiskBuilder();
+    }
+
+    public static RiskBuilder aCompleteRisk() {
+        return new RiskBuilder().id(1).description("Default Description").category(Category.COMMITTED_PEOPLE)
+                .impact(Impact.MODERATE).dateClosed(LocalDate.MAX);
     }
 
     @Override

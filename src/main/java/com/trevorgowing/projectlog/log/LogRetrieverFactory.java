@@ -6,24 +6,24 @@ import com.trevorgowing.projectlog.log.risk.RiskCRUDService;
 import org.springframework.stereotype.Service;
 
 @Service
-class LogCRUDServiceFactory {
+class LogRetrieverFactory {
 
     private final RiskCRUDService riskCRUDService;
     private final IssueCRUDService issueCRUDService;
-    private final CombinedLogCRUDService combinedLogCRUDService;
+    private final CombinedLogRetriever combinedLogRetriever;
 
-    LogCRUDServiceFactory(RiskCRUDService riskCRUDService, IssueCRUDService issueCRUDService,
-                                 CombinedLogCRUDService combinedLogCRUDService) {
+    LogRetrieverFactory(RiskCRUDService riskCRUDService, IssueCRUDService issueCRUDService,
+                        CombinedLogRetriever combinedLogRetriever) {
         this.riskCRUDService = riskCRUDService;
         this.issueCRUDService = issueCRUDService;
-        this.combinedLogCRUDService = combinedLogCRUDService;
+        this.combinedLogRetriever = combinedLogRetriever;
     }
 
-    LogCRUDService getLogCRUDService() {
-        return getLogCRUDService(null);
+    LogRetriever getLogLookupService() {
+        return getLogLookupService(null);
     }
 
-    LogCRUDService getLogCRUDService(LogType type) {
+    LogRetriever getLogLookupService(LogType type) {
         if (type != null) {
             switch (type) {
                 case RISK:
@@ -32,6 +32,7 @@ class LogCRUDServiceFactory {
                     return issueCRUDService;
             }
         }
-        return combinedLogCRUDService;
+
+        return combinedLogRetriever;
     }
 }

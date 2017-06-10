@@ -42,6 +42,30 @@ public class IssueCRUDServiceTests extends AbstractTests {
         assertThat(actualLogDTOs, is(expectedLogDTOs));
     }
 
+    @Test(expected = IssueNotFoundException.class)
+    public void testGetLogDTOByIdWithNoMatchingIssue_shouldThrowIssueNotFoundException() {
+        // Set up expectations
+        when(issueRepository.findIdentifiedIssueDTOById(1L)).thenReturn(null);
+
+        // Exercise SUT
+        issueCRUDService.getLogDTOById(1L);
+    }
+
+    @Test
+    public void testGetLogDTOByIdWithMatchingIssue_shouldDelegateToIssueRepositoryAndReturnIdentifiedIssueDTO() {
+        // Set up fixture
+        IdentifiedIssueDTO expectedIdentifiedIssueDTO = anIdentifiedIssueDTO().id(1L).build();
+
+        // Set up expectations
+        when(issueRepository.findIdentifiedIssueDTOById(1L)).thenReturn(expectedIdentifiedIssueDTO);
+
+        // Exercise SUT
+        LogDTO actualLogDTO = issueCRUDService.getLogDTOById(1L);
+
+        // Verify behaviour
+        assertThat(actualLogDTO, is(expectedIdentifiedIssueDTO));
+    }
+
     @Test
     public void testGetIdentifiedIssueDTOs_shouldDelegateToIssueRepositoryAndReturnIdentifiedIssueDTOs() {
         // Set up fixture

@@ -16,16 +16,16 @@ import static com.trevorgowing.projectlog.log.LogTypeParsingException.causedLogT
 @RequestMapping(LogConstants.LOGS_URL_PATH)
 class LogController {
 
-    private final LogCRUDServiceFactory logCRUDServiceFactory;
+    private final LogRetrieverFactory logRetrieverFactory;
 
-    LogController(LogCRUDServiceFactory logCRUDServiceFactory) {
-        this.logCRUDServiceFactory = logCRUDServiceFactory;
+    LogController(LogRetrieverFactory logRetrieverFactory) {
+        this.logRetrieverFactory = logRetrieverFactory;
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseStatus(HttpStatus.OK)
     List<LogDTO> getLogs() {
-        return logCRUDServiceFactory.getLogCRUDService().getLogDTOs();
+        return logRetrieverFactory.getLogLookupService().getLogDTOs();
     }
 
     @GetMapping(params = LogConstants.TYPE_QUERY_PARAMETER, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -39,16 +39,28 @@ class LogController {
             throw causedLogTypeParsingException(type, exception);
         }
 
-        return logCRUDServiceFactory.getLogCRUDService(logType).getLogDTOs();
+        return logRetrieverFactory.getLogLookupService(logType).getLogDTOs();
     }
 
     private LogType parseLogType(String type) {
         return LogType.valueOf(type.trim().toUpperCase());
     }
 
+    @GetMapping(path = LogConstants.LOG_ID_URL_PATH, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    LogDTO getLogById(@PathVariable long logId) {
+        return logRetrieverFactory.getLogLookupService().getLogDTOById(logId);
+    }
+
     @ExceptionHandler(LogTypeParsingException.class)
     @ResponseStatus(code = HttpStatus.BAD_REQUEST, reason = LogTypeParsingException.REASON)
     public void handleLogTypeParsingException(LogTypeParsingException logTypeParsingException) {
         log.warn(logTypeParsingException.getMessage(), logTypeParsingException);
+    }
+
+    @ExceptionHandler(LogNotFoundException.class)
+    @ResponseStatus(code = HttpStatus.NOT_FOUND, reason = LogNotFoundException.REASON)
+    public void handleLogNotFoundException(LogNotFoundException logNotFoundException) {
+        log.warn(logNotFoundException.getMessage(), logNotFoundException);
     }
 }

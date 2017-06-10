@@ -1,7 +1,9 @@
 package com.trevorgowing.projectlog.log.risk;
 
 import com.trevorgowing.projectlog.common.types.AbstractRepositoryIntegrationTests;
+import com.trevorgowing.projectlog.project.IdentifiedProjectDTO;
 import com.trevorgowing.projectlog.project.Project;
+import com.trevorgowing.projectlog.user.IdentifiedUserDTO;
 import com.trevorgowing.projectlog.user.User;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.time.LocalDate;
 import java.util.List;
 
+import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
 import static com.trevorgowing.projectlog.log.constant.Category.COMMITTED_PEOPLE;
 import static com.trevorgowing.projectlog.log.constant.Impact.MODERATE;
 import static com.trevorgowing.projectlog.log.constant.LogStatus.NEW;
@@ -24,6 +27,7 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 
 public class RiskRepositoryTests extends AbstractRepositoryIntegrationTests {
 
@@ -119,5 +123,58 @@ public class RiskRepositoryTests extends AbstractRepositoryIntegrationTests {
 
         // Verify results
         assertThat(actualRisks, is(expectedIdentifiedRiskDTOs));
+    }
+
+    @Test
+    public void testFindIdentifiedRiskDTOByIdWithNoMatchingIssue_shouldReturnNull() {
+        // Exercise SUT
+        IdentifiedRiskDTO actualIdentifiedRiskDTO = riskRepository.findIdentifiedRiskDTOById(1L);
+
+        // Verify results
+        assertThat(actualIdentifiedRiskDTO, is(nullValue()));
+    }
+
+    @Test
+    public void testFindIdentifiedRiskDTOWithMatchingIssue_shouldReturnIdentifiedRiskDTO() {
+        // Set up fixture
+        LocalDate date = LocalDate.now();
+        User owner = aUser().email("owner@owner.com").password("password").build();
+        Project project = aProject().code("P").owner(owner).startDate(date).build();
+
+        Risk risk = aRisk()
+                .summary("Summary")
+                .description("Description")
+                .category(COMMITTED_PEOPLE)
+                .impact(MODERATE)
+                .status(NEW)
+                .dateClosed(date)
+                .project(project)
+                .owner(owner)
+                .probability(POSSIBLE)
+                .riskResponse(ACCEPT)
+                .buildAndPersist(entityManager);
+
+        IdentifiedUserDTO ownerDTO = anIdentifiedUserDTO().id(owner.getId()).email("owner@owner.com").build();
+        IdentifiedProjectDTO projectDTO = anIdentifiedProjectDTO().id(project.getId()).code("P").build();
+
+        IdentifiedRiskDTO expectedIdentifiedRiskDTO = anIdentifiedRiskDTO()
+                .id(risk.getId())
+                .summary("Summary")
+                .description("Description")
+                .category(COMMITTED_PEOPLE)
+                .impact(MODERATE)
+                .status(NEW)
+                .dateClosed(date)
+                .project(projectDTO)
+                .owner(ownerDTO)
+                .probability(POSSIBLE)
+                .riskResponse(ACCEPT)
+                .build();
+
+        // Exercise SUT
+        IdentifiedRiskDTO actualIdentifiedRiskDTO = riskRepository.findIdentifiedRiskDTOById(risk.getId());
+
+        // Verify results
+        assertThat(actualIdentifiedRiskDTO, sameBeanAs(expectedIdentifiedRiskDTO));
     }
 }

@@ -17,7 +17,7 @@ import static com.trevorgowing.projectlog.user.UserBuilder.aUser;
 public class IssueBuilder extends AbstractEntityBuilder<Issue> {
 
     private Long id;
-    private String summary = "Default Risk Summary";
+    private String summary = "Default Summary";
     private String description;
     private Category category;
     private Impact impact = MODERATE;
@@ -28,6 +28,11 @@ public class IssueBuilder extends AbstractEntityBuilder<Issue> {
 
     public static IssueBuilder anIssue() {
         return new IssueBuilder();
+    }
+
+    public static IssueBuilder aCompleteIssue() {
+        return new IssueBuilder().id(1).description("Default Description").category(Category.COMMITTED_PEOPLE)
+                .dateClosed(LocalDate.MAX);
     }
 
     @Override

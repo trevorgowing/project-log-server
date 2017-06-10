@@ -17,7 +17,7 @@ repositories {
 
 dependencies {
     compile "org.projectlombok:lombok:1.16.16"
-    compile 'com.trevorgowing:url-string-builder:1.0.1'
+    compile 'com.trevorgowing:url-string-builder:1.1.0'
 
     compile "org.flywaydb:flyway-core:4.2.0"
     compile "mysql:mysql-connector-java:6.0.6"

@@ -13,42 +13,42 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 @SuppressWarnings("unchecked")
-public class LogCRUDServiceFactoryTests extends AbstractTests {
+public class LogRetrieverFactoryTests extends AbstractTests {
 
     @Mock
     private RiskCRUDService riskCRUDService;
     @Mock
     private IssueCRUDService issueCRUDService;
     @Mock
-    private CombinedLogCRUDService combinedLogCRUDService;
+    private CombinedLogRetriever combinedLogRetriever;
 
     @InjectMocks
-    private LogCRUDServiceFactory logCRUDServiceFactory;
+    private LogRetrieverFactory logRetrieverFactory;
 
     @Test
     public void testGetLogCRUDService_shouldReturnCombinedLogCRUDService() {
         // Exercise SUT
-        LogCRUDService actualLogCRUDService = logCRUDServiceFactory.getLogCRUDService();
+        LogRetriever actualLogRetriever = logRetrieverFactory.getLogLookupService();
 
         // Verify behaviour
-        assertThat(actualLogCRUDService, is(combinedLogCRUDService));
+        assertThat(actualLogRetriever, is(combinedLogRetriever));
     }
 
     @Test
     public void testGetLogCRUDServiceWithTypeRisk_shouldReturnRiskCRUDService() {
         // Exercise SUT
-        LogCRUDService actualLogCRUDService = logCRUDServiceFactory.getLogCRUDService(RISK);
+        LogRetriever actualLogRetriever = logRetrieverFactory.getLogLookupService(RISK);
 
         // Verify behaviour
-        assertThat(actualLogCRUDService, is(riskCRUDService));
+        assertThat(actualLogRetriever, is(riskCRUDService));
     }
 
     @Test
     public void testGetLogCRUDServiceWithTypeIssue_shouldReturnIssueCRUDService() {
         // Exercise SUT
-        LogCRUDService actualLogCRUDService = logCRUDServiceFactory.getLogCRUDService(ISSUE);
+        LogRetriever actualLogRetriever = logRetrieverFactory.getLogLookupService(ISSUE);
 
         // Verify behaviour
-        assertThat(actualLogCRUDService, is(issueCRUDService));
+        assertThat(actualLogRetriever, is(issueCRUDService));
     }
 }

@@ -7,9 +7,9 @@ import static com.trevorgowing.projectlog.project.IdentifiedProjectDTO.completeI
 import static com.trevorgowing.projectlog.user.IdentifiedUserDTO.passwordFreeIdentifiedUserDTO;
 
 @Service
-class ProjectDTOFactory {
+public class ProjectDTOFactory {
 
-    IdentifiedProjectDTO createIdentifiedProjectDTO(Project project) {
+    public IdentifiedProjectDTO createIdentifiedProjectDTO(Project project) {
         User owner = project.getOwner();
         return completeIdentifiedProjectDTO(project.getId(), project.getCode(), project.getName(),
                 passwordFreeIdentifiedUserDTO(owner.getId(), owner.getEmail(), owner.getFirstName(),

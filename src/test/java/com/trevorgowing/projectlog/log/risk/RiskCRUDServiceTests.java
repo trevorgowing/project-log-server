@@ -42,6 +42,30 @@ public class RiskCRUDServiceTests extends AbstractTests {
         assertThat(actualLogDTOs, is(expectedLogDTOs));
     }
 
+    @Test(expected = RiskNotFoundException.class)
+    public void testGetLogDTOByIdWithNoMatchingRisk_shouldThrowIdentifiedRiskNotFoundException() {
+        // Set up expectations
+        when(riskRepository.findIdentifiedRiskDTOById(1L)).thenReturn(null);
+
+        // Exercise SUT
+        riskCRUDService.getLogDTOById(1L);
+    }
+
+    @Test
+    public void testGetLogDTOByIdWithMatchingRisk_shouldDelegateToIssueRepositoryAndReturnIdentifiedIssueDTO() {
+        // Set up fixture
+        IdentifiedRiskDTO expectedIdentifiedRiskDTO = anIdentifiedRiskDTO().id(1L).build();
+
+        // Set up expectations
+        when(riskRepository.findIdentifiedRiskDTOById(1L)).thenReturn(expectedIdentifiedRiskDTO);
+
+        // Exercise SUT
+        LogDTO actualLogDTO = riskCRUDService.getLogDTOById(1L);
+
+        // Verify behaviour
+        assertThat(actualLogDTO, is(expectedIdentifiedRiskDTO));
+    }
+
     @Test
     public void testGetIdentifiedRiskDTOs_shouldDelegateToRiskRepositoryAndReturnIdentifiedRiskDTOs() {
         // Set up fixture

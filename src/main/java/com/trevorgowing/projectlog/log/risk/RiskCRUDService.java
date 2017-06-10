@@ -1,14 +1,17 @@
 package com.trevorgowing.projectlog.log.risk;
 
-import com.trevorgowing.projectlog.log.LogCRUDService;
 import com.trevorgowing.projectlog.log.LogDTO;
+import com.trevorgowing.projectlog.log.LogRetriever;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.trevorgowing.projectlog.log.risk.RiskNotFoundException.identifiedRiskNotFoundException;
+import static java.util.Optional.ofNullable;
+
 @Service
-public class RiskCRUDService implements LogCRUDService {
+public class RiskCRUDService implements LogRetriever {
 
     private final RiskRepository riskRepository;
 
@@ -21,7 +24,13 @@ public class RiskCRUDService implements LogCRUDService {
         return new ArrayList<>(getIdentifiedRiskDTOs());
     }
 
-    public List<IdentifiedRiskDTO> getIdentifiedRiskDTOs() {
+    @Override
+    public LogDTO getLogDTOById(long id) {
+        return ofNullable(riskRepository.findIdentifiedRiskDTOById(id))
+                .orElseThrow(() -> identifiedRiskNotFoundException(id));
+    }
+
+    List<IdentifiedRiskDTO> getIdentifiedRiskDTOs() {
         return riskRepository.findIdentifiedRiskDTOs();
     }
 }

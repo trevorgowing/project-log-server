@@ -3,6 +3,7 @@ package com.trevorgowing.projectlog.log;
 import com.trevorgowing.projectlog.common.types.AbstractControllerUnitTests;
 import com.trevorgowing.projectlog.log.constant.LogConstants;
 import com.trevorgowing.projectlog.log.constant.LogType;
+import com.trevorgowing.projectlog.log.risk.IdentifiedRiskDTO;
 import io.restassured.http.ContentType;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -15,6 +16,7 @@ import java.util.List;
 import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
 import static com.trevorgowing.UrlStringBuilder.basedUrlBuilder;
 import static com.trevorgowing.projectlog.common.converters.ObjectToJSONConverter.convertToJSON;
+import static com.trevorgowing.projectlog.log.LogNotFoundException.identifiedLogNotFoundException;
 import static com.trevorgowing.projectlog.log.issue.IdentifiedIssueDTOBuilder.anIdentifiedIssueDTO;
 import static com.trevorgowing.projectlog.log.risk.IdentifiedRiskDTOBuilder.anIdentifiedRiskDTO;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
@@ -28,10 +30,11 @@ import static org.mockito.Mockito.when;
 public class LogControllerUnitTests extends AbstractControllerUnitTests {
 
     @Mock
-    private LogCRUDService logCRUDService;
+    private LogRetriever logRetriever;
     
     @Mock
-    private LogCRUDServiceFactory logCRUDServiceFactory;
+    private LogRetrieverFactory logRetrieverFactory;
+
     @InjectMocks
     private LogController logController;
 
@@ -43,8 +46,8 @@ public class LogControllerUnitTests extends AbstractControllerUnitTests {
     @Test
     public void testGetAllLogsWithNoExistingLogs_shouldRespondWithStatusOkAndReturnNoLogs() throws Exception {
         // Set up expectations
-        when(logCRUDServiceFactory.getLogCRUDService()).thenReturn(logCRUDService);
-        when(logCRUDService.getLogDTOs()).thenReturn(emptyList());
+        when(logRetrieverFactory.getLogLookupService()).thenReturn(logRetriever);
+        when(logRetriever.getLogDTOs()).thenReturn(emptyList());
 
         // Exercise SUT
         given()
@@ -69,8 +72,8 @@ public class LogControllerUnitTests extends AbstractControllerUnitTests {
         List<LogDTO> expectedLogDTOs = asList(anIdentifiedIssueDTO().build(), anIdentifiedRiskDTO().build());
 
         // Set up expectations
-        when(logCRUDServiceFactory.getLogCRUDService()).thenReturn(logCRUDService);
-        when(logCRUDService.getLogDTOs()).thenReturn(expectedLogDTOs);
+        when(logRetrieverFactory.getLogLookupService()).thenReturn(logRetriever);
+        when(logRetriever.getLogDTOs()).thenReturn(expectedLogDTOs);
 
         // Exercise SUT
         given()
@@ -108,8 +111,8 @@ public class LogControllerUnitTests extends AbstractControllerUnitTests {
     @Test
     public void testGetLogsWithValidTypeRiskAndNoExistingRisks_shouldRespondWithStatusOkAndReturnNoRisks() throws Exception {
         // Set up expectations
-        when(logCRUDServiceFactory.getLogCRUDService(LogType.RISK)).thenReturn(logCRUDService);
-        when(logCRUDService.getLogDTOs()).thenReturn(emptyList());
+        when(logRetrieverFactory.getLogLookupService(LogType.RISK)).thenReturn(logRetriever);
+        when(logRetriever.getLogDTOs()).thenReturn(emptyList());
 
         // Exercise SUT
         given()
@@ -136,8 +139,8 @@ public class LogControllerUnitTests extends AbstractControllerUnitTests {
         List<LogDTO> expectedLogDTOs = asList(anIdentifiedRiskDTO().build(), anIdentifiedRiskDTO().build());
 
         // Set up expectations
-        when(logCRUDServiceFactory.getLogCRUDService(LogType.RISK)).thenReturn(logCRUDService);
-        when(logCRUDService.getLogDTOs()).thenReturn(expectedLogDTOs);
+        when(logRetrieverFactory.getLogLookupService(LogType.RISK)).thenReturn(logRetriever);
+        when(logRetriever.getLogDTOs()).thenReturn(expectedLogDTOs);
 
         // Exercise SUT
         given()
@@ -161,8 +164,8 @@ public class LogControllerUnitTests extends AbstractControllerUnitTests {
     @Test
     public void testGetLogsWithValidTypeIssuesAndNoExistingIssue_shouldRespondWithStatusOkAndReturnNoIssues() throws Exception {
         // Set up expectations
-        when(logCRUDServiceFactory.getLogCRUDService(LogType.ISSUE)).thenReturn(logCRUDService);
-        when(logCRUDService.getLogDTOs()).thenReturn(emptyList());
+        when(logRetrieverFactory.getLogLookupService(LogType.ISSUE)).thenReturn(logRetriever);
+        when(logRetriever.getLogDTOs()).thenReturn(emptyList());
 
         // Exercise SUT
         given()
@@ -189,8 +192,8 @@ public class LogControllerUnitTests extends AbstractControllerUnitTests {
         List<LogDTO> expectedLogDTOs = asList(anIdentifiedIssueDTO().build(), anIdentifiedIssueDTO().build());
 
         // Set up expectations
-        when(logCRUDServiceFactory.getLogCRUDService(LogType.ISSUE)).thenReturn(logCRUDService);
-        when(logCRUDService.getLogDTOs()).thenReturn(expectedLogDTOs);
+        when(logRetrieverFactory.getLogLookupService(LogType.ISSUE)).thenReturn(logRetriever);
+        when(logRetriever.getLogDTOs()).thenReturn(expectedLogDTOs);
 
         // Exercise SUT
         given()
@@ -209,5 +212,48 @@ public class LogControllerUnitTests extends AbstractControllerUnitTests {
 
         // Verify behaviour
         assertThat(actualLogDTOs, is(expectedLogDTOs));
+    }
+
+    @Test(expected = LogNotFoundException.class)
+    public void testGetLogDTOByIdWithNoMatchingLog_shouldRespondWithStatusNotFound() {
+        // Set up expectations
+        when(logRetrieverFactory.getLogLookupService()).thenReturn(logRetriever);
+        when(logRetriever.getLogDTOById(1)).thenThrow(identifiedLogNotFoundException(1));
+
+        // Exercise SUT
+        given()
+                .accept(ContentType.JSON)
+        .when()
+                .get(basedUrlBuilder(LogConstants.LOGS_URL_PATH).appendPath(1).toString())
+        .then()
+                .log().all()
+                .statusCode(HttpStatus.NOT_FOUND.value());
+
+        logController.getLogById(1);
+    }
+
+    @Test
+    public void testGetLogByIdWithMatchingLog_shouldRespondWithStatusOkAndReturnLog() throws Exception {
+        // Set up fixture
+        IdentifiedRiskDTO expectedLogDTO = anIdentifiedRiskDTO().id(1).build();
+
+        // Set up expectations
+        when(logRetrieverFactory.getLogLookupService()).thenReturn(logRetriever);
+        when(logRetriever.getLogDTOById(1)).thenReturn(expectedLogDTO);
+
+        // Exercise SUT
+        given()
+                .accept(ContentType.JSON)
+        .when()
+                .get(basedUrlBuilder(LogConstants.LOGS_URL_PATH).appendPath(1).toString())
+        .then()
+                .log().all()
+                .statusCode(HttpStatus.OK.value())
+                .body(sameBeanAs(convertToJSON(expectedLogDTO)));
+
+        LogDTO actualLogDTO = logController.getLogById(1);
+
+        // Verify behaviour
+        assertThat(actualLogDTO, is(expectedLogDTO));
     }
 }

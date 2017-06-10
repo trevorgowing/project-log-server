@@ -5,9 +5,9 @@ import org.springframework.stereotype.Service;
 import static com.trevorgowing.projectlog.user.IdentifiedUserDTO.completeIdentifiedUserDTO;
 
 @Service
-class UserDTOFactory {
+public class UserDTOFactory {
 
-    IdentifiedUserDTO createIdentifiedUserDTO(User user) {
+    public IdentifiedUserDTO createIdentifiedUserDTO(User user) {
         return completeIdentifiedUserDTO(user.getId(), user.getEmail(), user.getPassword(), user.getFirstName(),
                 user.getLastName());
     }
