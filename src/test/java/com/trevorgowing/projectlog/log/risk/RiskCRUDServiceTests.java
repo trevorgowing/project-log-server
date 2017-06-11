@@ -2,6 +2,17 @@ package com.trevorgowing.projectlog.log.risk;
 
 import com.trevorgowing.projectlog.common.types.AbstractTests;
 import com.trevorgowing.projectlog.log.LogDTO;
+import com.trevorgowing.projectlog.log.constant.Category;
+import com.trevorgowing.projectlog.log.constant.Impact;
+import com.trevorgowing.projectlog.log.constant.LogStatus;
+import com.trevorgowing.projectlog.log.constant.Probability;
+import com.trevorgowing.projectlog.log.constant.RiskResponse;
+import com.trevorgowing.projectlog.project.Project;
+import com.trevorgowing.projectlog.project.ProjectNotFoundException;
+import com.trevorgowing.projectlog.project.ProjectRepository;
+import com.trevorgowing.projectlog.user.User;
+import com.trevorgowing.projectlog.user.UserNotFoundException;
+import com.trevorgowing.projectlog.user.UserRepository;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;

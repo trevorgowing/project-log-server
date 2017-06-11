@@ -2,7 +2,11 @@ package com.trevorgowing.projectlog.log.risk;
 
 import com.trevorgowing.projectlog.common.builders.AbstractEntityBuilder;
 import com.trevorgowing.projectlog.common.persisters.AbstractEntityPersister;
-import com.trevorgowing.projectlog.log.constant.*;
+import com.trevorgowing.projectlog.log.constant.Category;
+import com.trevorgowing.projectlog.log.constant.Impact;
+import com.trevorgowing.projectlog.log.constant.LogStatus;
+import com.trevorgowing.projectlog.log.constant.Probability;
+import com.trevorgowing.projectlog.log.constant.RiskResponse;
 import com.trevorgowing.projectlog.project.Project;
 import com.trevorgowing.projectlog.user.User;
 

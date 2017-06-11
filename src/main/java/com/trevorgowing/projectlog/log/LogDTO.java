@@ -7,8 +7,8 @@ import com.trevorgowing.projectlog.project.IdentifiedProjectDTO;
 import com.trevorgowing.projectlog.user.IdentifiedUserDTO;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;

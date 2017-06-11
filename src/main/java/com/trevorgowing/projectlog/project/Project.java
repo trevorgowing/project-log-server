@@ -5,9 +5,18 @@ import com.trevorgowing.projectlog.common.persistence.DateRange;
 import com.trevorgowing.projectlog.common.persistence.HasDateRange;
 import com.trevorgowing.projectlog.common.persistence.ValidatedDateRange;
 import com.trevorgowing.projectlog.user.User;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import javax.persistence.*;
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Embedded;
+import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import java.time.LocalDate;
 
 import static java.util.Optional.ofNullable;

@@ -14,7 +14,9 @@ import static com.trevorgowing.projectlog.user.IdentifiedUserDTOBuilder.anIdenti
 import static com.trevorgowing.projectlog.user.UserBuilder.aUser;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 
 public class ProjectRepositoryIntegrationTests extends AbstractRepositoryIntegrationTests {
 

@@ -1,7 +1,9 @@
 package com.trevorgowing.projectlog.project;
 
 import com.trevorgowing.projectlog.user.IdentifiedUserDTO;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.Objects;

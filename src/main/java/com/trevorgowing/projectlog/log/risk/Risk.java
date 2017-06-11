@@ -1,14 +1,22 @@
 package com.trevorgowing.projectlog.log.risk;
 
 import com.trevorgowing.projectlog.log.Log;
-import com.trevorgowing.projectlog.log.constant.*;
+import com.trevorgowing.projectlog.log.constant.Category;
+import com.trevorgowing.projectlog.log.constant.Impact;
+import com.trevorgowing.projectlog.log.constant.LogStatus;
+import com.trevorgowing.projectlog.log.constant.Probability;
+import com.trevorgowing.projectlog.log.constant.RiskResponse;
 import com.trevorgowing.projectlog.project.Project;
 import com.trevorgowing.projectlog.user.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.*;
+import javax.persistence.Basic;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import java.time.LocalDate;
 
 @Entity

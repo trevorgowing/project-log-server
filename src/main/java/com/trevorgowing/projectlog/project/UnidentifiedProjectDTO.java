@@ -1,7 +1,11 @@
 package com.trevorgowing.projectlog.project;
 
 import com.trevorgowing.projectlog.user.IdentifiedUserDTO;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.io.Serializable;
 import java.time.LocalDate;

@@ -14,7 +14,9 @@ import static com.trevorgowing.projectlog.user.IdentifiedUserDTOBuilder.anIdenti
 import static com.trevorgowing.projectlog.user.UserBuilder.aUser;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
 
 public class UserCRUDServiceUnitTests extends AbstractTests {
 

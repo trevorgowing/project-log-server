@@ -1,8 +1,9 @@
 package com.trevorgowing.projectlog.log.issue;
 
 import com.trevorgowing.projectlog.log.Log;
-import com.trevorgowing.projectlog.log.constant.*;
-import com.trevorgowing.projectlog.log.risk.Risk;
+import com.trevorgowing.projectlog.log.constant.Category;
+import com.trevorgowing.projectlog.log.constant.Impact;
+import com.trevorgowing.projectlog.log.constant.LogStatus;
 import com.trevorgowing.projectlog.project.Project;
 import com.trevorgowing.projectlog.user.User;
 import lombok.NoArgsConstructor;
