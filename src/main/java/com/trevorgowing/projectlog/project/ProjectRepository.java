@@ -5,7 +5,7 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 
 import java.util.List;
 
-interface ProjectRepository extends PagingAndSortingRepository<Project, Long> {
+public interface ProjectRepository extends PagingAndSortingRepository<Project, Long> {
 
     String QUERY_FIND_IDENTIFIED_PROJECT_DTOS =
             "SELECT NEW com.trevorgowing.projectlog.project.IdentifiedProjectDTO(" +

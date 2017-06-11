@@ -21,6 +21,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.trevorgowing.projectlog.log.risk.IdentifiedRiskDTOBuilder.anIdentifiedRiskDTO;
+import static com.trevorgowing.projectlog.log.risk.RiskBuilder.aRisk;
+import static com.trevorgowing.projectlog.log.risk.UnidentifiedRiskDTOBuilder.anUnidentifiedRiskDTO;
+import static com.trevorgowing.projectlog.project.IdentifiedProjectDTOBuilder.anIdentifiedProjectDTO;
+import static com.trevorgowing.projectlog.project.ProjectBuilder.aProject;
+import static com.trevorgowing.projectlog.user.IdentifiedUserDTOBuilder.anIdentifiedUserDTO;
+import static com.trevorgowing.projectlog.user.UserBuilder.aUser;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -29,7 +35,11 @@ import static org.mockito.Mockito.when;
 public class RiskCRUDServiceTests extends AbstractTests {
 
     @Mock
+    private UserRepository userRepository;
+    @Mock
     private RiskRepository riskRepository;
+    @Mock
+    private ProjectRepository projectRepository;
 
     @InjectMocks
     private RiskCRUDService riskCRUDService;
@@ -92,5 +102,107 @@ public class RiskCRUDServiceTests extends AbstractTests {
 
         // Verify behaviour
         assertThat(actualIdentifiedRiskDTOs, is(expectedIdentifiedRiskDTOs));
+    }
+
+    @Test(expected = ProjectNotFoundException.class)
+    public void testCreateRiskWithNonExistentProject_shouldThrowProjectNotFoundException() {
+        // Set up fixture
+        UnidentifiedRiskDTO unidentifiedRiskDTO = anUnidentifiedRiskDTO()
+                .summary("Summary")
+                .description("Description")
+                .category(Category.COMMITTED_PEOPLE)
+                .impact(Impact.MODERATE)
+                .status(LogStatus.NEW)
+                .project(anIdentifiedProjectDTO().id(1).build())
+                .owner(anIdentifiedUserDTO().id(1).build())
+                .probability(Probability.POSSIBLE)
+                .riskResponse(RiskResponse.ACCEPT)
+                .build();
+
+        // Set up expectations
+        when(projectRepository.findOne(1L)).thenReturn(null);
+
+        // Exercise SUT
+        riskCRUDService.createRisk(unidentifiedRiskDTO);
+    }
+
+    @Test(expected = UserNotFoundException.class)
+    public void testCreateRiskWithNonExistentOwner_shouldThrowProjectNotFoundException() {
+        // Set up fixture
+        UnidentifiedRiskDTO unidentifiedRiskDTO = anUnidentifiedRiskDTO()
+                .summary("Summary")
+                .description("Description")
+                .category(Category.COMMITTED_PEOPLE)
+                .impact(Impact.MODERATE)
+                .status(LogStatus.NEW)
+                .project(anIdentifiedProjectDTO().id(1).build())
+                .owner(anIdentifiedUserDTO().id(1).build())
+                .probability(Probability.POSSIBLE)
+                .riskResponse(RiskResponse.ACCEPT)
+                .build();
+
+        Project project = aProject().id(1L).build();
+
+        // Set up expectations
+        when(projectRepository.findOne(1L)).thenReturn(project);
+        when(userRepository.findOne(1L)).thenReturn(null);
+
+        // Exercise SUT
+        riskCRUDService.createRisk(unidentifiedRiskDTO);
+    }
+
+    @Test
+    public void testCreateRiskWithValidRisk_shouldDelegateToRiskRepositoryToSaveRiskAndReturnManagedRisk() {
+        // Set up fixture
+        UnidentifiedRiskDTO unidentifiedRiskDTO = anUnidentifiedRiskDTO()
+                .summary("Summary")
+                .description("Description")
+                .category(Category.COMMITTED_PEOPLE)
+                .impact(Impact.MODERATE)
+                .status(LogStatus.NEW)
+                .project(anIdentifiedProjectDTO().id(1).build())
+                .owner(anIdentifiedUserDTO().id(1).build())
+                .probability(Probability.POSSIBLE)
+                .riskResponse(RiskResponse.ACCEPT)
+                .build();
+
+        Project project = aProject().id(1L).build();
+        User owner = aUser().id(1L).build();
+
+        Risk unidentifiedRisk = aRisk()
+                .summary("Summary")
+                .description("Description")
+                .category(Category.COMMITTED_PEOPLE)
+                .impact(Impact.MODERATE)
+                .status(LogStatus.NEW)
+                .project(project)
+                .owner(owner)
+                .probability(Probability.POSSIBLE)
+                .riskResponse(RiskResponse.ACCEPT)
+                .build();
+
+        Risk expectedRisk = aRisk()
+                .id(1)
+                .summary("Summary")
+                .description("Description")
+                .category(Category.COMMITTED_PEOPLE)
+                .impact(Impact.MODERATE)
+                .status(LogStatus.NEW)
+                .project(project)
+                .owner(owner)
+                .probability(Probability.POSSIBLE)
+                .riskResponse(RiskResponse.ACCEPT)
+                .build();
+
+        // Set up expectations
+        when(projectRepository.findOne(1L)).thenReturn(project);
+        when(userRepository.findOne(1L)).thenReturn(owner);
+        when(riskRepository.save(unidentifiedRisk)).thenReturn(expectedRisk);
+
+        // Exercise SUT
+        Risk actualRisk = riskCRUDService.createRisk(unidentifiedRiskDTO);
+
+        // Verify behaviour
+        assertThat(actualRisk, is(expectedRisk));
     }
 }

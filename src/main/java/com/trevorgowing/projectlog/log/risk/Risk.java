@@ -43,6 +43,19 @@ public class Risk extends Log {
         this.riskResponse = riskResponse;
     }
 
+    private Risk(String summary, String description, Category category, Impact impact, LogStatus status, LocalDate dateClosed, Project project, User owner, Probability probability, RiskResponse riskResponse) {
+        super(summary, description, category, impact, status, dateClosed, project, owner);
+        this.probability = probability;
+        this.riskResponse = riskResponse;
+    }
+
+    public static Risk unidentifiedRisk(String summary, String description, Category category, Impact impact,
+                                        LogStatus status, LocalDate dateClosed, Project project, User owner,
+                                        Probability probability, RiskResponse riskResponse) {
+        return new Risk(summary, description, category, impact, status, dateClosed, project, owner, probability,
+                riskResponse);
+    }
+
     public static Risk completeRisk(Long id, String summary, String description, Category category, Impact impact,
                                     LogStatus status, LocalDate dateClosed, Project project, User owner,
                                     Probability probability, RiskResponse riskResponse) {

@@ -5,7 +5,7 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 
 import java.util.List;
 
-interface UserRepository extends PagingAndSortingRepository<User, Long> {
+public interface UserRepository extends PagingAndSortingRepository<User, Long> {
 
     String QUERY_FIND_IDENTIFIED_USER_DTOS =
             "SELECT NEW com.trevorgowing.projectlog.user.IdentifiedUserDTO(u.id, u.email, u.password, u.firstName, u.lastName) " +
