@@ -52,8 +52,7 @@ public class ProjectCRUDService {
     }
 
     Project updateProject(long id, String code, String name, long ownerId, LocalDate startDate, LocalDate endDate) {
-        Project projectToUpdate = ofNullable(projectRepository.findOne(id))
-                .orElseThrow(() -> identifiedProjectNotFoundException(id));
+        Project projectToUpdate = findProject(id);
 
         projectToUpdate.setCode(code);
         projectToUpdate.setName(name);
