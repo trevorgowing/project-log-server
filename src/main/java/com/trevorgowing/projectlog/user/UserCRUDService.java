@@ -5,7 +5,6 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 import static com.trevorgowing.projectlog.user.DuplicateEmailException.causedDuplicateEmailException;
 import static com.trevorgowing.projectlog.user.User.unidentifiedUser;
@@ -44,8 +43,7 @@ public class UserCRUDService {
     }
 
     User updateUser(long userId, String email, String password, String firstName, String lastName) {
-        Optional<User> optionalUserToUpdate = ofNullable(userRepository.findOne(userId));
-        User userToUpdate = optionalUserToUpdate.orElseThrow(() -> identifiedUserNotFoundException(userId));
+        User userToUpdate = findUser(userId);
 
         userToUpdate.setEmail(email);
         userToUpdate.setPassword(password);

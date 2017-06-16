@@ -18,7 +18,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
-public class UserCRUDServiceUnitTests extends AbstractTests {
+public class UserCRUDServiceTests extends AbstractTests {
 
     @Mock
     private UserRepository userRepository;
