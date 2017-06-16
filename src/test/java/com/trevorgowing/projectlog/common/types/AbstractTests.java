@@ -1,5 +1,9 @@
 package com.trevorgowing.projectlog.common.types;
 
+import org.junit.Rule;
+import org.junit.rules.TestRule;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -16,4 +20,11 @@ public abstract class AbstractTests {
     protected static final String IRRELEVANT_USER_PASSWORD = "irrelevant.password";
     protected static final String IRRELEVANT_USER_FIRST_NAME = "irrelevant.first.name";
     protected static final String IRRELEVANT_USER_LAST_NAME = "irrelevant.last.name";
+
+    @Rule
+    public TestRule watcher = new TestWatcher() {
+        protected void starting(Description description) {
+            System.out.println(description.getDisplayName());
+        }
+    };
 }
