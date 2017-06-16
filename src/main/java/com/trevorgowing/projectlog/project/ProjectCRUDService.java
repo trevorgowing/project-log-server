@@ -15,17 +15,17 @@ import static com.trevorgowing.projectlog.project.ProjectNotFoundException.ident
 import static java.util.Optional.ofNullable;
 
 @Service
-class ProjectCRUDService {
+public class ProjectCRUDService {
 
     private final UserCRUDService userCRUDService;
     private final ProjectRepository projectRepository;
 
-    ProjectCRUDService(UserCRUDService userCRUDService, ProjectRepository projectRepository) {
+    public ProjectCRUDService(UserCRUDService userCRUDService, ProjectRepository projectRepository) {
         this.userCRUDService = userCRUDService;
         this.projectRepository = projectRepository;
     }
 
-    Project findProject(long projectId) {
+    public Project findProject(long projectId) {
         return ofNullable(projectRepository.findOne(projectId))
                 .orElseThrow(() -> identifiedProjectNotFoundException(projectId));
     }

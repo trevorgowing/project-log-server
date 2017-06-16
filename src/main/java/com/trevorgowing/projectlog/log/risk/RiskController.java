@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -26,11 +27,17 @@ class RiskController {
         this.riskCRUDService = riskCRUDService;
     }
 
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
-            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     IdentifiedRiskDTO postRisk(@RequestBody UnidentifiedRiskDTO unidentifiedRiskDTO) {
         Risk risk = riskCRUDService.createRisk(unidentifiedRiskDTO);
+        return riskDTOFactory.createIdentifiedRiskDTO(risk);
+    }
+
+    @PutMapping(consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    IdentifiedRiskDTO putRisk(@RequestBody IdentifiedRiskDTO identifiedRiskDTO) {
+        Risk risk = riskCRUDService.updateRisk(identifiedRiskDTO);
         return riskDTOFactory.createIdentifiedRiskDTO(risk);
     }
 

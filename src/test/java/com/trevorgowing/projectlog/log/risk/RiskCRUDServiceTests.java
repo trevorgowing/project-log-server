@@ -8,38 +8,43 @@ import com.trevorgowing.projectlog.log.constant.LogStatus;
 import com.trevorgowing.projectlog.log.constant.Probability;
 import com.trevorgowing.projectlog.log.constant.RiskResponse;
 import com.trevorgowing.projectlog.project.Project;
+import com.trevorgowing.projectlog.project.ProjectCRUDService;
 import com.trevorgowing.projectlog.project.ProjectNotFoundException;
-import com.trevorgowing.projectlog.project.ProjectRepository;
 import com.trevorgowing.projectlog.user.User;
+import com.trevorgowing.projectlog.user.UserCRUDService;
 import com.trevorgowing.projectlog.user.UserNotFoundException;
-import com.trevorgowing.projectlog.user.UserRepository;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
 import static com.trevorgowing.projectlog.log.risk.IdentifiedRiskDTOBuilder.anIdentifiedRiskDTO;
 import static com.trevorgowing.projectlog.log.risk.RiskBuilder.aRisk;
 import static com.trevorgowing.projectlog.log.risk.UnidentifiedRiskDTOBuilder.anUnidentifiedRiskDTO;
 import static com.trevorgowing.projectlog.project.IdentifiedProjectDTOBuilder.anIdentifiedProjectDTO;
 import static com.trevorgowing.projectlog.project.ProjectBuilder.aProject;
+import static com.trevorgowing.projectlog.project.ProjectNotFoundException.identifiedProjectNotFoundException;
 import static com.trevorgowing.projectlog.user.IdentifiedUserDTOBuilder.anIdentifiedUserDTO;
 import static com.trevorgowing.projectlog.user.UserBuilder.aUser;
+import static com.trevorgowing.projectlog.user.UserNotFoundException.identifiedUserNotFoundException;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.when;
 
 public class RiskCRUDServiceTests extends AbstractTests {
 
     @Mock
-    private UserRepository userRepository;
-    @Mock
     private RiskRepository riskRepository;
     @Mock
-    private ProjectRepository projectRepository;
+    private UserCRUDService userCRUDService;
+    @Mock
+    private ProjectCRUDService projectCRUDService;
 
     @InjectMocks
     private RiskCRUDService riskCRUDService;
@@ -113,21 +118,21 @@ public class RiskCRUDServiceTests extends AbstractTests {
                 .category(Category.COMMITTED_PEOPLE)
                 .impact(Impact.MODERATE)
                 .status(LogStatus.NEW)
-                .project(anIdentifiedProjectDTO().id(1).build())
-                .owner(anIdentifiedUserDTO().id(1).build())
+                .project(anIdentifiedProjectDTO().id(1L).build())
+                .owner(anIdentifiedUserDTO().id(1L).build())
                 .probability(Probability.POSSIBLE)
                 .riskResponse(RiskResponse.ACCEPT)
                 .build();
 
         // Set up expectations
-        when(projectRepository.findOne(1L)).thenReturn(null);
+        when(projectCRUDService.findProject(1L)).thenThrow(identifiedProjectNotFoundException(1L));
 
         // Exercise SUT
         riskCRUDService.createRisk(unidentifiedRiskDTO);
     }
 
     @Test(expected = UserNotFoundException.class)
-    public void testCreateRiskWithNonExistentOwner_shouldThrowProjectNotFoundException() {
+    public void testCreateRiskWithNonExistentOwner_shouldThrowUserNotFoundException() {
         // Set up fixture
         UnidentifiedRiskDTO unidentifiedRiskDTO = anUnidentifiedRiskDTO()
                 .summary("Summary")
@@ -144,8 +149,8 @@ public class RiskCRUDServiceTests extends AbstractTests {
         Project project = aProject().id(1L).build();
 
         // Set up expectations
-        when(projectRepository.findOne(1L)).thenReturn(project);
-        when(userRepository.findOne(1L)).thenReturn(null);
+        when(projectCRUDService.findProject(1L)).thenReturn(project);
+        when(userCRUDService.findUser(1L)).thenThrow(identifiedUserNotFoundException(1L));
 
         // Exercise SUT
         riskCRUDService.createRisk(unidentifiedRiskDTO);
@@ -195,12 +200,125 @@ public class RiskCRUDServiceTests extends AbstractTests {
                 .build();
 
         // Set up expectations
-        when(projectRepository.findOne(1L)).thenReturn(project);
-        when(userRepository.findOne(1L)).thenReturn(owner);
+        when(projectCRUDService.findProject(1L)).thenReturn(project);
+        when(userCRUDService.findUser(1L)).thenReturn(owner);
         when(riskRepository.save(unidentifiedRisk)).thenReturn(expectedRisk);
 
         // Exercise SUT
         Risk actualRisk = riskCRUDService.createRisk(unidentifiedRiskDTO);
+
+        // Verify behaviour
+        assertThat(actualRisk, is(expectedRisk));
+    }
+
+    @Test(expected = RiskNotFoundException.class)
+    public void testUpdateRiskWithNonExistentRisk_shouldThrowRiskNotFoundException() {
+        // Set up fixture
+        IdentifiedRiskDTO identifiedRiskDTO = anIdentifiedRiskDTO().id(1L).build();
+
+        // Set up expectations
+        when(riskRepository.findOne(1L)).thenReturn(null);
+
+        // Exercise SUT
+        riskCRUDService.updateRisk(identifiedRiskDTO);
+    }
+
+    @Test(expected = ProjectNotFoundException.class)
+    public void testUpdateRiskWithNonExistentProject_shouldThrowProjectNotFoundException() {
+        // Set up fixture
+        IdentifiedRiskDTO identifiedRiskDTO = anIdentifiedRiskDTO().id(1L)
+                .project(anIdentifiedProjectDTO().id(2L).build()).build();
+
+        Risk risk = aRisk().id(1)
+                .project(aProject().id(1L).build())
+                .owner(aUser().id(1L).build())
+                .build();
+
+        // Set up expectations
+        when(riskRepository.findOne(1L)).thenReturn(risk);
+        when(projectCRUDService.findProject(2L)).thenThrow(identifiedProjectNotFoundException(1L));
+
+        // Exercise SUT
+        riskCRUDService.updateRisk(identifiedRiskDTO);
+    }
+
+    @Test(expected = UserNotFoundException.class)
+    public void testUpdateRiskWithNonExistentUser_shouldThrowUserNotFoundException() {
+        // Set up fixture
+        IdentifiedRiskDTO identifiedRiskDTO = anIdentifiedRiskDTO().id(1L)
+                .project(anIdentifiedProjectDTO().id(1L).build())
+                .owner(anIdentifiedUserDTO().id(2L).build())
+                .build();
+
+        Risk risk = aRisk().id(1L)
+                .project(aProject().id(1L).build())
+                .owner(aUser().id(1L).build())
+                .build();
+
+        // Set up fixture
+        when(riskRepository.findOne(1L)).thenReturn(risk);
+        when(userCRUDService.findUser(2L)).thenThrow(identifiedUserNotFoundException(1L));
+
+        // Exercise SUT
+        riskCRUDService.updateRisk(identifiedRiskDTO);
+    }
+
+    @Test
+    public void testUpdateRiskWithValidRisk_shouldDelegateToRiskRepositoryToSaveRiskAndReturnUpdatedRisk() {
+        // Set up fixture
+        IdentifiedRiskDTO identifiedRiskDTO =anIdentifiedRiskDTO()
+                .id(1L)
+                .summary("New Summary")
+                .description("New Description")
+                .category(Category.QUALITY_EXECUTION)
+                .impact(Impact.INSIGNIFICANT)
+                .status(LogStatus.CLOSED)
+                .dateClosed(LocalDate.MAX)
+                .project(anIdentifiedProjectDTO().id(2L).build())
+                .owner(anIdentifiedUserDTO().id(2L).build())
+                .probability(Probability.VERY_UNLIKELY)
+                .riskResponse(RiskResponse.MITIGATE)
+                .build();
+
+        Risk riskPreUpdate = aRisk()
+                .id(1L)
+                .summary("Old Summary")
+                .description("Old Description")
+                .category(Category.COMMITTED_PEOPLE)
+                .impact(Impact.MODERATE)
+                .status(LogStatus.NEW)
+                .dateClosed(null)
+                .project(aProject().id(1L).build())
+                .owner(aUser().id(1L).build())
+                .probability(Probability.POSSIBLE)
+                .riskResponse(RiskResponse.ACCEPT)
+                .build();
+
+        Project project = aProject().id(2L).build();
+        User owner = aUser().id(2L).build();
+
+        Risk expectedRisk = aRisk()
+                .id(1L)
+                .summary("New Summary")
+                .description("New Description")
+                .category(Category.QUALITY_EXECUTION)
+                .impact(Impact.INSIGNIFICANT)
+                .status(LogStatus.CLOSED)
+                .dateClosed(LocalDate.MAX)
+                .project(project)
+                .owner(owner)
+                .probability(Probability.VERY_UNLIKELY)
+                .riskResponse(RiskResponse.MITIGATE)
+                .build();
+
+        // Set up expectations
+        when(riskRepository.findOne(1L)).thenReturn(riskPreUpdate);
+        when(projectCRUDService.findProject(2L)).thenReturn(project);
+        when(userCRUDService.findUser(2L)).thenReturn(owner);
+        when(riskRepository.save(argThat(sameBeanAs(expectedRisk)))).thenReturn(expectedRisk);
+
+        // Exercise SUT
+        Risk actualRisk = riskCRUDService.updateRisk(identifiedRiskDTO);
 
         // Verify behaviour
         assertThat(actualRisk, is(expectedRisk));

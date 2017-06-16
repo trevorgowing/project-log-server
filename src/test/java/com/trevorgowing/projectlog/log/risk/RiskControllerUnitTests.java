@@ -119,4 +119,79 @@ public class RiskControllerUnitTests extends AbstractControllerUnitTests {
         // Verify behaviour
         assertThat(actualIdentifiedRiskDTO, is(expectedIdentifiedRiskDTO));
     }
+
+    @Test(expected = ProjectNotFoundException.class)
+    public void testPutRiskWithNonExistentProject_shouldRespondWithStatusConflict() throws Exception {
+        // Set up fixture
+        IdentifiedRiskDTO identifiedRiskDTO = anIdentifiedRiskDTO().id(1L).build();
+
+        // Set up expectations
+        when(riskCRUDService.updateRisk(identifiedRiskDTO)).thenThrow(identifiedProjectNotFoundException(1L));
+
+        // Exercise SUT
+        given()
+                .accept(ContentType.JSON)
+                .contentType(ContentType.JSON)
+                .body(convertToJSON(identifiedRiskDTO))
+        .when()
+                .put(basedUrlBuilder(LogConstants.LOGS_URL_PATH).appendPath(LogConstants.RISKS_URL_PATH).toString())
+        .then()
+                .log().all()
+                .statusCode(HttpStatus.CONFLICT.value());
+
+        riskController.putRisk(identifiedRiskDTO);
+    }
+
+    @Test(expected = UserNotFoundException.class)
+    public void testPutRiskWithNonExistentOwner_shouldRespondWithStatusConflict() throws Exception {
+        // Set up fixture
+        IdentifiedRiskDTO identifiedRiskDTO = anIdentifiedRiskDTO().id(1L).build();
+
+        // Set up expectations
+        when(riskCRUDService.updateRisk(identifiedRiskDTO)).thenThrow(identifiedUserNotFoundException(1L));
+
+        // Exercise SUT
+        given()
+                .accept(ContentType.JSON)
+                .contentType(ContentType.JSON)
+                .body(convertToJSON(identifiedRiskDTO))
+        .when()
+                .put(basedUrlBuilder(LogConstants.LOGS_URL_PATH).appendPath(LogConstants.RISKS_URL_PATH).toString())
+        .then()
+                .log().all()
+                .statusCode(HttpStatus.CONFLICT.value());
+
+        riskController.putRisk(identifiedRiskDTO);
+    }
+
+    @Test
+    public void testPutRiskWithValidRisk_shouldRespondWithStatusOkAndReturnUpdatedRisk() throws Exception {
+        // Set up fixture
+        IdentifiedRiskDTO identifiedRiskDTO = anIdentifiedRiskDTO().id(1L).build();
+
+        Risk risk = aRisk().id(1L).build();
+
+        IdentifiedRiskDTO expectedIdentifiedRiskDTO = anIdentifiedRiskDTO().id(1L).build();
+
+        // Set up expectations
+        when(riskCRUDService.updateRisk(identifiedRiskDTO)).thenReturn(risk);
+        when(riskDTOFactory.createIdentifiedRiskDTO(risk)).thenReturn(expectedIdentifiedRiskDTO);
+
+        // Exercise SUT
+        given()
+                .accept(ContentType.JSON)
+                .contentType(ContentType.JSON)
+                .body(convertToJSON(identifiedRiskDTO))
+        .when()
+                .put(basedUrlBuilder(LogConstants.LOGS_URL_PATH).appendPath(LogConstants.RISKS_URL_PATH).toString())
+        .then()
+                .log().all()
+                .statusCode(HttpStatus.OK.value())
+                .body(sameBeanAs(convertToJSON(expectedIdentifiedRiskDTO)));
+
+        IdentifiedRiskDTO actualIdentifiedRiskDTO = riskController.putRisk(identifiedRiskDTO);
+
+        // Verify behaviour
+        assertThat(actualIdentifiedRiskDTO, is(expectedIdentifiedRiskDTO));
+    }
 }
