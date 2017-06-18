@@ -168,21 +168,19 @@ public class ProjectCRUDServiceTests extends AbstractTests {
         // Set up fixture
         String duplicateCode = IRRELEVANT_PROJECT_CODE;
 
-        User identifiedUser = aUser()
-                .id(IRRELEVANT_USER_ID)
-                .build();
+        User owner = aUser().id(IRRELEVANT_USER_ID) .build();
 
         Project unidentifiedProject = aProject()
                 .code(duplicateCode)
                 .name(IRRELEVANT_PROJECT_NAME)
-                .owner(identifiedUser)
+                .owner(owner)
                 .startDate(IRRELEVANT_DATE)
                 .endDate(IRRELEVANT_DATE)
                 .build();
 
         // Set up expectations
         when(userCRUDService.findUser(IRRELEVANT_USER_ID))
-                .thenReturn(identifiedUser);
+                .thenReturn(owner);
         when(projectRepository.save(unidentifiedProject))
                 .thenThrow(new DataIntegrityViolationException(IRRELEVANT_MESSAGE));
 
@@ -197,10 +195,12 @@ public class ProjectCRUDServiceTests extends AbstractTests {
         LocalDate startDate = LocalDate.now().plusDays(1);
         LocalDate endDate = startDate.plusDays(1);
 
+        User owner = aUser().id(IRRELEVANT_USER_ID).build();
+
         Project unidentifiedProject = aProject()
                 .code(IRRELEVANT_PROJECT_CODE)
                 .name(IRRELEVANT_PROJECT_NAME)
-                .owner(aUser().id(IRRELEVANT_USER_ID).build())
+                .owner(owner)
                 .startDate(startDate)
                 .endDate(endDate)
                 .build();
@@ -215,7 +215,8 @@ public class ProjectCRUDServiceTests extends AbstractTests {
                 .build();
 
         // Set up expectations
-        when(projectRepository.save(unidentifiedProject)).thenReturn(expectedProject);
+        when(userCRUDService.findUser(IRRELEVANT_USER_ID)).thenReturn(owner);
+        when(projectRepository.save(argThat(sameBeanAs(unidentifiedProject)))).thenReturn(expectedProject);
 
         // Exercise SUT
         Project actualProject = projectCRUDService.createProject(IRRELEVANT_PROJECT_CODE, IRRELEVANT_PROJECT_NAME,

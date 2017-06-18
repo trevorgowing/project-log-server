@@ -40,9 +40,9 @@ public class ProjectCRUDService {
     }
 
     Project createProject(String code, String name, long ownerId, LocalDate startDate, LocalDate endDate) {
-        User user = userCRUDService.findUser(ownerId);
+        User owner = userCRUDService.findUser(ownerId);
 
-        Project project = unidentifiedProject(code, name, user, startDate, endDate);
+        Project project = unidentifiedProject(code, name, owner, startDate, endDate);
 
         try {
             return projectRepository.save(project);
