@@ -14,6 +14,8 @@ import static com.trevorgowing.projectlog.user.IdentifiedUserDTOBuilder.anIdenti
 import static com.trevorgowing.projectlog.user.UserBuilder.aUser;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.samePropertyValuesAs;
+import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
@@ -141,7 +143,7 @@ public class UserCRUDServiceTests extends AbstractTests {
                 .build();
 
         // Set up expectations
-        when(userRepository.save(unidentifiedUser))
+        when(userRepository.save(argThat(samePropertyValuesAs(unidentifiedUser))))
                 .thenReturn(expectedUser);
 
         // Exercise SUT
@@ -199,7 +201,7 @@ public class UserCRUDServiceTests extends AbstractTests {
         // Set up expectations
         when(userRepository.findOne(IRRELEVANT_USER_ID))
                 .thenReturn(expectedUser);
-        when(userRepository.save(expectedUser))
+        when(userRepository.save(argThat(samePropertyValuesAs(expectedUser))))
                 .thenReturn(expectedUser);
 
         // Exercise SUT
