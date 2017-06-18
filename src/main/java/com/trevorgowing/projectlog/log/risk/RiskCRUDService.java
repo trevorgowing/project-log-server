@@ -29,6 +29,11 @@ public class RiskCRUDService implements LogRetriever {
         this.projectCRUDService = projectCRUDService;
     }
 
+    public Risk findRisk(long riskId) {
+        return ofNullable(riskRepository.findOne(riskId))
+                .orElseThrow(() -> identifiedRiskNotFoundException(riskId));
+    }
+
     @Override
     public List<LogDTO> getLogDTOs() {
         return new ArrayList<>(getIdentifiedRiskDTOs());
@@ -57,8 +62,7 @@ public class RiskCRUDService implements LogRetriever {
     }
 
     public Risk updateRisk(IdentifiedRiskDTO identifiedRiskDTO) {
-        Risk risk = ofNullable(riskRepository.findOne(identifiedRiskDTO.getId()))
-                .orElseThrow(() -> identifiedRiskNotFoundException(identifiedRiskDTO.getId()));
+        Risk risk = findRisk(identifiedRiskDTO.getId());
 
         risk.setSummary(identifiedRiskDTO.getSummary());
         risk.setDescription(identifiedRiskDTO.getDescription());

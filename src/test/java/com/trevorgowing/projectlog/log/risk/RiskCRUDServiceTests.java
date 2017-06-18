@@ -23,6 +23,7 @@ import java.util.List;
 
 import static com.trevorgowing.projectlog.log.risk.IdentifiedRiskDTOBuilder.anIdentifiedRiskDTO;
 import static com.trevorgowing.projectlog.log.risk.RiskBuilder.aRisk;
+import static com.trevorgowing.projectlog.log.risk.RiskNotFoundException.identifiedRiskNotFoundException;
 import static com.trevorgowing.projectlog.log.risk.UnidentifiedRiskDTOBuilder.anUnidentifiedRiskDTO;
 import static com.trevorgowing.projectlog.project.IdentifiedProjectDTOBuilder.anIdentifiedProjectDTO;
 import static com.trevorgowing.projectlog.project.ProjectBuilder.aProject;
@@ -48,6 +49,30 @@ public class RiskCRUDServiceTests extends AbstractTests {
 
     @InjectMocks
     private RiskCRUDService riskCRUDService;
+
+    @Test(expected = RiskNotFoundException.class)
+    public void testFindRiskWithNonExistentRisk_shouldThrowRiskNotFoundException() {
+        // Set up expectations
+        when(riskRepository.findOne(1L)).thenThrow(identifiedRiskNotFoundException(1L));
+
+        // Exercise SUT
+        riskCRUDService.findRisk(1L);
+    }
+
+    @Test
+    public void testFindRiskWithExistingRisk_shouldReturnRisk() {
+        // Set up fixture
+        Risk expectedRisk = aRisk().id(1L).build();
+
+        // Set up expectations
+        when(riskRepository.findOne(1L)).thenReturn(expectedRisk);
+
+        // Exercise SUT
+        Risk actualRisk = riskCRUDService.findRisk(1L);
+
+        // Verify behaviour
+        assertThat(actualRisk, is(expectedRisk));
+    }
 
     @Test
     public void testGetLogDTOs_shouldDelegateToRiskRepositoryAndReturnLogDTOs() {
