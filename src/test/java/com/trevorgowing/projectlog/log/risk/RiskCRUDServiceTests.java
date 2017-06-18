@@ -202,7 +202,7 @@ public class RiskCRUDServiceTests extends AbstractTests {
         // Set up expectations
         when(projectCRUDService.findProject(1L)).thenReturn(project);
         when(userCRUDService.findUser(1L)).thenReturn(owner);
-        when(riskRepository.save(unidentifiedRisk)).thenReturn(expectedRisk);
+        when(riskRepository.save(argThat(sameBeanAs(unidentifiedRisk)))).thenReturn(expectedRisk);
 
         // Exercise SUT
         Risk actualRisk = riskCRUDService.createRisk(unidentifiedRiskDTO);
