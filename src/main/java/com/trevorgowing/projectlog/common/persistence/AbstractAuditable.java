@@ -3,9 +3,11 @@ package com.trevorgowing.projectlog.common.persistence;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
+import javax.persistence.EntityListeners;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -15,6 +17,7 @@ import java.time.Instant;
 
 @MappedSuperclass
 @NoArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
 public abstract class AbstractAuditable<U, PK extends Serializable> extends AbstractPersistable<PK>
         implements Auditable<U, PK> {
 
@@ -27,7 +30,7 @@ public abstract class AbstractAuditable<U, PK extends Serializable> extends Abst
     @Basic(optional = false)
     @Column(nullable = false, name = "app_created_date")
     @CreatedDate
-    private Instant createdDate = Instant.now();
+    private Instant createdDate;
 
     @JoinColumn(name = "app_last_modified_by_id")
     @ManyToOne(fetch = FetchType.LAZY)
@@ -37,7 +40,7 @@ public abstract class AbstractAuditable<U, PK extends Serializable> extends Abst
     @LastModifiedDate
     private Instant lastModifiedDate;
 
-    public AbstractAuditable(PK id) {
+    protected AbstractAuditable(PK id) {
         super(id);
     }
 
