@@ -41,6 +41,12 @@ class IssueController {
         return issueDTOFactory.createIdentifiedIssueDTO(issue);
     }
 
+    @ExceptionHandler(IssueNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public void handleIssueNotFoundException(IssueNotFoundException issueNotFoundException) {
+        log.warn(issueNotFoundException.getMessage(), issueNotFoundException);
+    }
+
     @ExceptionHandler(ProjectNotFoundException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public void handleProjectNotFoundException(ProjectNotFoundException projectNotFoundException) {

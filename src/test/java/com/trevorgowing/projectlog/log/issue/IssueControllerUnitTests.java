@@ -14,6 +14,7 @@ import static com.trevorgowing.UrlStringBuilder.basedUrlBuilder;
 import static com.trevorgowing.projectlog.common.converters.ObjectToJSONConverter.convertToJSON;
 import static com.trevorgowing.projectlog.log.issue.IdentifiedIssueDTOBuilder.anIdentifiedIssueDTO;
 import static com.trevorgowing.projectlog.log.issue.IssueBuilder.anIssue;
+import static com.trevorgowing.projectlog.log.issue.IssueNotFoundException.identifiedIssueNotFoundException;
 import static com.trevorgowing.projectlog.log.issue.UnidentifiedIssueDTOBuilder.anUnidentifiedIssueDTO;
 import static com.trevorgowing.projectlog.project.IdentifiedProjectDTOBuilder.anIdentifiedProjectDTO;
 import static com.trevorgowing.projectlog.project.ProjectNotFoundException.identifiedProjectNotFoundException;
@@ -117,6 +118,28 @@ public class IssueControllerUnitTests extends AbstractControllerUnitTests {
 
         // Verify behaviour
         assertThat(actualIdentifiedIssueDTO, is(expectedIdentifiedIssueDTO));
+    }
+
+    @Test(expected = IssueNotFoundException.class)
+    public void testPutIssueWithNoExistingIssue_shouldRespondWithStatusNotFound() throws Exception {
+        // Set up fixture
+        IdentifiedIssueDTO identifiedIssueDTO = anIdentifiedIssueDTO().id(1L).build();
+
+        // Set up expectations
+        when(issueCRUDService.updateIssue(identifiedIssueDTO)).thenThrow(identifiedIssueNotFoundException(1L));
+
+        // Exercise SUT
+        given()
+                .accept(ContentType.JSON)
+                .contentType(ContentType.JSON)
+                .body(convertToJSON(identifiedIssueDTO))
+        .when()
+                .put(basedUrlBuilder(LogConstants.LOGS_URL_PATH).appendPath(LogConstants.ISSUES_URL_PATH).toString())
+        .then()
+                .log().all()
+                .statusCode(HttpStatus.NOT_FOUND.value());
+
+        issueController.putIssue(identifiedIssueDTO);
     }
 
     @Test(expected = ProjectNotFoundException.class)
