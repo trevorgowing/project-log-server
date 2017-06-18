@@ -118,4 +118,84 @@ public class IssueControllerUnitTests extends AbstractControllerUnitTests {
         // Verify behaviour
         assertThat(actualIdentifiedIssueDTO, is(expectedIdentifiedIssueDTO));
     }
+
+    @Test(expected = ProjectNotFoundException.class)
+    public void testPutIssueWithNonExistentProject_shouldRespondWithStatusConflict() throws Exception {
+        // Set up fixture
+        IdentifiedIssueDTO identifiedIssueDTO = anIdentifiedIssueDTO()
+                .project(anIdentifiedProjectDTO().id(1L).build())
+                .build();
+
+        // Set up expectations
+        when(issueCRUDService.updateIssue(identifiedIssueDTO)).thenThrow(identifiedProjectNotFoundException(1L));
+
+        // Exercise SUT
+        given()
+                .accept(ContentType.JSON)
+                .contentType(ContentType.JSON)
+                .body(convertToJSON(identifiedIssueDTO))
+        .when()
+                .put(basedUrlBuilder(LogConstants.LOGS_URL_PATH).appendPath(LogConstants.ISSUES_URL_PATH).toString())
+        .then()
+                .log().all()
+                .statusCode(HttpStatus.CONFLICT.value());
+
+        issueController.putIssue(identifiedIssueDTO);
+    }
+
+    @Test(expected = UserNotFoundException.class)
+    public void testPutIssueWithNonExistentOwner_shouldRespondWithStatusConflict() throws Exception {
+        // Set up fixture
+        IdentifiedIssueDTO identifiedIssueDTO = anIdentifiedIssueDTO()
+                .owner(anIdentifiedUserDTO().id(1L).build())
+                .build();
+
+        // Set up expectations
+        when(issueCRUDService.updateIssue(identifiedIssueDTO)).thenThrow(identifiedUserNotFoundException(1L));
+
+        // Exercise SUT
+        given()
+                .accept(ContentType.JSON)
+                .contentType(ContentType.JSON)
+                .body(convertToJSON(identifiedIssueDTO))
+        .when()
+                .put(basedUrlBuilder(LogConstants.LOGS_URL_PATH).appendPath(LogConstants.ISSUES_URL_PATH).toString())
+        .then()
+                .log().all()
+                .statusCode(HttpStatus.CONFLICT.value());
+
+        issueController.putIssue(identifiedIssueDTO);
+    }
+
+    @Test
+    public void testPutIssueWithValidIssue_shouldRespondWithStatusOkAndReturnIdentifiedIssueDTO() throws Exception {
+        // Set up fixture
+        IdentifiedIssueDTO identifiedIssueDTO = anIdentifiedIssueDTO().build();
+
+        Issue issue = anIssue().build();
+
+        IdentifiedIssueDTO expectedIdentifiedIssueDTO = anIdentifiedIssueDTO().build();
+
+        // Set up expectations
+        when(issueCRUDService.updateIssue(identifiedIssueDTO)).thenReturn(issue);
+        when(issueDTOFactory.createIdentifiedIssueDTO(issue)).thenReturn(expectedIdentifiedIssueDTO);
+
+        // Exercise SUT
+        given()
+                .accept(ContentType.JSON)
+                .contentType(ContentType.JSON)
+                .body(convertToJSON(identifiedIssueDTO))
+        .when()
+                .put(basedUrlBuilder(LogConstants.LOGS_URL_PATH).appendPath(LogConstants.ISSUES_URL_PATH).toString())
+        .then()
+                .log().all()
+                .statusCode(HttpStatus.OK.value())
+                .contentType(ContentType.JSON)
+                .body(is(convertToJSON(expectedIdentifiedIssueDTO)));
+
+        IdentifiedIssueDTO actualIdentifiedIssueDTO = issueController.putIssue(identifiedIssueDTO);
+
+        // Verify behaviour
+        assertThat(actualIdentifiedIssueDTO, (is(expectedIdentifiedIssueDTO)));
+    }
 }

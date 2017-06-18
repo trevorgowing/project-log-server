@@ -15,6 +15,7 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,6 +46,30 @@ public class IssueCRUDServiceTests extends AbstractTests {
 
     @InjectMocks
     private IssueCRUDService issueCRUDService;
+
+    @Test(expected = IssueNotFoundException.class)
+    public void testFindIssueWithNonExistentIssue_shouldThrowIssueNotFoundException() {
+        // Set up expectations
+        when(issueRepository.findOne(1L)).thenReturn(null);
+
+        // Exercise SUT
+        issueCRUDService.findIssue(1L);
+    }
+
+    @Test
+    public void testFindIssueWithExistingIssue_shouldReturnIssue() {
+        // Set up fixture
+        Issue expectedIssue = anIssue().id(1L).build();
+
+        // Set up expectations
+        when(issueRepository.findOne(1L)).thenReturn(expectedIssue);
+
+        // Exercise SUT
+        Issue actualIssue = issueCRUDService.findIssue(1L);
+
+        // Verify behaviour
+        assertThat(actualIssue, is(expectedIssue));
+    }
 
     @Test
     public void testGetLogDTOs_shouldDelegateToIssueRepositoryAndReturnLogDTOs() {
@@ -185,6 +210,103 @@ public class IssueCRUDServiceTests extends AbstractTests {
 
         // Exercise SUT
         Issue actualIssue = issueCRUDService.createIssue(unidentifiedIssueDTO);
+
+        // Verify behaviour
+        assertThat(actualIssue, is(expectedIssue));
+    }
+
+    @Test(expected = ProjectNotFoundException.class)
+    public void testUpdateIssueWithNonExistentProject_shouldThrowProjectNotFoundException() {
+        // Set up fixture
+        IdentifiedIssueDTO identifiedIssueDTO = anIdentifiedIssueDTO()
+                .id(1L)
+                .project(anIdentifiedProjectDTO().id(2L).build())
+                .build();
+
+        Issue issue = anIssue()
+                .id(1L)
+                .project(aProject().id(1L).build())
+                .build();
+
+        // Set up expectations
+        when(issueRepository.findOne(1L)).thenReturn(issue);
+        when(projectCRUDService.findProject(2L)).thenThrow(identifiedProjectNotFoundException(2L));
+
+        // Exercise SUT
+        issueCRUDService.updateIssue(identifiedIssueDTO);
+    }
+
+    @Test(expected = UserNotFoundException.class)
+    public void testUpdateIssueWithNonExistentOwner_shouldThrowUserNotFoundException() {
+        // Set up fixture
+        IdentifiedIssueDTO identifiedIssueDTO = anIdentifiedIssueDTO()
+                .id(1L)
+                .owner(anIdentifiedUserDTO().id(2L).build())
+                .build();
+
+        Issue issue = anIssue()
+                .id(1L)
+                .owner(aUser().id(1L).build())
+                .build();
+
+        // Set up expectations
+        when(issueRepository.findOne(1L)).thenReturn(issue);
+        when(userCRUDService.findUser(2L)).thenThrow(identifiedUserNotFoundException(2L));
+
+        // Exercise SUT
+        issueCRUDService.updateIssue(identifiedIssueDTO);
+    }
+
+    @Test
+    public void testUpdateIssueWithValidIssue_shouldDelegateToIssueRepositoryToSaveIssueAndReturnUpdateIssue() {
+        // Set up expectations
+        IdentifiedIssueDTO identifiedIssueDTO = anIdentifiedIssueDTO()
+                .id(1L)
+                .summary("New Summary")
+                .description("New Description")
+                .category(Category.COMMITTED_PEOPLE)
+                .impact(Impact.INSIGNIFICANT)
+                .status(LogStatus.CLOSED)
+                .dateClosed(LocalDate.MAX)
+                .project(anIdentifiedProjectDTO().id(2L).build())
+                .owner(anIdentifiedUserDTO().id(2L).build())
+                .build();
+
+        Issue issuePreUpdate = anIssue()
+                .id(1L)
+                .summary("Old Summary")
+                .description("Old Description")
+                .category(Category.QUALITY_EXECUTION)
+                .impact(Impact.MODERATE)
+                .status(LogStatus.NEW)
+                .dateClosed(null)
+                .project(aProject().id(1L).build())
+                .owner(aUser().id(1L).build())
+                .build();
+
+        Project project = aProject().id(2L).build();
+        User owner = aUser().id(2L).build();
+
+        Issue expectedIssue = anIssue()
+                .id(1L)
+                .summary("New Summary")
+                .description("New Description")
+                .category(Category.COMMITTED_PEOPLE)
+                .impact(Impact.INSIGNIFICANT)
+                .status(LogStatus.CLOSED)
+                .dateClosed(LocalDate.MAX)
+                .project(project)
+                .owner(owner)
+                .build();
+
+        // Set up expectations
+        when(issueRepository.findOne(1L)).thenReturn(issuePreUpdate);
+        when(projectCRUDService.findProject(2L)).thenReturn(project);
+        when(userCRUDService.findUser(2L)).thenReturn(owner);
+        when(issueRepository.save(argThat(samePropertyValuesAs(expectedIssue)))).thenReturn(expectedIssue);
+
+        // Exercise SUT
+        Issue actualIssue = issueCRUDService.updateIssue(identifiedIssueDTO);
 
         // Verify behaviour
         assertThat(actualIssue, is(expectedIssue));

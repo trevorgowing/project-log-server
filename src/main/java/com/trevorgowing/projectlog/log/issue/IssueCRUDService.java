@@ -29,6 +29,11 @@ public class IssueCRUDService implements LogRetriever {
         this.projectCRUDService = projectCRUDService;
     }
 
+    public Issue findIssue(long issueId) {
+        return ofNullable(issueRepository.findOne(issueId))
+                .orElseThrow(() -> identifiedIssueNotFoundException(issueId));
+    }
+
     @Override
     public List<LogDTO> getLogDTOs() {
         return new ArrayList<>(getIdentifiedIssueDTOs());
@@ -51,6 +56,29 @@ public class IssueCRUDService implements LogRetriever {
         Issue issue = unidentifiedIssue(unidentifiedIssueDTO.getSummary(), unidentifiedIssueDTO.getDescription(),
                 unidentifiedIssueDTO.getCategory(), unidentifiedIssueDTO.getImpact(), unidentifiedIssueDTO.getStatus(),
                 unidentifiedIssueDTO.getDateClosed(), project, owner);
+
+        return issueRepository.save(issue);
+    }
+
+    public Issue updateIssue(IdentifiedIssueDTO identifiedIssueDTO) {
+        Issue issue = findIssue(identifiedIssueDTO.getId());
+
+        issue.setSummary(identifiedIssueDTO.getSummary());
+        issue.setDescription(identifiedIssueDTO.getDescription());
+        issue.setCategory(identifiedIssueDTO.getCategory());
+        issue.setImpact(identifiedIssueDTO.getImpact());
+        issue.setStatus(identifiedIssueDTO.getStatus());
+        issue.setDateClosed(identifiedIssueDTO.getDateClosed());
+
+        if (identifiedIssueDTO.getProject() != null
+                && issue.getProject().getId() != identifiedIssueDTO.getProject().getId()) {
+            issue.setProject(projectCRUDService.findProject(identifiedIssueDTO.getProject().getId()));
+        }
+
+        if (identifiedIssueDTO.getOwner() != null
+                && issue.getOwner().getId() != identifiedIssueDTO.getOwner().getId()) {
+            issue.setOwner(userCRUDService.findUser(identifiedIssueDTO.getOwner().getId()));
+        }
 
         return issueRepository.save(issue);
     }
