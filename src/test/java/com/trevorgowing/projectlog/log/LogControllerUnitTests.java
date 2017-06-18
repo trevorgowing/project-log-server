@@ -13,7 +13,6 @@ import org.springframework.http.HttpStatus;
 import java.util.Collections;
 import java.util.List;
 
-import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
 import static com.trevorgowing.UrlStringBuilder.basedUrlBuilder;
 import static com.trevorgowing.projectlog.common.converters.ObjectToJSONConverter.convertToJSON;
 import static com.trevorgowing.projectlog.log.LogNotFoundException.identifiedLogNotFoundException;
@@ -58,7 +57,7 @@ public class LogControllerUnitTests extends AbstractControllerUnitTests {
                 .log().all()
                 .statusCode(HttpStatus.OK.value())
                 .contentType(ContentType.JSON)
-                .body(sameBeanAs(convertToJSON(Collections.<LogDTO>emptyList())));
+                .body(is(convertToJSON(Collections.<LogDTO>emptyList())));
 
         List<LogDTO> actualUnidentifiedIssueDTOS = logController.getLogs();
 
@@ -84,7 +83,7 @@ public class LogControllerUnitTests extends AbstractControllerUnitTests {
                 .log().all()
                 .statusCode(HttpStatus.OK.value())
                 .contentType(ContentType.JSON)
-                .body(sameBeanAs(convertToJSON(expectedLogDTOs)));
+                .body(is(convertToJSON(expectedLogDTOs)));
 
         List<LogDTO> actualLogDTOs = logController.getLogs();
 
@@ -125,7 +124,7 @@ public class LogControllerUnitTests extends AbstractControllerUnitTests {
                 .log().all()
                 .statusCode(HttpStatus.OK.value())
                 .contentType(ContentType.JSON)
-                .body(sameBeanAs(convertToJSON(Collections.<LogDTO>emptyList())));
+                .body(is(convertToJSON(Collections.<LogDTO>emptyList())));
 
         List<LogDTO> actualLogDTOs = logController.getLogs(LogType.RISK.name());
 
@@ -153,7 +152,7 @@ public class LogControllerUnitTests extends AbstractControllerUnitTests {
                 .log().all()
                 .statusCode(HttpStatus.OK.value())
                 .contentType(ContentType.JSON)
-                .body(sameBeanAs(convertToJSON(expectedLogDTOs)));
+                .body(is(convertToJSON(expectedLogDTOs)));
 
         List<LogDTO> actualLogDTOs = logController.getLogs(LogType.RISK.name());
 
@@ -178,7 +177,7 @@ public class LogControllerUnitTests extends AbstractControllerUnitTests {
                 .log().all()
                 .statusCode(HttpStatus.OK.value())
                 .contentType(ContentType.JSON)
-                .body(sameBeanAs(convertToJSON(Collections.<LogDTO>emptyList())));
+                .body(is(convertToJSON(Collections.<LogDTO>emptyList())));
 
         List<LogDTO> actualLogDTOs = logController.getLogs(LogType.ISSUE.name());
 
@@ -206,7 +205,7 @@ public class LogControllerUnitTests extends AbstractControllerUnitTests {
                 .log().all()
                 .statusCode(HttpStatus.OK.value())
                 .contentType(ContentType.JSON)
-                .body(sameBeanAs(convertToJSON(expectedLogDTOs)));
+                .body(is(convertToJSON(expectedLogDTOs)));
 
         List<LogDTO> actualLogDTOs = logController.getLogs(LogType.ISSUE.name());
 
@@ -249,7 +248,7 @@ public class LogControllerUnitTests extends AbstractControllerUnitTests {
         .then()
                 .log().all()
                 .statusCode(HttpStatus.OK.value())
-                .body(sameBeanAs(convertToJSON(expectedLogDTO)));
+                .body(is(convertToJSON(expectedLogDTO)));
 
         LogDTO actualLogDTO = logController.getLogById(1);
 

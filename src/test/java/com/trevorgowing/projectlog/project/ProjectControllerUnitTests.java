@@ -13,7 +13,6 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 
-import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
 import static com.trevorgowing.projectlog.common.converters.ObjectToJSONConverter.convertToJSON;
 import static com.trevorgowing.projectlog.project.DuplicateProjectCodeException.codedDuplicateCodeException;
 import static com.trevorgowing.projectlog.project.IdentifiedProjectDTOBuilder.anIdentifiedProjectDTO;
@@ -71,7 +70,7 @@ public class ProjectControllerUnitTests extends AbstractControllerUnitTests {
                 .log().all()
                 .statusCode(HttpStatus.OK.value())
                 .contentType(ContentType.JSON)
-                .body(sameBeanAs(convertToJSON(Collections.<IdentifiedProjectDTO>emptyList())));
+                .body(is(convertToJSON(Collections.<IdentifiedProjectDTO>emptyList())));
 
         List<IdentifiedProjectDTO> actualProjects = projectController.getProjects();
 
@@ -118,7 +117,7 @@ public class ProjectControllerUnitTests extends AbstractControllerUnitTests {
                 .log().all()
                 .statusCode(HttpStatus.OK.value())
                 .contentType(ContentType.JSON)
-                .body(sameBeanAs(convertToJSON(expectedIdentifiedProjectDTOs)));
+                .body(is(convertToJSON(expectedIdentifiedProjectDTOs)));
 
         List<IdentifiedProjectDTO> actualIdentifiedProjectDTOs = projectController.getProjects();
 
@@ -168,7 +167,7 @@ public class ProjectControllerUnitTests extends AbstractControllerUnitTests {
         .then()
                 .log().all()
                 .statusCode(HttpStatus.OK.value())
-                .body(sameBeanAs(convertToJSON(expectedIdentifiedProjectDTO)));
+                .body(is(convertToJSON(expectedIdentifiedProjectDTO)));
 
         IdentifiedProjectDTO actualIdentifiedProjectDTO = projectController.getProjectById(IRRELEVANT_PROJECT_ID);
 
@@ -288,7 +287,7 @@ public class ProjectControllerUnitTests extends AbstractControllerUnitTests {
                 .log().all()
                 .statusCode(HttpStatus.CREATED.value())
                 .contentType(ContentType.JSON)
-                .body(sameBeanAs(convertToJSON(expectedIdentifiedProjectDTO)));
+                .body(is(convertToJSON(expectedIdentifiedProjectDTO)));
 
         IdentifiedProjectDTO actualIdentifiedProjectDTO = projectController.postProject(unidentifiedProjectDTO);
 
@@ -410,7 +409,7 @@ public class ProjectControllerUnitTests extends AbstractControllerUnitTests {
                 .log().all()
                 .statusCode(HttpStatus.OK.value())
                 .contentType(ContentType.JSON)
-                .body(sameBeanAs(convertToJSON(expectedIdentifiedProjectDTO)));
+                .body(is(convertToJSON(expectedIdentifiedProjectDTO)));
 
         IdentifiedProjectDTO actualIdentifiedProjectDTO = projectController.putProject(IRRELEVANT_PROJECT_ID,
                 identifiedProjectDTO);

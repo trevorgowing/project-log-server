@@ -9,7 +9,6 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
-import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
 import static com.trevorgowing.projectlog.log.issue.IdentifiedIssueDTOBuilder.anIdentifiedIssueDTO;
 import static com.trevorgowing.projectlog.log.issue.IssueBuilder.aCompleteIssue;
 import static com.trevorgowing.projectlog.project.IdentifiedProjectDTOBuilder.anIdentifiedProjectDTO;
@@ -17,6 +16,7 @@ import static com.trevorgowing.projectlog.project.ProjectBuilder.aProject;
 import static com.trevorgowing.projectlog.user.IdentifiedUserDTOBuilder.anIdentifiedUserDTO;
 import static com.trevorgowing.projectlog.user.UserBuilder.aUser;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.samePropertyValuesAs;
 import static org.mockito.Mockito.when;
 
 public class IssueDTOFactoryTests extends AbstractTests {
@@ -57,6 +57,6 @@ public class IssueDTOFactoryTests extends AbstractTests {
         IdentifiedIssueDTO actualIdentifiedIssueDTO = issueDTOFactory.createIdentifiedIssueDTO(issue);
 
         // Verify behaviour
-        assertThat(actualIdentifiedIssueDTO, sameBeanAs(expectedIdentifiedIssueDTO));
+        assertThat(actualIdentifiedIssueDTO, samePropertyValuesAs(expectedIdentifiedIssueDTO));
     }
 }

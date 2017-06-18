@@ -21,7 +21,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
 import static com.trevorgowing.projectlog.log.risk.IdentifiedRiskDTOBuilder.anIdentifiedRiskDTO;
 import static com.trevorgowing.projectlog.log.risk.RiskBuilder.aRisk;
 import static com.trevorgowing.projectlog.log.risk.UnidentifiedRiskDTOBuilder.anUnidentifiedRiskDTO;
@@ -34,6 +33,7 @@ import static com.trevorgowing.projectlog.user.UserNotFoundException.identifiedU
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.samePropertyValuesAs;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.when;
 
@@ -202,7 +202,7 @@ public class RiskCRUDServiceTests extends AbstractTests {
         // Set up expectations
         when(projectCRUDService.findProject(1L)).thenReturn(project);
         when(userCRUDService.findUser(1L)).thenReturn(owner);
-        when(riskRepository.save(argThat(sameBeanAs(unidentifiedRisk)))).thenReturn(expectedRisk);
+        when(riskRepository.save(argThat(samePropertyValuesAs(unidentifiedRisk)))).thenReturn(expectedRisk);
 
         // Exercise SUT
         Risk actualRisk = riskCRUDService.createRisk(unidentifiedRiskDTO);
@@ -315,7 +315,7 @@ public class RiskCRUDServiceTests extends AbstractTests {
         when(riskRepository.findOne(1L)).thenReturn(riskPreUpdate);
         when(projectCRUDService.findProject(2L)).thenReturn(project);
         when(userCRUDService.findUser(2L)).thenReturn(owner);
-        when(riskRepository.save(argThat(sameBeanAs(expectedRisk)))).thenReturn(expectedRisk);
+        when(riskRepository.save(argThat(samePropertyValuesAs(expectedRisk)))).thenReturn(expectedRisk);
 
         // Exercise SUT
         Risk actualRisk = riskCRUDService.updateRisk(identifiedRiskDTO);

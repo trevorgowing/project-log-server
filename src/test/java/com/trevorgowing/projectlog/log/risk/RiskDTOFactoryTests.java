@@ -9,7 +9,6 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
-import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
 import static com.trevorgowing.projectlog.log.risk.IdentifiedRiskDTOBuilder.anIdentifiedRiskDTO;
 import static com.trevorgowing.projectlog.log.risk.RiskBuilder.aCompleteRisk;
 import static com.trevorgowing.projectlog.project.IdentifiedProjectDTOBuilder.anIdentifiedProjectDTO;
@@ -17,6 +16,7 @@ import static com.trevorgowing.projectlog.project.ProjectBuilder.aProject;
 import static com.trevorgowing.projectlog.user.IdentifiedUserDTOBuilder.anIdentifiedUserDTO;
 import static com.trevorgowing.projectlog.user.UserBuilder.aUser;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.samePropertyValuesAs;
 import static org.mockito.Mockito.when;
 
 public class RiskDTOFactoryTests extends AbstractTests {
@@ -59,6 +59,6 @@ public class RiskDTOFactoryTests extends AbstractTests {
         IdentifiedRiskDTO actualIdentifiedRiskDTO = riskDTOFactory.createIdentifiedRiskDTO(risk);
 
         // Verify behaviour
-        assertThat(actualIdentifiedRiskDTO, sameBeanAs(expectedIdentifiedRiskDTO));
+        assertThat(actualIdentifiedRiskDTO, samePropertyValuesAs(expectedIdentifiedRiskDTO));
     }
 }

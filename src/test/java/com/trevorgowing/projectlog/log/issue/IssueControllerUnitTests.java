@@ -10,7 +10,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.http.HttpStatus;
 
-import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
 import static com.trevorgowing.UrlStringBuilder.basedUrlBuilder;
 import static com.trevorgowing.projectlog.common.converters.ObjectToJSONConverter.convertToJSON;
 import static com.trevorgowing.projectlog.log.issue.IdentifiedIssueDTOBuilder.anIdentifiedIssueDTO;
@@ -112,7 +111,7 @@ public class IssueControllerUnitTests extends AbstractControllerUnitTests {
                 .log().all()
                 .statusCode(HttpStatus.CREATED.value())
                 .contentType(ContentType.JSON)
-                .body(sameBeanAs(convertToJSON(expectedIdentifiedIssueDTO)));
+                .body(is(convertToJSON(expectedIdentifiedIssueDTO)));
 
         IdentifiedIssueDTO actualIdentifiedIssueDTO = issueController.postIssue(unidentifiedIssueDTO);
 

@@ -18,7 +18,6 @@ import org.mockito.Mock;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
 import static com.trevorgowing.projectlog.log.issue.IdentifiedIssueDTOBuilder.anIdentifiedIssueDTO;
 import static com.trevorgowing.projectlog.log.issue.IssueBuilder.anIssue;
 import static com.trevorgowing.projectlog.log.issue.UnidentifiedIssueDTOBuilder.anUnidentifiedIssueDTO;
@@ -31,6 +30,7 @@ import static com.trevorgowing.projectlog.user.UserNotFoundException.identifiedU
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.samePropertyValuesAs;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.when;
 
@@ -181,7 +181,7 @@ public class IssueCRUDServiceTests extends AbstractTests {
         // Set up expectations
         when(projectCRUDService.findProject(1L)).thenReturn(project);
         when(userCRUDService.findUser(1L)).thenReturn(owner);
-        when(issueRepository.save(argThat(sameBeanAs(unidentifiedIssue)))).thenReturn(expectedIssue);
+        when(issueRepository.save(argThat(samePropertyValuesAs(unidentifiedIssue)))).thenReturn(expectedIssue);
 
         // Exercise SUT
         Issue actualIssue = issueCRUDService.createIssue(unidentifiedIssueDTO);

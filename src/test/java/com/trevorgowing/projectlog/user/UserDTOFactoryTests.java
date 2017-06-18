@@ -3,10 +3,10 @@ package com.trevorgowing.projectlog.user;
 import com.trevorgowing.projectlog.common.types.AbstractTests;
 import org.junit.Test;
 
-import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
 import static com.trevorgowing.projectlog.user.IdentifiedUserDTOBuilder.anIdentifiedUserDTO;
 import static com.trevorgowing.projectlog.user.UserBuilder.aUser;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.samePropertyValuesAs;
 
 public class UserDTOFactoryTests extends AbstractTests {
 
@@ -35,6 +35,6 @@ public class UserDTOFactoryTests extends AbstractTests {
         IdentifiedUserDTO actualIdentifiedUserDTO = userDTOFactory.createIdentifiedUserDTO(user);
 
         // Verify behaviour and state
-        assertThat(actualIdentifiedUserDTO, sameBeanAs(expectedIdentifiedUserDTO));
+        assertThat(actualIdentifiedUserDTO, samePropertyValuesAs(expectedIdentifiedUserDTO));
     }
 }

@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
-import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
 import static com.trevorgowing.projectlog.user.IdentifiedUserDTOBuilder.anIdentifiedUserDTO;
 import static com.trevorgowing.projectlog.user.UserBuilder.aUser;
 import static java.util.Arrays.asList;
@@ -14,6 +13,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.samePropertyValuesAs;
 
 public class UserRepositoryIntegrationTests extends AbstractRepositoryIntegrationTests {
 
@@ -111,6 +111,6 @@ public class UserRepositoryIntegrationTests extends AbstractRepositoryIntegratio
         IdentifiedUserDTO actualIdentifiedUserDTO = userRepository.findIdentifiedUserDTOById(expectedUser.getId());
 
         // Verify results
-        assertThat(actualIdentifiedUserDTO, sameBeanAs(expectedIdentifiedUserDTO));
+        assertThat(actualIdentifiedUserDTO, samePropertyValuesAs(expectedIdentifiedUserDTO));
     }
 }

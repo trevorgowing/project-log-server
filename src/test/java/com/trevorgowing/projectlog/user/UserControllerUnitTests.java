@@ -11,7 +11,6 @@ import org.springframework.http.HttpStatus;
 import java.util.Collections;
 import java.util.List;
 
-import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
 import static com.trevorgowing.projectlog.common.converters.ObjectToJSONConverter.convertToJSON;
 import static com.trevorgowing.projectlog.user.DuplicateEmailExceptionBuilder.aDuplicateEmailException;
 import static com.trevorgowing.projectlog.user.IdentifiedUserDTOBuilder.anIdentifiedUserDTO;
@@ -57,7 +56,7 @@ public class UserControllerUnitTests extends AbstractControllerUnitTests {
                 .log().all()
                 .statusCode(HttpStatus.OK.value())
                 .contentType(ContentType.JSON)
-                .body(sameBeanAs(convertToJSON(Collections.<IdentifiedUserDTO>emptyList())));
+                .body(is(convertToJSON(Collections.<IdentifiedUserDTO>emptyList())));
 
         List<IdentifiedUserDTO> actualUsers = userController.getUsers();
 
@@ -96,7 +95,7 @@ public class UserControllerUnitTests extends AbstractControllerUnitTests {
                 .log().all()
                 .statusCode(HttpStatus.OK.value())
                 .contentType(ContentType.JSON)
-                .body(sameBeanAs(convertToJSON(expectedIdentifiedUserDTOs)));
+                .body(is(convertToJSON(expectedIdentifiedUserDTOs)));
 
         List<IdentifiedUserDTO> actualIdentifiedUserDTOs = userController.getUsers();
 
@@ -145,7 +144,7 @@ public class UserControllerUnitTests extends AbstractControllerUnitTests {
                 .log().all()
                 .statusCode(HttpStatus.OK.value())
                 .contentType(ContentType.JSON)
-                .body(sameBeanAs(convertToJSON(expectedIdentifiedUserDTO)));
+                .body(is(convertToJSON(expectedIdentifiedUserDTO)));
 
         IdentifiedUserDTO actualIdentifiedUserDTO = userController.getUser(IRRELEVANT_USER_ID);
 
@@ -229,7 +228,7 @@ public class UserControllerUnitTests extends AbstractControllerUnitTests {
                 .log().all()
                 .contentType(ContentType.JSON)
                 .statusCode(HttpStatus.CREATED.value())
-                .body(sameBeanAs(convertToJSON(expectedIdentifiedUserDTO)));
+                .body(is(convertToJSON(expectedIdentifiedUserDTO)));
 
         IdentifiedUserDTO actualIdentifiedUserDTO = userController.postUser(unidentifiedUserDTO);
 
@@ -348,7 +347,7 @@ public class UserControllerUnitTests extends AbstractControllerUnitTests {
                 .log().all()
                 .contentType(ContentType.JSON)
                 .statusCode(HttpStatus.OK.value())
-                .body(sameBeanAs(convertToJSON(expectedIdentifiedUserDTO)));
+                .body(is(convertToJSON(expectedIdentifiedUserDTO)));
 
         IdentifiedUserDTO actualIdentifiedUserDTO = userController.putUser(IRRELEVANT_USER_ID, identifiedUserDTO);
 

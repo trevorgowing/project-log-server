@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.time.LocalDate;
 import java.util.List;
 
-import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
 import static com.trevorgowing.projectlog.log.constant.Category.COMMITTED_PEOPLE;
 import static com.trevorgowing.projectlog.log.constant.Impact.MODERATE;
 import static com.trevorgowing.projectlog.log.constant.LogStatus.NEW;
@@ -28,6 +27,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.samePropertyValuesAs;
 
 public class RiskRepositoryTests extends AbstractRepositoryIntegrationTests {
 
@@ -175,6 +175,6 @@ public class RiskRepositoryTests extends AbstractRepositoryIntegrationTests {
         IdentifiedRiskDTO actualIdentifiedRiskDTO = riskRepository.findIdentifiedRiskDTOById(risk.getId());
 
         // Verify results
-        assertThat(actualIdentifiedRiskDTO, sameBeanAs(expectedIdentifiedRiskDTO));
+        assertThat(actualIdentifiedRiskDTO, samePropertyValuesAs(expectedIdentifiedRiskDTO));
     }
 }

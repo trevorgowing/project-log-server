@@ -7,12 +7,12 @@ import org.junit.Test;
 
 import java.time.LocalDate;
 
-import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
 import static com.trevorgowing.projectlog.project.IdentifiedProjectDTOBuilder.anIdentifiedProjectDTO;
 import static com.trevorgowing.projectlog.project.ProjectBuilder.aProject;
 import static com.trevorgowing.projectlog.user.IdentifiedUserDTOBuilder.anIdentifiedUserDTO;
 import static com.trevorgowing.projectlog.user.UserBuilder.aUser;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.samePropertyValuesAs;
 
 public class ProjectDTOFactoryTests extends AbstractTests {
 
@@ -62,6 +62,6 @@ public class ProjectDTOFactoryTests extends AbstractTests {
         IdentifiedProjectDTO actualIdentifiedProjectDTO = projectDTOFactory.createIdentifiedProjectDTO(project);
 
         // Verify behaviour
-        assertThat(actualIdentifiedProjectDTO, sameBeanAs(expectedIdentifiedProjectDTO));
+        assertThat(actualIdentifiedProjectDTO, samePropertyValuesAs(expectedIdentifiedProjectDTO));
     }
 }

@@ -14,7 +14,6 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import java.time.LocalDate;
 import java.util.List;
 
-import static com.shazam.shazamcrest.matcher.Matchers.sameBeanAs;
 import static com.trevorgowing.projectlog.project.IdentifiedProjectDTOBuilder.anIdentifiedProjectDTO;
 import static com.trevorgowing.projectlog.project.ProjectBuilder.aProject;
 import static com.trevorgowing.projectlog.user.IdentifiedUserDTOBuilder.anIdentifiedUserDTO;
@@ -23,6 +22,7 @@ import static com.trevorgowing.projectlog.user.UserNotFoundException.identifiedU
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.samePropertyValuesAs;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
@@ -216,7 +216,7 @@ public class ProjectCRUDServiceTests extends AbstractTests {
 
         // Set up expectations
         when(userCRUDService.findUser(IRRELEVANT_USER_ID)).thenReturn(owner);
-        when(projectRepository.save(argThat(sameBeanAs(unidentifiedProject)))).thenReturn(expectedProject);
+        when(projectRepository.save(argThat(samePropertyValuesAs(unidentifiedProject)))).thenReturn(expectedProject);
 
         // Exercise SUT
         Project actualProject = projectCRUDService.createProject(IRRELEVANT_PROJECT_CODE, IRRELEVANT_PROJECT_NAME,
@@ -259,7 +259,7 @@ public class ProjectCRUDServiceTests extends AbstractTests {
                 .thenReturn(projectPreUpdate);
         when(userCRUDService.findUser(IRRELEVANT_USER_ID))
                 .thenReturn(identifiedUser);
-        when(projectRepository.save(argThat(sameBeanAs(updatedProject))))
+        when(projectRepository.save(argThat(samePropertyValuesAs(updatedProject))))
                 .thenThrow(new DataIntegrityViolationException(duplicateCodeMessage));
 
         // Exercise SUT
@@ -320,7 +320,7 @@ public class ProjectCRUDServiceTests extends AbstractTests {
                 .thenReturn(projectPreUpdate);
         when(userCRUDService.findUser(IRRELEVANT_USER_ID))
                 .thenReturn(user);
-        when(projectRepository.save(argThat(sameBeanAs(expectedProject))))
+        when(projectRepository.save(argThat(samePropertyValuesAs(expectedProject))))
                 .thenReturn(expectedProject);
 
         // Exercise SUT
