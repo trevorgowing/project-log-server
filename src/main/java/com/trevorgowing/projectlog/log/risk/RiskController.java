@@ -41,6 +41,12 @@ class RiskController {
         return riskDTOFactory.createIdentifiedRiskDTO(risk);
     }
 
+    @ExceptionHandler(RiskNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public void handleRiskNotFoundException(RiskNotFoundException riskNotFoundException) {
+        log.warn(riskNotFoundException.getMessage(), riskNotFoundException);
+    }
+
     @ExceptionHandler(ProjectNotFoundException.class)
     @ResponseStatus(code = HttpStatus.CONFLICT, reason = ProjectNotFoundException.REASON)
     public void handleProjectNotFoundException(ProjectNotFoundException projectNotFoundException) {

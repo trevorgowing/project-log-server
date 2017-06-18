@@ -14,6 +14,7 @@ import static com.trevorgowing.UrlStringBuilder.basedUrlBuilder;
 import static com.trevorgowing.projectlog.common.converters.ObjectToJSONConverter.convertToJSON;
 import static com.trevorgowing.projectlog.log.risk.IdentifiedRiskDTOBuilder.anIdentifiedRiskDTO;
 import static com.trevorgowing.projectlog.log.risk.RiskBuilder.aRisk;
+import static com.trevorgowing.projectlog.log.risk.RiskNotFoundException.identifiedRiskNotFoundException;
 import static com.trevorgowing.projectlog.log.risk.UnidentifiedRiskDTOBuilder.anUnidentifiedRiskDTO;
 import static com.trevorgowing.projectlog.project.IdentifiedProjectDTOBuilder.anIdentifiedProjectDTO;
 import static com.trevorgowing.projectlog.project.ProjectNotFoundException.identifiedProjectNotFoundException;
@@ -117,6 +118,28 @@ public class RiskControllerUnitTests extends AbstractControllerUnitTests {
 
         // Verify behaviour
         assertThat(actualIdentifiedRiskDTO, is(expectedIdentifiedRiskDTO));
+    }
+
+    @Test(expected = RiskNotFoundException.class)
+    public void testPutRiskWithNonExistentRisk_shouldRespondWithStatusNotFound() throws Exception {
+        // Set up fixture
+        IdentifiedRiskDTO identifiedRiskDTO = anIdentifiedRiskDTO().id(1L).build();
+
+        // Set up expectations
+        when(riskCRUDService.updateRisk(identifiedRiskDTO)).thenThrow(identifiedRiskNotFoundException(1L));
+
+        // Exercise SUT
+        given()
+                .accept(ContentType.JSON)
+                .contentType(ContentType.JSON)
+                .body(convertToJSON(identifiedRiskDTO))
+        .when()
+                .put(basedUrlBuilder(LogConstants.LOGS_URL_PATH).appendPath(LogConstants.RISKS_URL_PATH).toString())
+        .then()
+                .log().all()
+                .statusCode(HttpStatus.NOT_FOUND.value());
+
+        riskController.putRisk(identifiedRiskDTO);
     }
 
     @Test(expected = ProjectNotFoundException.class)
