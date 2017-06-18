@@ -19,9 +19,19 @@ public class Issue extends Log {
 
     private static final long serialVersionUID = 1984300132708207255L;
 
+    private Issue(String summary, String description, Category category, Impact impact, LogStatus status,
+                  LocalDate dateClosed, Project project, User owner) {
+        super(summary, description, category, impact, status, dateClosed, project, owner);
+    }
+
     private Issue(Long id, String summary, String description, Category category, Impact impact, LogStatus status,
                  LocalDate dateClosed, Project project, User owner) {
         super(id, summary, description, category, impact, status, dateClosed, project, owner);
+    }
+
+    public static Issue unidentifiedIssue(String summary, String description, Category category, Impact impact, LogStatus status,
+                                          LocalDate dateClosed, Project project, User owner) {
+        return new Issue(summary, description, category, impact, status, dateClosed, project, owner);
     }
 
     public static Issue completeIssue(Long id, String summary, String description, Category category, Impact impact,
