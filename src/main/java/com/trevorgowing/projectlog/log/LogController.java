@@ -5,6 +5,7 @@ import com.trevorgowing.projectlog.log.constant.LogType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,9 +23,11 @@ import static com.trevorgowing.projectlog.log.LogTypeParsingException.causedLogT
 @RequestMapping(LogConstants.LOGS_URL_PATH)
 class LogController {
 
+    private final LogDeleter logDeleter;
     private final LogRetrieverFactory logRetrieverFactory;
 
-    LogController(LogRetrieverFactory logRetrieverFactory) {
+    LogController(LogDeleter logDeleter, LogRetrieverFactory logRetrieverFactory) {
+        this.logDeleter = logDeleter;
         this.logRetrieverFactory = logRetrieverFactory;
     }
 
@@ -56,6 +59,12 @@ class LogController {
     @ResponseStatus(HttpStatus.OK)
     LogDTO getLogById(@PathVariable long logId) {
         return logRetrieverFactory.getLogLookupService().getLogDTOById(logId);
+    }
+
+    @DeleteMapping(path = LogConstants.LOG_ID_URL_PATH)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void deleteLogById(@PathVariable long logId) {
+        logDeleter.deleteLogById(logId);
     }
 
     @ExceptionHandler(LogTypeParsingException.class)

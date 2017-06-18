@@ -24,13 +24,17 @@ import static java.util.Collections.emptyList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 public class LogControllerUnitTests extends AbstractControllerUnitTests {
 
     @Mock
     private LogRetriever logRetriever;
-    
+
+    @Mock
+    private LogDeleter logDeleter;
     @Mock
     private LogRetrieverFactory logRetrieverFactory;
 
@@ -254,5 +258,35 @@ public class LogControllerUnitTests extends AbstractControllerUnitTests {
 
         // Verify behaviour
         assertThat(actualLogDTO, is(expectedLogDTO));
+    }
+
+    @Test(expected = LogNotFoundException.class)
+    public void testDeleteLogByIdWithNonExistentLog_shouldRespondWithStatusNotFound() {
+        // Set up expectations
+        doThrow(identifiedLogNotFoundException(1L)).when(logDeleter).deleteLogById(1L);
+
+        // Exercise SUT
+        given()
+        .when()
+                .delete(basedUrlBuilder(LogConstants.LOGS_URL_PATH).appendPath(1L).toString())
+        .then()
+                .log().all()
+                .statusCode(HttpStatus.NOT_FOUND.value());
+
+        logController.deleteLogById(1L);
+    }
+
+    @Test
+    public void testDeleteLogByIdWithExistingLog_shouldRespondWithStatusNoContent() {
+        // Set up expectations
+        doNothing().when(logDeleter).deleteLogById(1L);
+
+        // Exercise SUT
+        given()
+        .when()
+                .delete(basedUrlBuilder(LogConstants.LOGS_URL_PATH).appendPath(1L).toString())
+        .then()
+                .log().all()
+                .statusCode(HttpStatus.NO_CONTENT.value());
     }
 }
