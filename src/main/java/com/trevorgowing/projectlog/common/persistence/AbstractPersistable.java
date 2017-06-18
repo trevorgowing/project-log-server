@@ -1,6 +1,7 @@
 package com.trevorgowing.projectlog.common.persistence;
 
-import lombok.EqualsAndHashCode;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Persistable;
 
@@ -15,7 +16,7 @@ import java.util.Objects;
 
 @MappedSuperclass
 @NoArgsConstructor
-@EqualsAndHashCode
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class AbstractPersistable<PK extends Serializable> implements Persistable<PK> {
 
     private static final long serialVersionUID = 5662590973333935284L;
@@ -26,10 +27,6 @@ public abstract class AbstractPersistable<PK extends Serializable> implements Pe
     @GeneratedValue
     private PK id;
 
-    public AbstractPersistable(PK id) {
-        this.id = id;
-    }
-
     @Override
     public PK getId() {
         return id;
@@ -38,7 +35,20 @@ public abstract class AbstractPersistable<PK extends Serializable> implements Pe
     @Override
     @Transient
     public boolean isNew() {
-        return Objects.equals(id, null);
+        return Objects.isNull(id);
+    }
+
+    @Override
+    public boolean equals(Object objectToCompareTo) {
+        if (this == objectToCompareTo) return true;
+        if (!(objectToCompareTo instanceof AbstractPersistable)) return false;
+        AbstractPersistable<?> persistableToCompareTo = (AbstractPersistable<?>) objectToCompareTo;
+        return Objects.equals(id, persistableToCompareTo.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 
     @Override
