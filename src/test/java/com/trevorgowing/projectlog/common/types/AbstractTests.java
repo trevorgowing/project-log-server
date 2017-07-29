@@ -1,6 +1,7 @@
 package com.trevorgowing.projectlog.common.types;
 
 import org.junit.Rule;
+import org.junit.experimental.categories.Category;
 import org.junit.rules.TestRule;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
@@ -9,6 +10,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.time.LocalDate;
 
+@Category(ServiceUnitTests.class)
 @RunWith(MockitoJUnitRunner.class)
 public abstract class AbstractTests {
 
