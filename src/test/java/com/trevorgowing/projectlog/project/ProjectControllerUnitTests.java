@@ -1,6 +1,7 @@
 package com.trevorgowing.projectlog.project;
 
 import com.trevorgowing.projectlog.common.types.AbstractControllerUnitTests;
+import com.trevorgowing.projectlog.project.constant.ProjectConstants;
 import com.trevorgowing.projectlog.user.IdentifiedUserDTO;
 import com.trevorgowing.projectlog.user.UserNotFoundException;
 import io.restassured.http.ContentType;

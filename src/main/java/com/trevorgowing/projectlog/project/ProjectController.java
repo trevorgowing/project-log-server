@@ -1,5 +1,6 @@
 package com.trevorgowing.projectlog.project;
 
+import com.trevorgowing.projectlog.project.constant.ProjectConstants;
 import com.trevorgowing.projectlog.user.UserNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
