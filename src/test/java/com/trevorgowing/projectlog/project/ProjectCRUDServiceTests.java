@@ -3,8 +3,8 @@ package com.trevorgowing.projectlog.project;
 import com.trevorgowing.projectlog.common.types.AbstractTests;
 import com.trevorgowing.projectlog.user.IdentifiedUserDTO;
 import com.trevorgowing.projectlog.user.User;
-import com.trevorgowing.projectlog.user.UserCRUDService;
 import com.trevorgowing.projectlog.user.UserNotFoundException;
+import com.trevorgowing.projectlog.user.UserRetriever;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -41,7 +41,7 @@ public class ProjectCRUDServiceTests extends AbstractTests {
             .build();
 
     @Mock
-    private UserCRUDService userCRUDService;
+    private UserRetriever userRetriever;
     @Mock
     private ProjectRepository projectRepository;
 
@@ -155,7 +155,7 @@ public class ProjectCRUDServiceTests extends AbstractTests {
         long nonExistentUserID = IRRELEVANT_USER_ID;
 
         // Set up expectations
-        when(userCRUDService.findUser(nonExistentUserID))
+        when(userRetriever.findUser(nonExistentUserID))
                 .thenThrow(identifiedUserNotFoundException(IRRELEVANT_USER_ID));
 
         // Exercise SUT
@@ -179,7 +179,7 @@ public class ProjectCRUDServiceTests extends AbstractTests {
                 .build();
 
         // Set up expectations
-        when(userCRUDService.findUser(IRRELEVANT_USER_ID))
+        when(userRetriever.findUser(IRRELEVANT_USER_ID))
                 .thenReturn(owner);
         when(projectRepository.save(unidentifiedProject))
                 .thenThrow(new DataIntegrityViolationException(IRRELEVANT_MESSAGE));
@@ -215,7 +215,7 @@ public class ProjectCRUDServiceTests extends AbstractTests {
                 .build();
 
         // Set up expectations
-        when(userCRUDService.findUser(IRRELEVANT_USER_ID)).thenReturn(owner);
+        when(userRetriever.findUser(IRRELEVANT_USER_ID)).thenReturn(owner);
         when(projectRepository.save(argThat(samePropertyValuesAs(unidentifiedProject)))).thenReturn(expectedProject);
 
         // Exercise SUT
@@ -257,7 +257,7 @@ public class ProjectCRUDServiceTests extends AbstractTests {
         // Set up expectations
         when(projectRepository.findOne(IRRELEVANT_PROJECT_ID))
                 .thenReturn(projectPreUpdate);
-        when(userCRUDService.findUser(IRRELEVANT_USER_ID))
+        when(userRetriever.findUser(IRRELEVANT_USER_ID))
                 .thenReturn(identifiedUser);
         when(projectRepository.save(argThat(samePropertyValuesAs(updatedProject))))
                 .thenThrow(new DataIntegrityViolationException(duplicateCodeMessage));
@@ -279,7 +279,7 @@ public class ProjectCRUDServiceTests extends AbstractTests {
         // Set up expectations
         when(projectRepository.findOne(IRRELEVANT_PROJECT_ID))
                 .thenReturn(projectPreUpdate);
-        when(userCRUDService.findUser(nonExistentUserId))
+        when(userRetriever.findUser(nonExistentUserId))
                 .thenThrow(identifiedUserNotFoundException(IRRELEVANT_USER_ID));
 
         // Exercise SUT
@@ -318,7 +318,7 @@ public class ProjectCRUDServiceTests extends AbstractTests {
         // Set up expectations
         when(projectRepository.findOne(IRRELEVANT_PROJECT_ID))
                 .thenReturn(projectPreUpdate);
-        when(userCRUDService.findUser(IRRELEVANT_USER_ID))
+        when(userRetriever.findUser(IRRELEVANT_USER_ID))
                 .thenReturn(user);
         when(projectRepository.save(argThat(samePropertyValuesAs(expectedProject))))
                 .thenReturn(expectedProject);

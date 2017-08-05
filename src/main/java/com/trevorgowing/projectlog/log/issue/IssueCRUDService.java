@@ -5,7 +5,7 @@ import com.trevorgowing.projectlog.log.LogRetriever;
 import com.trevorgowing.projectlog.project.Project;
 import com.trevorgowing.projectlog.project.ProjectCRUDService;
 import com.trevorgowing.projectlog.user.User;
-import com.trevorgowing.projectlog.user.UserCRUDService;
+import com.trevorgowing.projectlog.user.UserRetriever;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -18,14 +18,14 @@ import static java.util.Optional.ofNullable;
 @Service
 public class IssueCRUDService implements LogRetriever {
 
+    private final UserRetriever userRetriever;
     private final IssueRepository issueRepository;
-    private final UserCRUDService userCRUDService;
     private final ProjectCRUDService projectCRUDService;
 
-    public IssueCRUDService(IssueRepository issueRepository, UserCRUDService userCRUDService,
+    public IssueCRUDService(UserRetriever userRetriever, IssueRepository issueRepository,
                             ProjectCRUDService projectCRUDService) {
+        this.userRetriever = userRetriever;
         this.issueRepository = issueRepository;
-        this.userCRUDService = userCRUDService;
         this.projectCRUDService = projectCRUDService;
     }
 
@@ -51,7 +51,7 @@ public class IssueCRUDService implements LogRetriever {
 
     public Issue createIssue(UnidentifiedIssueDTO unidentifiedIssueDTO) {
         Project project = projectCRUDService.findProject(unidentifiedIssueDTO.getProject().getId());
-        User owner = userCRUDService.findUser(unidentifiedIssueDTO.getOwner().getId());
+        User owner = userRetriever.findUser(unidentifiedIssueDTO.getOwner().getId());
 
         Issue issue = unidentifiedIssue(unidentifiedIssueDTO.getSummary(), unidentifiedIssueDTO.getDescription(),
                 unidentifiedIssueDTO.getCategory(), unidentifiedIssueDTO.getImpact(), unidentifiedIssueDTO.getStatus(),
@@ -77,7 +77,7 @@ public class IssueCRUDService implements LogRetriever {
 
         if (identifiedIssueDTO.getOwner() != null
                 && issue.getOwner().getId() != identifiedIssueDTO.getOwner().getId()) {
-            issue.setOwner(userCRUDService.findUser(identifiedIssueDTO.getOwner().getId()));
+            issue.setOwner(userRetriever.findUser(identifiedIssueDTO.getOwner().getId()));
         }
 
         return issueRepository.save(issue);

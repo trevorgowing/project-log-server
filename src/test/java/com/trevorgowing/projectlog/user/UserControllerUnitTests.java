@@ -30,9 +30,15 @@ import static org.mockito.Mockito.when;
 public class UserControllerUnitTests extends AbstractControllerUnitTests {
 
     @Mock
-    private UserDTOFactory userDTOFactory;
+    private UserFactory userFactory;
     @Mock
-    private UserCRUDService userCRUDService;
+    private UserDeleter userDeleter;
+    @Mock
+    private UserModifier userModifier;
+    @Mock
+    private UserRetriever userRetriever;
+    @Mock
+    private UserDTOFactory userDTOFactory;
 
     @InjectMocks
     private UserController userController;
@@ -45,7 +51,7 @@ public class UserControllerUnitTests extends AbstractControllerUnitTests {
     @Test
     public void testGetUsersWithNoExistingUsers_shouldRespondWithStatusOKAndReturnNoUsers() throws Exception {
         // Set up expectations
-        when(userCRUDService.findIdentifiedUserDTOs()).thenReturn(Collections.emptyList());
+        when(userRetriever.findIdentifiedUserDTOs()).thenReturn(Collections.emptyList());
 
         // Exercise SUT
         given()
@@ -84,7 +90,7 @@ public class UserControllerUnitTests extends AbstractControllerUnitTests {
         List<IdentifiedUserDTO> expectedIdentifiedUserDTOs = asList(identifiedUserOneDTO, identifiedUserTwoDTO);
 
         // Set up expectations
-        when(userCRUDService.findIdentifiedUserDTOs()).thenReturn(expectedIdentifiedUserDTOs);
+        when(userRetriever.findIdentifiedUserDTOs()).thenReturn(expectedIdentifiedUserDTOs);
 
         // Exercise SUT
         given()
@@ -106,7 +112,7 @@ public class UserControllerUnitTests extends AbstractControllerUnitTests {
     @Test(expected = UserNotFoundException.class)
     public void testGetUserWithNoMatchingUser_shouldRespondWithStatusNotFound() {
         // Set up expectations
-        when(userCRUDService.findIdentifiedUserDTOById(IRRELEVANT_USER_ID))
+        when(userRetriever.findIdentifiedUserDTOById(IRRELEVANT_USER_ID))
                 .thenThrow(identifiedUserNotFoundException(IRRELEVANT_USER_ID));
 
         // Exercise SUT
@@ -132,7 +138,7 @@ public class UserControllerUnitTests extends AbstractControllerUnitTests {
                 .build();
 
         // Set up expectations
-        when(userCRUDService.findIdentifiedUserDTOById(IRRELEVANT_USER_ID))
+        when(userRetriever.findIdentifiedUserDTOById(IRRELEVANT_USER_ID))
                 .thenReturn(expectedIdentifiedUserDTO);
 
         // Exercise SUT
@@ -167,7 +173,7 @@ public class UserControllerUnitTests extends AbstractControllerUnitTests {
                 .build();
 
         // Set up expectations
-        when(userCRUDService.createUser(IRRELEVANT_USER_EMAIL, IRRELEVANT_USER_PASSWORD, IRRELEVANT_USER_FIRST_NAME,
+        when(userFactory.createUser(IRRELEVANT_USER_EMAIL, IRRELEVANT_USER_PASSWORD, IRRELEVANT_USER_FIRST_NAME,
                 IRRELEVANT_USER_LAST_NAME)).thenThrow(duplicateEmailException);
 
         // Exercise SUT
@@ -212,7 +218,7 @@ public class UserControllerUnitTests extends AbstractControllerUnitTests {
                 .build();
 
         // Set up expectations
-        when(userCRUDService.createUser(IRRELEVANT_USER_EMAIL, IRRELEVANT_USER_PASSWORD, IRRELEVANT_USER_FIRST_NAME,
+        when(userFactory.createUser(IRRELEVANT_USER_EMAIL, IRRELEVANT_USER_PASSWORD, IRRELEVANT_USER_FIRST_NAME,
                 IRRELEVANT_USER_LAST_NAME)).thenReturn(user);
         when(userDTOFactory.createIdentifiedUserDTO(user))
                 .thenReturn(expectedIdentifiedUserDTO);
@@ -252,7 +258,7 @@ public class UserControllerUnitTests extends AbstractControllerUnitTests {
                 .build();
 
         // Set up expectations
-        when(userCRUDService.updateUser(IRRELEVANT_USER_ID, IRRELEVANT_USER_EMAIL, IRRELEVANT_USER_PASSWORD, IRRELEVANT_USER_FIRST_NAME,
+        when(userModifier.updateUser(IRRELEVANT_USER_ID, IRRELEVANT_USER_EMAIL, IRRELEVANT_USER_PASSWORD, IRRELEVANT_USER_FIRST_NAME,
                 IRRELEVANT_USER_LAST_NAME)).thenThrow(userNotFoundException);
 
         // Exercise SUT
@@ -285,7 +291,7 @@ public class UserControllerUnitTests extends AbstractControllerUnitTests {
                 .build();
 
         // Set up expectations
-        when(userCRUDService.updateUser(IRRELEVANT_USER_ID, IRRELEVANT_USER_EMAIL, IRRELEVANT_USER_PASSWORD, IRRELEVANT_USER_FIRST_NAME,
+        when(userModifier.updateUser(IRRELEVANT_USER_ID, IRRELEVANT_USER_EMAIL, IRRELEVANT_USER_PASSWORD, IRRELEVANT_USER_FIRST_NAME,
                 IRRELEVANT_USER_LAST_NAME)).thenThrow(duplicateEmailException);
 
         // Exercise SUT
@@ -331,7 +337,7 @@ public class UserControllerUnitTests extends AbstractControllerUnitTests {
                 .build();
 
         // Set up expectations
-        when(userCRUDService.updateUser(IRRELEVANT_USER_ID, IRRELEVANT_USER_EMAIL, IRRELEVANT_USER_PASSWORD,
+        when(userModifier.updateUser(IRRELEVANT_USER_ID, IRRELEVANT_USER_EMAIL, IRRELEVANT_USER_PASSWORD,
                 IRRELEVANT_USER_FIRST_NAME, IRRELEVANT_USER_LAST_NAME)).thenReturn(user);
         when(userDTOFactory.createIdentifiedUserDTO(user))
                 .thenReturn(expectedIdentifiedUserDTO);
@@ -359,7 +365,7 @@ public class UserControllerUnitTests extends AbstractControllerUnitTests {
     public void testDeleteUserWithNoMatchingUser_shouldRespondWithStatusNotFound() {
         // Set up expectations
         doThrow(identifiedUserNotFoundException(IRRELEVANT_USER_ID))
-                .when(userCRUDService).deleteUser(IRRELEVANT_USER_ID);
+                .when(userDeleter).deleteUser(IRRELEVANT_USER_ID);
 
         // Exercise SUT
         given()
@@ -375,7 +381,7 @@ public class UserControllerUnitTests extends AbstractControllerUnitTests {
     @Test
     public void testDeleteUserWithMatchingUser_shouldRespondWithStatusNoContent() {
         // Set up expectations
-        doNothing().when(userCRUDService).deleteUser(IRRELEVANT_USER_ID);
+        doNothing().when(userDeleter).deleteUser(IRRELEVANT_USER_ID);
 
         // Exercise SUT
         given()

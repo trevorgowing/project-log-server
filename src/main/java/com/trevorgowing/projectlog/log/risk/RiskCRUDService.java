@@ -5,7 +5,7 @@ import com.trevorgowing.projectlog.log.LogRetriever;
 import com.trevorgowing.projectlog.project.Project;
 import com.trevorgowing.projectlog.project.ProjectCRUDService;
 import com.trevorgowing.projectlog.user.User;
-import com.trevorgowing.projectlog.user.UserCRUDService;
+import com.trevorgowing.projectlog.user.UserRetriever;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -18,14 +18,14 @@ import static java.util.Optional.ofNullable;
 @Service
 public class RiskCRUDService implements LogRetriever {
 
+    private final UserRetriever userRetriever;
     private final RiskRepository riskRepository;
-    private final UserCRUDService userCRUDService;
     private final ProjectCRUDService projectCRUDService;
 
-    public RiskCRUDService(RiskRepository riskRepository, UserCRUDService userCRUDService,
+    public RiskCRUDService(UserRetriever userRetriever, RiskRepository riskRepository,
                            ProjectCRUDService projectCRUDService) {
+        this.userRetriever = userRetriever;
         this.riskRepository = riskRepository;
-        this.userCRUDService = userCRUDService;
         this.projectCRUDService = projectCRUDService;
     }
 
@@ -51,7 +51,7 @@ public class RiskCRUDService implements LogRetriever {
 
     public Risk createRisk(UnidentifiedRiskDTO unidentifiedRiskDTO) {
         Project project = projectCRUDService.findProject(unidentifiedRiskDTO.getProject().getId());
-        User owner = userCRUDService.findUser(unidentifiedRiskDTO.getOwner().getId());
+        User owner = userRetriever.findUser(unidentifiedRiskDTO.getOwner().getId());
 
         Risk risk = unidentifiedRisk(unidentifiedRiskDTO.getSummary(), unidentifiedRiskDTO.getDescription(),
                 unidentifiedRiskDTO.getCategory(), unidentifiedRiskDTO.getImpact(), unidentifiedRiskDTO.getStatus(),
@@ -77,7 +77,7 @@ public class RiskCRUDService implements LogRetriever {
         }
 
         if (identifiedRiskDTO.getOwner() != null && risk.getOwner().getId() != identifiedRiskDTO.getOwner().getId()) {
-            User owner = userCRUDService.findUser(identifiedRiskDTO.getOwner().getId());
+            User owner = userRetriever.findUser(identifiedRiskDTO.getOwner().getId());
             risk.setOwner(owner);
         }
 

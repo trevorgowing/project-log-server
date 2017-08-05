@@ -1,7 +1,7 @@
 package com.trevorgowing.projectlog.project;
 
 import com.trevorgowing.projectlog.user.User;
-import com.trevorgowing.projectlog.user.UserCRUDService;
+import com.trevorgowing.projectlog.user.UserRetriever;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
@@ -17,11 +17,11 @@ import static java.util.Optional.ofNullable;
 @Service
 public class ProjectCRUDService {
 
-    private final UserCRUDService userCRUDService;
+    private final UserRetriever userRetriever;
     private final ProjectRepository projectRepository;
 
-    public ProjectCRUDService(UserCRUDService userCRUDService, ProjectRepository projectRepository) {
-        this.userCRUDService = userCRUDService;
+    public ProjectCRUDService(UserRetriever userRetriever, ProjectRepository projectRepository) {
+        this.userRetriever = userRetriever;
         this.projectRepository = projectRepository;
     }
 
@@ -40,7 +40,7 @@ public class ProjectCRUDService {
     }
 
     Project createProject(String code, String name, long ownerId, LocalDate startDate, LocalDate endDate) {
-        User owner = userCRUDService.findUser(ownerId);
+        User owner = userRetriever.findUser(ownerId);
 
         Project project = unidentifiedProject(code, name, owner, startDate, endDate);
 
@@ -56,7 +56,7 @@ public class ProjectCRUDService {
 
         projectToUpdate.setCode(code);
         projectToUpdate.setName(name);
-        projectToUpdate.setOwner(userCRUDService.findUser(ownerId));
+        projectToUpdate.setOwner(userRetriever.findUser(ownerId));
         projectToUpdate.setStartDate(startDate);
         projectToUpdate.setEndDate(endDate);
 

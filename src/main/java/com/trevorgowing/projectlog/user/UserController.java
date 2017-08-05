@@ -22,30 +22,37 @@ import java.util.List;
 @RequestMapping(UserConstants.USERS_URL_PATH)
 class UserController {
 
+    private final UserFactory userFactory;
+    private final UserDeleter userDeleter;
+    private final UserModifier userModifier;
+    private final UserRetriever userRetriever;
     private final UserDTOFactory userDTOFactory;
-    private final UserCRUDService userCRUDService;
 
-    UserController(UserDTOFactory userDTOFactory, UserCRUDService userCRUDService) {
+    public UserController(UserFactory userFactory, UserDeleter userDeleter, UserModifier userModifier,
+                          UserRetriever userRetriever, UserDTOFactory userDTOFactory) {
+        this.userFactory = userFactory;
+        this.userDeleter = userDeleter;
+        this.userModifier = userModifier;
+        this.userRetriever = userRetriever;
         this.userDTOFactory = userDTOFactory;
-        this.userCRUDService = userCRUDService;
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseStatus(HttpStatus.OK)
     List<IdentifiedUserDTO> getUsers() {
-        return userCRUDService.findIdentifiedUserDTOs();
+        return userRetriever.findIdentifiedUserDTOs();
     }
 
     @GetMapping(path = UserConstants.USER_ID_PARAMETER_URL_PATH, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseStatus(HttpStatus.OK)
     IdentifiedUserDTO getUser(@PathVariable long userId) {
-        return userCRUDService.findIdentifiedUserDTOById(userId);
+        return userRetriever.findIdentifiedUserDTOById(userId);
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     IdentifiedUserDTO postUser(@RequestBody UnidentifiedUserDTO unidentifiedUserDTO) {
-        User user = userCRUDService.createUser(unidentifiedUserDTO.getEmail(), unidentifiedUserDTO.getPassword(),
+        User user = userFactory.createUser(unidentifiedUserDTO.getEmail(), unidentifiedUserDTO.getPassword(),
                 unidentifiedUserDTO.getFirstName(), unidentifiedUserDTO.getLastName());
         return userDTOFactory.createIdentifiedUserDTO(user);
     }
@@ -54,7 +61,7 @@ class UserController {
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseStatus(HttpStatus.OK)
     IdentifiedUserDTO putUser(@PathVariable long userId, @RequestBody IdentifiedUserDTO identifiedUserDTO) {
-        User updatedUser = userCRUDService.updateUser(userId, identifiedUserDTO.getEmail(),
+        User updatedUser = userModifier.updateUser(userId, identifiedUserDTO.getEmail(),
                 identifiedUserDTO.getPassword(), identifiedUserDTO.getFirstName(), identifiedUserDTO.getLastName());
         return userDTOFactory.createIdentifiedUserDTO(updatedUser);
     }
@@ -62,7 +69,7 @@ class UserController {
     @DeleteMapping(path = UserConstants.USER_ID_PARAMETER_URL_PATH)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void deleteUser(@PathVariable long userId) {
-        userCRUDService.deleteUser(userId);
+        userDeleter.deleteUser(userId);
     }
 
     @ExceptionHandler(UserNotFoundException.class)

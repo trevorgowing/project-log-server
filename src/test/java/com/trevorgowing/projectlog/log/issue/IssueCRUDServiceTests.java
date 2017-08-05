@@ -9,8 +9,8 @@ import com.trevorgowing.projectlog.project.Project;
 import com.trevorgowing.projectlog.project.ProjectCRUDService;
 import com.trevorgowing.projectlog.project.ProjectNotFoundException;
 import com.trevorgowing.projectlog.user.User;
-import com.trevorgowing.projectlog.user.UserCRUDService;
 import com.trevorgowing.projectlog.user.UserNotFoundException;
+import com.trevorgowing.projectlog.user.UserRetriever;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -38,9 +38,9 @@ import static org.mockito.Mockito.when;
 public class IssueCRUDServiceTests extends AbstractTests {
 
     @Mock
-    private IssueRepository issueRepository;
+    private UserRetriever userModifier;
     @Mock
-    private UserCRUDService userCRUDService;
+    private IssueRepository issueRepository;
     @Mock
     private ProjectCRUDService projectCRUDService;
 
@@ -157,7 +157,7 @@ public class IssueCRUDServiceTests extends AbstractTests {
 
         // Set up expectations
         when(projectCRUDService.findProject(1L)).thenReturn(project);
-        when(userCRUDService.findUser(1L)).thenThrow(identifiedUserNotFoundException(1L));
+        when(userModifier.findUser(1L)).thenThrow(identifiedUserNotFoundException(1L));
 
         // Exercise SUT
         issueCRUDService.createIssue(unidentifiedIssueDTO);
@@ -205,7 +205,7 @@ public class IssueCRUDServiceTests extends AbstractTests {
 
         // Set up expectations
         when(projectCRUDService.findProject(1L)).thenReturn(project);
-        when(userCRUDService.findUser(1L)).thenReturn(owner);
+        when(userModifier.findUser(1L)).thenReturn(owner);
         when(issueRepository.save(argThat(samePropertyValuesAs(unidentifiedIssue)))).thenReturn(expectedIssue);
 
         // Exercise SUT
@@ -251,7 +251,7 @@ public class IssueCRUDServiceTests extends AbstractTests {
 
         // Set up expectations
         when(issueRepository.findOne(1L)).thenReturn(issue);
-        when(userCRUDService.findUser(2L)).thenThrow(identifiedUserNotFoundException(2L));
+        when(userModifier.findUser(2L)).thenThrow(identifiedUserNotFoundException(2L));
 
         // Exercise SUT
         issueCRUDService.updateIssue(identifiedIssueDTO);
@@ -302,7 +302,7 @@ public class IssueCRUDServiceTests extends AbstractTests {
         // Set up expectations
         when(issueRepository.findOne(1L)).thenReturn(issuePreUpdate);
         when(projectCRUDService.findProject(2L)).thenReturn(project);
-        when(userCRUDService.findUser(2L)).thenReturn(owner);
+        when(userModifier.findUser(2L)).thenReturn(owner);
         when(issueRepository.save(argThat(samePropertyValuesAs(expectedIssue)))).thenReturn(expectedIssue);
 
         // Exercise SUT
