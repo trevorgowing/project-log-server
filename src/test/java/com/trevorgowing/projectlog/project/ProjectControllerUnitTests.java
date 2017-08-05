@@ -45,9 +45,15 @@ public class ProjectControllerUnitTests extends AbstractControllerUnitTests {
             .build();
 
     @Mock
-    private ProjectDTOFactory projectDTOFactory;
+    private ProjectFactory projectFactory;
     @Mock
-    private ProjectCRUDService projectCRUDService;
+    private ProjectDeleter projectDeleter;
+    @Mock
+    private ProjectModifier projectModifier;
+    @Mock
+    private ProjectRetriever projectRetriever;
+    @Mock
+    private ProjectDTOFactory projectDTOFactory;
 
     @InjectMocks
     private ProjectController projectController;
@@ -60,7 +66,7 @@ public class ProjectControllerUnitTests extends AbstractControllerUnitTests {
     @Test
     public void testGetProjectsWithNoExistingProjects_shouldRespondWithStatusOKAndReturnNoProjects() throws Exception {
         // Set up expectations
-        when(projectCRUDService.getIdentifiedProjectDTOs()).thenReturn(Collections.emptyList());
+        when(projectRetriever.getIdentifiedProjectDTOs()).thenReturn(Collections.emptyList());
 
         // Exercise SUT
         given()
@@ -107,7 +113,7 @@ public class ProjectControllerUnitTests extends AbstractControllerUnitTests {
                 identifiedProjectTwoDTO);
 
         // Set up expectations
-        when(projectCRUDService.getIdentifiedProjectDTOs()).thenReturn(expectedIdentifiedProjectDTOs);
+        when(projectRetriever.getIdentifiedProjectDTOs()).thenReturn(expectedIdentifiedProjectDTOs);
 
         // Exercise SUT
         given()
@@ -129,7 +135,7 @@ public class ProjectControllerUnitTests extends AbstractControllerUnitTests {
     @Test(expected = ProjectNotFoundException.class)
     public void testGetProjectByIdWithNoMatchingProject_shouldRespondWithStatusNotFound() {
         // Set up expectations
-        when(projectCRUDService.getIdentifiedProjectDTOById(IRRELEVANT_PROJECT_ID))
+        when(projectRetriever.getIdentifiedProjectDTOById(IRRELEVANT_PROJECT_ID))
                 .thenThrow(identifiedProjectNotFoundException(IRRELEVANT_PROJECT_ID));
 
         // Exercise SUT
@@ -157,7 +163,7 @@ public class ProjectControllerUnitTests extends AbstractControllerUnitTests {
                 .build();
 
         // Set up expectations
-        when(projectCRUDService.getIdentifiedProjectDTOById(IRRELEVANT_PROJECT_ID))
+        when(projectRetriever.getIdentifiedProjectDTOById(IRRELEVANT_PROJECT_ID))
                 .thenReturn(expectedIdentifiedProjectDTO);
 
         // Exercise SUT
@@ -192,7 +198,7 @@ public class ProjectControllerUnitTests extends AbstractControllerUnitTests {
                 .build();
 
         // Set up expectations
-        when(projectCRUDService.createProject(duplicateProjectCode, IRRELEVANT_PROJECT_NAME,
+        when(projectFactory.createProject(duplicateProjectCode, IRRELEVANT_PROJECT_NAME,
                 IRRELEVANT_USER_ID, startDate, endDate))
                 .thenThrow(codedDuplicateCodeException(duplicateProjectCode));
 
@@ -224,7 +230,7 @@ public class ProjectControllerUnitTests extends AbstractControllerUnitTests {
                 .build();
 
         // Set up expectations
-        when(projectCRUDService.createProject(IRRELEVANT_PROJECT_CODE, IRRELEVANT_PROJECT_NAME, nonExistentUserId,
+        when(projectFactory.createProject(IRRELEVANT_PROJECT_CODE, IRRELEVANT_PROJECT_NAME, nonExistentUserId,
                 IRRELEVANT_DATE, IRRELEVANT_DATE))
                 .thenThrow(identifiedUserNotFoundException(nonExistentUserId));
 
@@ -272,7 +278,7 @@ public class ProjectControllerUnitTests extends AbstractControllerUnitTests {
                 .build();
 
         // Set up expectations
-        when(projectCRUDService.createProject(IRRELEVANT_PROJECT_CODE, IRRELEVANT_PROJECT_NAME, IRRELEVANT_USER_ID, IRRELEVANT_DATE, IRRELEVANT_DATE))
+        when(projectFactory.createProject(IRRELEVANT_PROJECT_CODE, IRRELEVANT_PROJECT_NAME, IRRELEVANT_USER_ID, IRRELEVANT_DATE, IRRELEVANT_DATE))
                 .thenReturn(project);
         when(projectDTOFactory.createIdentifiedProjectDTO(project))
                 .thenReturn(expectedIdentifiedProjectDTO);
@@ -311,7 +317,7 @@ public class ProjectControllerUnitTests extends AbstractControllerUnitTests {
                 .build();
 
         // Set up expectations
-        when(projectCRUDService.updateProject(IRRELEVANT_PROJECT_ID, duplicateProjectCode, IRRELEVANT_PROJECT_NAME,
+        when(projectModifier.updateProject(IRRELEVANT_PROJECT_ID, duplicateProjectCode, IRRELEVANT_PROJECT_NAME,
                 IRRELEVANT_USER_ID, IRRELEVANT_DATE, IRRELEVANT_DATE))
                 .thenThrow(codedDuplicateCodeException(duplicateProjectCode));
 
@@ -344,7 +350,7 @@ public class ProjectControllerUnitTests extends AbstractControllerUnitTests {
                 .build();
 
         // Set up expectations
-        when(projectCRUDService.updateProject(IRRELEVANT_PROJECT_ID, IRRELEVANT_PROJECT_CODE, IRRELEVANT_PROJECT_NAME,
+        when(projectModifier.updateProject(IRRELEVANT_PROJECT_ID, IRRELEVANT_PROJECT_CODE, IRRELEVANT_PROJECT_NAME,
                 nonExistentUserId, IRRELEVANT_DATE, IRRELEVANT_DATE))
                 .thenThrow(identifiedUserNotFoundException(nonExistentUserId));
 
@@ -393,7 +399,7 @@ public class ProjectControllerUnitTests extends AbstractControllerUnitTests {
                 .build();
 
         // Set up expectations
-        when(projectCRUDService.updateProject(IRRELEVANT_PROJECT_ID, IRRELEVANT_PROJECT_CODE, IRRELEVANT_PROJECT_NAME,
+        when(projectModifier.updateProject(IRRELEVANT_PROJECT_ID, IRRELEVANT_PROJECT_CODE, IRRELEVANT_PROJECT_NAME,
                 IRRELEVANT_USER_ID, IRRELEVANT_DATE, IRRELEVANT_DATE))
                 .thenReturn(project);
         when(projectDTOFactory.createIdentifiedProjectDTO(project))
@@ -423,7 +429,7 @@ public class ProjectControllerUnitTests extends AbstractControllerUnitTests {
     public void testDeleteProjectWithNoMatchingProject_shouldRespondWithStatusNotFound() {
         // Set up expectations
         doThrow(identifiedProjectNotFoundException(IRRELEVANT_PROJECT_ID))
-                .when(projectCRUDService).deleteProject(IRRELEVANT_PROJECT_ID);
+                .when(projectDeleter).deleteProject(IRRELEVANT_PROJECT_ID);
 
         // Exercise SUT
         given()
@@ -439,7 +445,7 @@ public class ProjectControllerUnitTests extends AbstractControllerUnitTests {
     @Test
     public void testDeleteProjectWithMatchingProject_shouldRespondWithStatusNoContent() {
         // Set up expectations
-        doNothing().when(projectCRUDService).deleteProject(IRRELEVANT_PROJECT_ID);
+        doNothing().when(projectDeleter).deleteProject(IRRELEVANT_PROJECT_ID);
 
         // Exercise SUT
         given()

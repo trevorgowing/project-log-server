@@ -8,8 +8,8 @@ import com.trevorgowing.projectlog.log.constant.LogStatus;
 import com.trevorgowing.projectlog.log.constant.Probability;
 import com.trevorgowing.projectlog.log.constant.RiskResponse;
 import com.trevorgowing.projectlog.project.Project;
-import com.trevorgowing.projectlog.project.ProjectCRUDService;
 import com.trevorgowing.projectlog.project.ProjectNotFoundException;
+import com.trevorgowing.projectlog.project.ProjectRetriever;
 import com.trevorgowing.projectlog.user.User;
 import com.trevorgowing.projectlog.user.UserNotFoundException;
 import com.trevorgowing.projectlog.user.UserRetriever;
@@ -45,7 +45,7 @@ public class RiskCRUDServiceTests extends AbstractTests {
     @Mock
     private RiskRepository riskRepository;
     @Mock
-    private ProjectCRUDService projectCRUDService;
+    private ProjectRetriever projectRetriever;
 
     @InjectMocks
     private RiskCRUDService riskCRUDService;
@@ -150,7 +150,7 @@ public class RiskCRUDServiceTests extends AbstractTests {
                 .build();
 
         // Set up expectations
-        when(projectCRUDService.findProject(1L)).thenThrow(identifiedProjectNotFoundException(1L));
+        when(projectRetriever.findProject(1L)).thenThrow(identifiedProjectNotFoundException(1L));
 
         // Exercise SUT
         riskCRUDService.createRisk(unidentifiedRiskDTO);
@@ -174,7 +174,7 @@ public class RiskCRUDServiceTests extends AbstractTests {
         Project project = aProject().id(1L).build();
 
         // Set up expectations
-        when(projectCRUDService.findProject(1L)).thenReturn(project);
+        when(projectRetriever.findProject(1L)).thenReturn(project);
         when(userRetriever.findUser(1L)).thenThrow(identifiedUserNotFoundException(1L));
 
         // Exercise SUT
@@ -225,7 +225,7 @@ public class RiskCRUDServiceTests extends AbstractTests {
                 .build();
 
         // Set up expectations
-        when(projectCRUDService.findProject(1L)).thenReturn(project);
+        when(projectRetriever.findProject(1L)).thenReturn(project);
         when(userRetriever.findUser(1L)).thenReturn(owner);
         when(riskRepository.save(argThat(samePropertyValuesAs(unidentifiedRisk)))).thenReturn(expectedRisk);
 
@@ -261,7 +261,7 @@ public class RiskCRUDServiceTests extends AbstractTests {
 
         // Set up expectations
         when(riskRepository.findOne(1L)).thenReturn(risk);
-        when(projectCRUDService.findProject(2L)).thenThrow(identifiedProjectNotFoundException(1L));
+        when(projectRetriever.findProject(2L)).thenThrow(identifiedProjectNotFoundException(1L));
 
         // Exercise SUT
         riskCRUDService.updateRisk(identifiedRiskDTO);
@@ -338,7 +338,7 @@ public class RiskCRUDServiceTests extends AbstractTests {
 
         // Set up expectations
         when(riskRepository.findOne(1L)).thenReturn(riskPreUpdate);
-        when(projectCRUDService.findProject(2L)).thenReturn(project);
+        when(projectRetriever.findProject(2L)).thenReturn(project);
         when(userRetriever.findUser(2L)).thenReturn(owner);
         when(riskRepository.save(argThat(samePropertyValuesAs(expectedRisk)))).thenReturn(expectedRisk);
 

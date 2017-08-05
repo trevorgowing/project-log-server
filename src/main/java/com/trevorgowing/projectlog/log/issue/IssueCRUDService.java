@@ -3,7 +3,7 @@ package com.trevorgowing.projectlog.log.issue;
 import com.trevorgowing.projectlog.log.LogDTO;
 import com.trevorgowing.projectlog.log.LogRetriever;
 import com.trevorgowing.projectlog.project.Project;
-import com.trevorgowing.projectlog.project.ProjectCRUDService;
+import com.trevorgowing.projectlog.project.ProjectRetriever;
 import com.trevorgowing.projectlog.user.User;
 import com.trevorgowing.projectlog.user.UserRetriever;
 import org.springframework.stereotype.Service;
@@ -20,13 +20,13 @@ public class IssueCRUDService implements LogRetriever {
 
     private final UserRetriever userRetriever;
     private final IssueRepository issueRepository;
-    private final ProjectCRUDService projectCRUDService;
+    private final ProjectRetriever projectRetriever;
 
     public IssueCRUDService(UserRetriever userRetriever, IssueRepository issueRepository,
-                            ProjectCRUDService projectCRUDService) {
+							ProjectRetriever projectRetriever) {
         this.userRetriever = userRetriever;
         this.issueRepository = issueRepository;
-        this.projectCRUDService = projectCRUDService;
+        this.projectRetriever = projectRetriever;
     }
 
     public Issue findIssue(long issueId) {
@@ -50,7 +50,7 @@ public class IssueCRUDService implements LogRetriever {
     }
 
     public Issue createIssue(UnidentifiedIssueDTO unidentifiedIssueDTO) {
-        Project project = projectCRUDService.findProject(unidentifiedIssueDTO.getProject().getId());
+        Project project = projectRetriever.findProject(unidentifiedIssueDTO.getProject().getId());
         User owner = userRetriever.findUser(unidentifiedIssueDTO.getOwner().getId());
 
         Issue issue = unidentifiedIssue(unidentifiedIssueDTO.getSummary(), unidentifiedIssueDTO.getDescription(),
@@ -72,7 +72,7 @@ public class IssueCRUDService implements LogRetriever {
 
         if (identifiedIssueDTO.getProject() != null
                 && issue.getProject().getId() != identifiedIssueDTO.getProject().getId()) {
-            issue.setProject(projectCRUDService.findProject(identifiedIssueDTO.getProject().getId()));
+            issue.setProject(projectRetriever.findProject(identifiedIssueDTO.getProject().getId()));
         }
 
         if (identifiedIssueDTO.getOwner() != null

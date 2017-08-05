@@ -23,30 +23,38 @@ import java.util.List;
 @RequestMapping(ProjectConstants.PROJECTS_URL_PATH)
 class ProjectController {
 
+    private final ProjectFactory projectFactory;
+    private final ProjectDeleter projectDeleter;
+    private final ProjectModifier projectModifier;
+    private final ProjectRetriever projectRetriever;
     private final ProjectDTOFactory projectDTOFactory;
-    private final ProjectCRUDService projectCRUDService;
 
-    ProjectController(ProjectDTOFactory projectDTOFactory, ProjectCRUDService projectCRUDService) {
+    public ProjectController(ProjectFactory projectFactory, ProjectDeleter projectDeleter,
+                             ProjectModifier projectModifier, ProjectRetriever projectRetriever,
+                             ProjectDTOFactory projectDTOFactory) {
+        this.projectFactory = projectFactory;
+        this.projectDeleter = projectDeleter;
+        this.projectModifier = projectModifier;
+        this.projectRetriever = projectRetriever;
         this.projectDTOFactory = projectDTOFactory;
-        this.projectCRUDService = projectCRUDService;
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseStatus(HttpStatus.OK)
     List<IdentifiedProjectDTO> getProjects() {
-        return projectCRUDService.getIdentifiedProjectDTOs();
+        return projectRetriever.getIdentifiedProjectDTOs();
     }
 
     @GetMapping(path = ProjectConstants.PROJECT_ID_VARIABLE_URL_PATH, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseStatus(HttpStatus.OK)
     IdentifiedProjectDTO getProjectById(@PathVariable long projectId) {
-        return projectCRUDService.getIdentifiedProjectDTOById(projectId);
+        return projectRetriever.getIdentifiedProjectDTOById(projectId);
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     IdentifiedProjectDTO postProject(@RequestBody UnidentifiedProjectDTO unidentifiedProjectDTO) {
-        Project project = projectCRUDService.createProject(unidentifiedProjectDTO.getCode(),unidentifiedProjectDTO.getName(),
+        Project project = projectFactory.createProject(unidentifiedProjectDTO.getCode(),unidentifiedProjectDTO.getName(),
                 unidentifiedProjectDTO.getOwner().getId(), unidentifiedProjectDTO.getStartDate(),
                 unidentifiedProjectDTO.getEndDate());
         return projectDTOFactory.createIdentifiedProjectDTO(project);
@@ -57,7 +65,7 @@ class ProjectController {
     @ResponseStatus(HttpStatus.OK)
     IdentifiedProjectDTO putProject(@PathVariable long projectId,
                                     @RequestBody IdentifiedProjectDTO identifiedProjectDTO) {
-        Project project = projectCRUDService.updateProject(projectId, identifiedProjectDTO.getCode(),
+        Project project = projectModifier.updateProject(projectId, identifiedProjectDTO.getCode(),
                 identifiedProjectDTO.getName(), identifiedProjectDTO.getOwner().getId(),
                 identifiedProjectDTO.getStartDate(), identifiedProjectDTO.getEndDate());
          return projectDTOFactory.createIdentifiedProjectDTO(project);
@@ -66,7 +74,7 @@ class ProjectController {
     @DeleteMapping(path = ProjectConstants.PROJECT_ID_VARIABLE_URL_PATH)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void deleteProject(@PathVariable long projectId) {
-        projectCRUDService.deleteProject(projectId);
+        projectDeleter.deleteProject(projectId);
     }
 
     @ExceptionHandler(ProjectNotFoundException.class)

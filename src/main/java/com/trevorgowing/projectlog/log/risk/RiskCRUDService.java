@@ -3,7 +3,7 @@ package com.trevorgowing.projectlog.log.risk;
 import com.trevorgowing.projectlog.log.LogDTO;
 import com.trevorgowing.projectlog.log.LogRetriever;
 import com.trevorgowing.projectlog.project.Project;
-import com.trevorgowing.projectlog.project.ProjectCRUDService;
+import com.trevorgowing.projectlog.project.ProjectRetriever;
 import com.trevorgowing.projectlog.user.User;
 import com.trevorgowing.projectlog.user.UserRetriever;
 import org.springframework.stereotype.Service;
@@ -20,13 +20,13 @@ public class RiskCRUDService implements LogRetriever {
 
     private final UserRetriever userRetriever;
     private final RiskRepository riskRepository;
-    private final ProjectCRUDService projectCRUDService;
+    private final ProjectRetriever projectRetriever;
 
     public RiskCRUDService(UserRetriever userRetriever, RiskRepository riskRepository,
-                           ProjectCRUDService projectCRUDService) {
+						   ProjectRetriever projectRetriever) {
         this.userRetriever = userRetriever;
         this.riskRepository = riskRepository;
-        this.projectCRUDService = projectCRUDService;
+        this.projectRetriever = projectRetriever;
     }
 
     public Risk findRisk(long riskId) {
@@ -50,7 +50,7 @@ public class RiskCRUDService implements LogRetriever {
     }
 
     public Risk createRisk(UnidentifiedRiskDTO unidentifiedRiskDTO) {
-        Project project = projectCRUDService.findProject(unidentifiedRiskDTO.getProject().getId());
+        Project project = projectRetriever.findProject(unidentifiedRiskDTO.getProject().getId());
         User owner = userRetriever.findUser(unidentifiedRiskDTO.getOwner().getId());
 
         Risk risk = unidentifiedRisk(unidentifiedRiskDTO.getSummary(), unidentifiedRiskDTO.getDescription(),
@@ -72,7 +72,7 @@ public class RiskCRUDService implements LogRetriever {
         risk.setDateClosed(identifiedRiskDTO.getDateClosed());
 
         if (identifiedRiskDTO.getProject() != null && risk.getProject().getId() != identifiedRiskDTO.getProject().getId()) {
-            Project project = projectCRUDService.findProject(identifiedRiskDTO.getProject().getId());
+            Project project = projectRetriever.findProject(identifiedRiskDTO.getProject().getId());
             risk.setProject(project);
         }
 
