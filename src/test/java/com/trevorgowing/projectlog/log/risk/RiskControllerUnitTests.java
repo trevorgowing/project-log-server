@@ -28,9 +28,11 @@ import static org.mockito.Mockito.when;
 public class RiskControllerUnitTests extends AbstractControllerUnitTests {
 
     @Mock
-    private RiskDTOFactory riskDTOFactory;
+    private RiskFactory riskFactory;
     @Mock
-    private RiskCRUDService riskCRUDService;
+    private RiskModifier riskModifier;
+    @Mock
+    private RiskDTOFactory riskDTOFactory;
 
     @InjectMocks
     private RiskController riskController;
@@ -48,7 +50,7 @@ public class RiskControllerUnitTests extends AbstractControllerUnitTests {
                 .build();
 
         // Set up expectations
-        when(riskCRUDService.createRisk(unidentifiedRiskDTO)).thenThrow(identifiedProjectNotFoundException(1L));
+        when(riskFactory.createRisk(unidentifiedRiskDTO)).thenThrow(identifiedProjectNotFoundException(1L));
 
         // Exercise SUT
         given()
@@ -72,7 +74,7 @@ public class RiskControllerUnitTests extends AbstractControllerUnitTests {
                 .build();
 
         // Set up expectations
-        when(riskCRUDService.createRisk(unidentifiedRiskDTO)).thenThrow(identifiedUserNotFoundException(1L));
+        when(riskFactory.createRisk(unidentifiedRiskDTO)).thenThrow(identifiedUserNotFoundException(1L));
 
         // Exercise SUT
         given()
@@ -98,7 +100,7 @@ public class RiskControllerUnitTests extends AbstractControllerUnitTests {
         IdentifiedRiskDTO expectedIdentifiedRiskDTO = anIdentifiedRiskDTO().build();
 
         // Set up expectations
-        when(riskCRUDService.createRisk(unidentifiedRiskDTO)).thenReturn(risk);
+        when(riskFactory.createRisk(unidentifiedRiskDTO)).thenReturn(risk);
         when(riskDTOFactory.createIdentifiedRiskDTO(risk)).thenReturn(expectedIdentifiedRiskDTO);
 
         // Exercise SUT
@@ -126,7 +128,7 @@ public class RiskControllerUnitTests extends AbstractControllerUnitTests {
         IdentifiedRiskDTO identifiedRiskDTO = anIdentifiedRiskDTO().id(1L).build();
 
         // Set up expectations
-        when(riskCRUDService.updateRisk(identifiedRiskDTO)).thenThrow(identifiedRiskNotFoundException(1L));
+        when(riskModifier.updateRisk(identifiedRiskDTO)).thenThrow(identifiedRiskNotFoundException(1L));
 
         // Exercise SUT
         given()
@@ -148,7 +150,7 @@ public class RiskControllerUnitTests extends AbstractControllerUnitTests {
         IdentifiedRiskDTO identifiedRiskDTO = anIdentifiedRiskDTO().id(1L).build();
 
         // Set up expectations
-        when(riskCRUDService.updateRisk(identifiedRiskDTO)).thenThrow(identifiedProjectNotFoundException(1L));
+        when(riskModifier.updateRisk(identifiedRiskDTO)).thenThrow(identifiedProjectNotFoundException(1L));
 
         // Exercise SUT
         given()
@@ -170,7 +172,7 @@ public class RiskControllerUnitTests extends AbstractControllerUnitTests {
         IdentifiedRiskDTO identifiedRiskDTO = anIdentifiedRiskDTO().id(1L).build();
 
         // Set up expectations
-        when(riskCRUDService.updateRisk(identifiedRiskDTO)).thenThrow(identifiedUserNotFoundException(1L));
+        when(riskModifier.updateRisk(identifiedRiskDTO)).thenThrow(identifiedUserNotFoundException(1L));
 
         // Exercise SUT
         given()
@@ -196,7 +198,7 @@ public class RiskControllerUnitTests extends AbstractControllerUnitTests {
         IdentifiedRiskDTO expectedIdentifiedRiskDTO = anIdentifiedRiskDTO().id(1L).build();
 
         // Set up expectations
-        when(riskCRUDService.updateRisk(identifiedRiskDTO)).thenReturn(risk);
+        when(riskModifier.updateRisk(identifiedRiskDTO)).thenReturn(risk);
         when(riskDTOFactory.createIdentifiedRiskDTO(risk)).thenReturn(expectedIdentifiedRiskDTO);
 
         // Exercise SUT

@@ -2,7 +2,7 @@ package com.trevorgowing.projectlog.log;
 
 import com.trevorgowing.projectlog.common.types.AbstractTests;
 import com.trevorgowing.projectlog.log.issue.IssueRetriever;
-import com.trevorgowing.projectlog.log.risk.RiskCRUDService;
+import com.trevorgowing.projectlog.log.risk.RiskRetriever;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -16,7 +16,7 @@ import static org.hamcrest.Matchers.is;
 public class LogRetrieverFactoryTests extends AbstractTests {
 
     @Mock
-    private RiskCRUDService riskCRUDService;
+    private RiskRetriever riskRetriever;
     @Mock
     private IssueRetriever issueRetriever;
     @Mock
@@ -40,7 +40,7 @@ public class LogRetrieverFactoryTests extends AbstractTests {
         LogRetriever actualLogRetriever = logRetrieverFactory.getLogLookupService(RISK);
 
         // Verify behaviour
-        assertThat(actualLogRetriever, is(riskCRUDService));
+        assertThat(actualLogRetriever, is(riskRetriever));
     }
 
     @Test

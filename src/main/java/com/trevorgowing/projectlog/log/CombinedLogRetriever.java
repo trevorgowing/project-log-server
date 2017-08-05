@@ -4,8 +4,8 @@ import com.trevorgowing.projectlog.log.issue.Issue;
 import com.trevorgowing.projectlog.log.issue.IssueDTOFactory;
 import com.trevorgowing.projectlog.log.issue.IssueRetriever;
 import com.trevorgowing.projectlog.log.risk.Risk;
-import com.trevorgowing.projectlog.log.risk.RiskCRUDService;
 import com.trevorgowing.projectlog.log.risk.RiskDTOFactory;
+import com.trevorgowing.projectlog.log.risk.RiskRetriever;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -20,23 +20,23 @@ class CombinedLogRetriever implements LogRetriever {
     private final LogRepository logRepository;
     private final IssueRetriever issueRetriever;
     private final RiskDTOFactory riskDTOFactory;
-    private final RiskCRUDService riskCRUDService;
+    private final RiskRetriever riskRetriever;
     private final IssueDTOFactory issueDTOFactory;
 
     public CombinedLogRetriever(LogRepository logRepository, IssueRetriever issueRetriever,
-                                RiskDTOFactory riskDTOFactory, RiskCRUDService riskCRUDService,
-                                IssueDTOFactory issueDTOFactory) {
+								RiskDTOFactory riskDTOFactory, RiskRetriever riskRetriever,
+								IssueDTOFactory issueDTOFactory) {
         this.logRepository = logRepository;
         this.issueRetriever = issueRetriever;
         this.riskDTOFactory = riskDTOFactory;
-        this.riskCRUDService = riskCRUDService;
+        this.riskRetriever = riskRetriever;
         this.issueDTOFactory = issueDTOFactory;
     }
 
     @Override
     public List<LogDTO> getLogDTOs() {
         List<LogDTO> logDTOs = new ArrayList<>();
-        logDTOs.addAll(riskCRUDService.getLogDTOs());
+        logDTOs.addAll(riskRetriever.getLogDTOs());
         logDTOs.addAll(issueRetriever.getLogDTOs());
         return logDTOs;
     }

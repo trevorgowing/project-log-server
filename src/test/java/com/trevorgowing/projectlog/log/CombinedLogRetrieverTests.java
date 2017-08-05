@@ -7,8 +7,8 @@ import com.trevorgowing.projectlog.log.issue.IssueDTOFactory;
 import com.trevorgowing.projectlog.log.issue.IssueRetriever;
 import com.trevorgowing.projectlog.log.risk.IdentifiedRiskDTO;
 import com.trevorgowing.projectlog.log.risk.Risk;
-import com.trevorgowing.projectlog.log.risk.RiskCRUDService;
 import com.trevorgowing.projectlog.log.risk.RiskDTOFactory;
+import com.trevorgowing.projectlog.log.risk.RiskRetriever;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -34,7 +34,7 @@ public class CombinedLogRetrieverTests extends AbstractTests {
     @Mock
     private RiskDTOFactory riskDTOFactory;
     @Mock
-    private RiskCRUDService riskCRUDService;
+    private RiskRetriever riskRetriever;
     @Mock
     private IssueDTOFactory issueDTOFactory;
 
@@ -54,7 +54,7 @@ public class CombinedLogRetrieverTests extends AbstractTests {
         expectedLogDTOs.addAll(issueDTOs);
 
         // Set up expectations
-        when(riskCRUDService.getLogDTOs()).thenReturn(riskDTOs);
+        when(riskRetriever.getLogDTOs()).thenReturn(riskDTOs);
         when(issueRetriever.getLogDTOs()).thenReturn(issueDTOs);
 
         // Exercise SUT
