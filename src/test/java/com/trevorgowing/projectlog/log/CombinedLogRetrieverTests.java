@@ -3,8 +3,8 @@ package com.trevorgowing.projectlog.log;
 import com.trevorgowing.projectlog.common.types.AbstractTests;
 import com.trevorgowing.projectlog.log.issue.IdentifiedIssueDTO;
 import com.trevorgowing.projectlog.log.issue.Issue;
-import com.trevorgowing.projectlog.log.issue.IssueCRUDService;
 import com.trevorgowing.projectlog.log.issue.IssueDTOFactory;
+import com.trevorgowing.projectlog.log.issue.IssueRetriever;
 import com.trevorgowing.projectlog.log.risk.IdentifiedRiskDTO;
 import com.trevorgowing.projectlog.log.risk.Risk;
 import com.trevorgowing.projectlog.log.risk.RiskCRUDService;
@@ -30,13 +30,13 @@ public class CombinedLogRetrieverTests extends AbstractTests {
     @Mock
     private LogRepository logRepository;
     @Mock
+    private IssueRetriever issueRetriever;
+    @Mock
     private RiskDTOFactory riskDTOFactory;
     @Mock
     private RiskCRUDService riskCRUDService;
     @Mock
     private IssueDTOFactory issueDTOFactory;
-    @Mock
-    private IssueCRUDService issueCRUDService;
 
     @InjectMocks
     private CombinedLogRetriever combinedLogRetriever;
@@ -55,7 +55,7 @@ public class CombinedLogRetrieverTests extends AbstractTests {
 
         // Set up expectations
         when(riskCRUDService.getLogDTOs()).thenReturn(riskDTOs);
-        when(issueCRUDService.getLogDTOs()).thenReturn(issueDTOs);
+        when(issueRetriever.getLogDTOs()).thenReturn(issueDTOs);
 
         // Exercise SUT
         List<LogDTO> actualLogDTOs = combinedLogRetriever.getLogDTOs();

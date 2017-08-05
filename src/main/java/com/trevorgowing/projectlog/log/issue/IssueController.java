@@ -19,25 +19,27 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(LogConstants.LOGS_URL_PATH + LogConstants.ISSUES_URL_PATH)
 class IssueController {
 
+    private final IssueFactory issueFactory;
+    private final IssueModifier issueModifier;
     private final IssueDTOFactory issueDTOFactory;
-    private final IssueCRUDService issueCRUDService;
 
-    IssueController(IssueDTOFactory issueDTOFactory, IssueCRUDService issueCRUDService) {
+    IssueController(IssueFactory issueFactory, IssueDTOFactory issueDTOFactory, IssueModifier issueModifier) {
+        this.issueFactory = issueFactory;
         this.issueDTOFactory = issueDTOFactory;
-        this.issueCRUDService = issueCRUDService;
+        this.issueModifier = issueModifier;
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     IdentifiedIssueDTO postIssue(@RequestBody UnidentifiedIssueDTO unidentifiedIssueDTO) {
-        Issue issue = issueCRUDService.createIssue(unidentifiedIssueDTO);
+        Issue issue = issueFactory.createIssue(unidentifiedIssueDTO);
         return issueDTOFactory.createIdentifiedIssueDTO(issue);
     }
 
     @PutMapping(consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseStatus(HttpStatus.OK)
     IdentifiedIssueDTO putIssue(@RequestBody IdentifiedIssueDTO identifiedIssueDTO) {
-        Issue issue = issueCRUDService.updateIssue(identifiedIssueDTO);
+        Issue issue = issueModifier.updateIssue(identifiedIssueDTO);
         return issueDTOFactory.createIdentifiedIssueDTO(issue);
     }
 

@@ -1,7 +1,7 @@
 package com.trevorgowing.projectlog.log;
 
 import com.trevorgowing.projectlog.common.types.AbstractTests;
-import com.trevorgowing.projectlog.log.issue.IssueCRUDService;
+import com.trevorgowing.projectlog.log.issue.IssueRetriever;
 import com.trevorgowing.projectlog.log.risk.RiskCRUDService;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -18,7 +18,7 @@ public class LogRetrieverFactoryTests extends AbstractTests {
     @Mock
     private RiskCRUDService riskCRUDService;
     @Mock
-    private IssueCRUDService issueCRUDService;
+    private IssueRetriever issueRetriever;
     @Mock
     private CombinedLogRetriever combinedLogRetriever;
 
@@ -49,6 +49,6 @@ public class LogRetrieverFactoryTests extends AbstractTests {
         LogRetriever actualLogRetriever = logRetrieverFactory.getLogLookupService(ISSUE);
 
         // Verify behaviour
-        assertThat(actualLogRetriever, is(issueCRUDService));
+        assertThat(actualLogRetriever, is(issueRetriever));
     }
 }

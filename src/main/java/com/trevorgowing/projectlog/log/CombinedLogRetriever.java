@@ -1,8 +1,8 @@
 package com.trevorgowing.projectlog.log;
 
 import com.trevorgowing.projectlog.log.issue.Issue;
-import com.trevorgowing.projectlog.log.issue.IssueCRUDService;
 import com.trevorgowing.projectlog.log.issue.IssueDTOFactory;
+import com.trevorgowing.projectlog.log.issue.IssueRetriever;
 import com.trevorgowing.projectlog.log.risk.Risk;
 import com.trevorgowing.projectlog.log.risk.RiskCRUDService;
 import com.trevorgowing.projectlog.log.risk.RiskDTOFactory;
@@ -18,26 +18,26 @@ import static java.util.Optional.ofNullable;
 class CombinedLogRetriever implements LogRetriever {
 
     private final LogRepository logRepository;
+    private final IssueRetriever issueRetriever;
     private final RiskDTOFactory riskDTOFactory;
     private final RiskCRUDService riskCRUDService;
     private final IssueDTOFactory issueDTOFactory;
-    private final IssueCRUDService issueCRUDService;
 
-    public CombinedLogRetriever(LogRepository logRepository, RiskDTOFactory riskDTOFactory,
-                                RiskCRUDService riskCRUDService, IssueDTOFactory issueDTOFactory,
-                                IssueCRUDService issueCRUDService) {
+    public CombinedLogRetriever(LogRepository logRepository, IssueRetriever issueRetriever,
+                                RiskDTOFactory riskDTOFactory, RiskCRUDService riskCRUDService,
+                                IssueDTOFactory issueDTOFactory) {
         this.logRepository = logRepository;
+        this.issueRetriever = issueRetriever;
         this.riskDTOFactory = riskDTOFactory;
         this.riskCRUDService = riskCRUDService;
         this.issueDTOFactory = issueDTOFactory;
-        this.issueCRUDService = issueCRUDService;
     }
 
     @Override
     public List<LogDTO> getLogDTOs() {
         List<LogDTO> logDTOs = new ArrayList<>();
         logDTOs.addAll(riskCRUDService.getLogDTOs());
-        logDTOs.addAll(issueCRUDService.getLogDTOs());
+        logDTOs.addAll(issueRetriever.getLogDTOs());
         return logDTOs;
     }
 

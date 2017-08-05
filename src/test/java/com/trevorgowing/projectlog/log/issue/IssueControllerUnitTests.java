@@ -28,9 +28,11 @@ import static org.mockito.Mockito.when;
 public class IssueControllerUnitTests extends AbstractControllerUnitTests {
 
     @Mock
-    private IssueDTOFactory issueDTOFactory;
+    private IssueFactory issueFactory;
     @Mock
-    private IssueCRUDService issueCRUDService;
+    private IssueModifier issueModifier;
+    @Mock
+    private IssueDTOFactory issueDTOFactory;
 
     @InjectMocks
     private IssueController issueController;
@@ -48,7 +50,7 @@ public class IssueControllerUnitTests extends AbstractControllerUnitTests {
                 .build();
 
         // Set up expectations
-        when(issueCRUDService.createIssue(unidentifiedIssueDTO)).thenThrow(identifiedProjectNotFoundException(1L));
+        when(issueFactory.createIssue(unidentifiedIssueDTO)).thenThrow(identifiedProjectNotFoundException(1L));
 
         // Exercise SUT
         given()
@@ -72,7 +74,7 @@ public class IssueControllerUnitTests extends AbstractControllerUnitTests {
                 .build();
 
         // Set up expectations
-        when(issueCRUDService.createIssue(unidentifiedIssueDTO)).thenThrow(identifiedUserNotFoundException(1L));
+        when(issueFactory.createIssue(unidentifiedIssueDTO)).thenThrow(identifiedUserNotFoundException(1L));
 
         // Exercise SUT
         given()
@@ -98,7 +100,7 @@ public class IssueControllerUnitTests extends AbstractControllerUnitTests {
         IdentifiedIssueDTO expectedIdentifiedIssueDTO = anIdentifiedIssueDTO().build();
 
         // Set up expectations
-        when(issueCRUDService.createIssue(unidentifiedIssueDTO)).thenReturn(issue);
+        when(issueFactory.createIssue(unidentifiedIssueDTO)).thenReturn(issue);
         when(issueDTOFactory.createIdentifiedIssueDTO(issue)).thenReturn(expectedIdentifiedIssueDTO);
 
         // Exercise SUT
@@ -126,7 +128,7 @@ public class IssueControllerUnitTests extends AbstractControllerUnitTests {
         IdentifiedIssueDTO identifiedIssueDTO = anIdentifiedIssueDTO().id(1L).build();
 
         // Set up expectations
-        when(issueCRUDService.updateIssue(identifiedIssueDTO)).thenThrow(identifiedIssueNotFoundException(1L));
+        when(issueModifier.updateIssue(identifiedIssueDTO)).thenThrow(identifiedIssueNotFoundException(1L));
 
         // Exercise SUT
         given()
@@ -150,7 +152,7 @@ public class IssueControllerUnitTests extends AbstractControllerUnitTests {
                 .build();
 
         // Set up expectations
-        when(issueCRUDService.updateIssue(identifiedIssueDTO)).thenThrow(identifiedProjectNotFoundException(1L));
+        when(issueModifier.updateIssue(identifiedIssueDTO)).thenThrow(identifiedProjectNotFoundException(1L));
 
         // Exercise SUT
         given()
@@ -174,7 +176,7 @@ public class IssueControllerUnitTests extends AbstractControllerUnitTests {
                 .build();
 
         // Set up expectations
-        when(issueCRUDService.updateIssue(identifiedIssueDTO)).thenThrow(identifiedUserNotFoundException(1L));
+        when(issueModifier.updateIssue(identifiedIssueDTO)).thenThrow(identifiedUserNotFoundException(1L));
 
         // Exercise SUT
         given()
@@ -200,7 +202,7 @@ public class IssueControllerUnitTests extends AbstractControllerUnitTests {
         IdentifiedIssueDTO expectedIdentifiedIssueDTO = anIdentifiedIssueDTO().build();
 
         // Set up expectations
-        when(issueCRUDService.updateIssue(identifiedIssueDTO)).thenReturn(issue);
+        when(issueModifier.updateIssue(identifiedIssueDTO)).thenReturn(issue);
         when(issueDTOFactory.createIdentifiedIssueDTO(issue)).thenReturn(expectedIdentifiedIssueDTO);
 
         // Exercise SUT
