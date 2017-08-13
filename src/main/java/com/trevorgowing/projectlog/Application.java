@@ -3,6 +3,8 @@ package com.trevorgowing.projectlog;
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.trevorgowing.projectlog.common.DateTimeService;
+import com.trevorgowing.projectlog.common.DateTimeServiceSupport;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -31,6 +33,11 @@ public class Application {
     public Module javaTimeModule() {
 	    return new JavaTimeModule();
     }
+
+    @Bean
+	public DateTimeService dateTimeService() {
+    	return new DateTimeServiceSupport();
+	}
 
     @Bean
 	public PasswordEncoder passwordEncoder() {

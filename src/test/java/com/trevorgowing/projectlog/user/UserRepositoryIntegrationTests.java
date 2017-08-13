@@ -113,4 +113,35 @@ public class UserRepositoryIntegrationTests extends AbstractRepositoryIntegratio
         // Verify results
         assertThat(actualIdentifiedUserDTO, samePropertyValuesAs(expectedIdentifiedUserDTO));
     }
+
+    @Test
+    public void testFindByEmailWithUnrecognisedEmail_shouldReturnNull() {
+        // Set up fixture
+        String unrecognisedEmail = "unrecognised@trevorgowing.com";
+
+        aUser().email("random@trevorgowing.com").buildAndPersist(entityManager);
+
+        // Exercise SUT
+        User actualUser = userRepository.findByEmail(unrecognisedEmail);
+
+        // Verify results
+        assertThat(actualUser, is(nullValue(User.class)));
+    }
+
+    @Test
+    public void testFindByEmailWithRecognisedEmail_shouldReturnUser() {
+        // Set up fixture
+        String recognisedEmail = "recognised@trevorgowing.com";
+
+        User expectedUser = aUser().email(recognisedEmail).buildAndPersist(entityManager);
+
+        // Exclude
+        aUser().email("random@trevorgowing.com").buildAndPersist(entityManager);
+
+        // Exercise SUT
+        User actualUser = userRepository.findByEmail(recognisedEmail);
+
+        // Verify results
+        assertThat(actualUser, is(expectedUser));
+    }
 }

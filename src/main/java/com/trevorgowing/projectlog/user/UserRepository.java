@@ -21,4 +21,6 @@ public interface UserRepository extends PagingAndSortingRepository<User, Long> {
 
     @Query(QUERY_FIND_IDENTIFIED_USER_DTO_BY_ID)
     IdentifiedUserDTO findIdentifiedUserDTOById(long userId);
+
+	User findByEmail(String email);
 }
