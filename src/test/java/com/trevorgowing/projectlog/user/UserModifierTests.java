@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static com.trevorgowing.projectlog.user.UserBuilder.aUser;
 import static com.trevorgowing.projectlog.user.UserNotFoundException.identifiedUserNotFoundException;
@@ -20,6 +21,8 @@ public class UserModifierTests extends AbstractTests {
     private UserRetriever userRetriever;
     @Mock
     private UserRepository userRepository;
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @InjectMocks
     private UserModifier userModifier;
@@ -41,7 +44,7 @@ public class UserModifierTests extends AbstractTests {
         User userWithDuplicateEmail = aUser()
                 .id(IRRELEVANT_USER_ID)
                 .email(IRRELEVANT_USER_EMAIL)
-                .password(IRRELEVANT_USER_PASSWORD)
+                .password(IRRELEVANT_ENCODED_PASSWORD)
                 .firstName(IRRELEVANT_USER_FIRST_NAME)
                 .lastName(IRRELEVANT_USER_LAST_NAME)
                 .build();
@@ -49,6 +52,7 @@ public class UserModifierTests extends AbstractTests {
         // Set up expectations
         when(userRetriever.findUser(IRRELEVANT_USER_ID))
                 .thenReturn(userWithDuplicateEmail);
+        when(passwordEncoder.encode(IRRELEVANT_USER_PASSWORD)).thenReturn(IRRELEVANT_ENCODED_PASSWORD);
         when(userRepository.save(userWithDuplicateEmail))
                 .thenThrow(new DataIntegrityViolationException(IRRELEVANT_MESSAGE));
 
@@ -63,7 +67,7 @@ public class UserModifierTests extends AbstractTests {
         User expectedUser = aUser()
                 .id(IRRELEVANT_USER_ID)
                 .email(IRRELEVANT_USER_EMAIL)
-                .password(IRRELEVANT_USER_PASSWORD)
+                .password(IRRELEVANT_ENCODED_PASSWORD)
                 .firstName(IRRELEVANT_USER_FIRST_NAME)
                 .lastName(IRRELEVANT_USER_LAST_NAME)
                 .build();
@@ -71,6 +75,7 @@ public class UserModifierTests extends AbstractTests {
         // Set up expectations
         when(userRetriever.findUser(IRRELEVANT_USER_ID))
                 .thenReturn(expectedUser);
+        when(passwordEncoder.encode(IRRELEVANT_USER_PASSWORD)).thenReturn(IRRELEVANT_ENCODED_PASSWORD);
         when(userRepository.save(argThat(samePropertyValuesAs(expectedUser))))
                 .thenReturn(expectedUser);
 

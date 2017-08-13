@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static com.trevorgowing.projectlog.user.UserBuilder.aUser;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -17,6 +18,8 @@ public class UserFactoryTests extends AbstractTests {
 
 	@Mock
 	private UserRepository userRepository;
+	@Mock
+	private PasswordEncoder passwordEncoder;
 
 	@InjectMocks
 	private UserFactory userFactory;
@@ -27,12 +30,13 @@ public class UserFactoryTests extends AbstractTests {
 		// Set up fixture
 		User unidentifiedUser = aUser()
 				.email(IRRELEVANT_USER_EMAIL)
-				.password(IRRELEVANT_USER_PASSWORD)
+				.password(IRRELEVANT_ENCODED_PASSWORD)
 				.firstName(IRRELEVANT_USER_FIRST_NAME)
 				.lastName(IRRELEVANT_USER_LAST_NAME)
 				.build();
 
 		// Set up expectations
+		when(passwordEncoder.encode(IRRELEVANT_USER_PASSWORD)).thenReturn(IRRELEVANT_ENCODED_PASSWORD);
 		when(userRepository.save(unidentifiedUser))
 				.thenThrow(new DataIntegrityViolationException(IRRELEVANT_MESSAGE));
 
@@ -47,7 +51,7 @@ public class UserFactoryTests extends AbstractTests {
 		// Set up fixture
 		User unidentifiedUser = aUser()
 				.email(IRRELEVANT_USER_EMAIL)
-				.password(IRRELEVANT_USER_PASSWORD)
+				.password(IRRELEVANT_ENCODED_PASSWORD)
 				.firstName(IRRELEVANT_USER_FIRST_NAME)
 				.lastName(IRRELEVANT_USER_LAST_NAME)
 				.build();
@@ -55,12 +59,13 @@ public class UserFactoryTests extends AbstractTests {
 		User expectedUser = aUser()
 				.id(IRRELEVANT_USER_ID)
 				.email(IRRELEVANT_USER_EMAIL)
-				.password(IRRELEVANT_USER_PASSWORD)
+				.password(IRRELEVANT_ENCODED_PASSWORD)
 				.firstName(IRRELEVANT_USER_FIRST_NAME)
 				.lastName(IRRELEVANT_USER_LAST_NAME)
 				.build();
 
 		// Set up expectations
+		when(passwordEncoder.encode(IRRELEVANT_USER_PASSWORD)).thenReturn(IRRELEVANT_ENCODED_PASSWORD);
 		when(userRepository.save(argThat(samePropertyValuesAs(unidentifiedUser))))
 				.thenReturn(expectedUser);
 
