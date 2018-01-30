@@ -6,6 +6,7 @@ plugins {
     id "java"
     id "jacoco"
     id "application"
+    id "net.ltgt.apt" version "0.10"
     id "org.flywaydb.flyway" version "5.0.6"
     id "org.springframework.boot" version "1.5.9.RELEASE"
     id "com.gorylenko.gradle-git-properties" version "1.4.20"
@@ -16,7 +17,9 @@ repositories {
 }
 
 dependencies {
-    compile "org.projectlombok:lombok:1.16.20"
+    apt "org.projectlombok:lombok:1.16.20"
+    compileOnly "org.projectlombok:lombok:1.16.20"
+
     compile 'com.trevorgowing:url-string-builder:1.1.0'
 
     compile "org.flywaydb:flyway-core:5.0.6"
