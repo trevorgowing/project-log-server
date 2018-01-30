@@ -6,9 +6,9 @@ plugins {
     id "java"
     id "jacoco"
     id "application"
-    id "org.flywaydb.flyway" version "4.2.0"
-    id "org.springframework.boot" version "1.5.4.RELEASE"
-    id "com.gorylenko.gradle-git-properties" version "1.4.17"
+    id "org.flywaydb.flyway" version "5.0.6"
+    id "org.springframework.boot" version "1.5.9.RELEASE"
+    id "com.gorylenko.gradle-git-properties" version "1.4.20"
 }
 
 repositories {
@@ -16,15 +16,15 @@ repositories {
 }
 
 dependencies {
-    compile "org.projectlombok:lombok:1.16.16"
+    compile "org.projectlombok:lombok:1.16.20"
     compile 'com.trevorgowing:url-string-builder:1.1.0'
 
-    compile "org.flywaydb:flyway-core:4.2.0"
-    compile "mysql:mysql-connector-java:6.0.6"
-    compile "org.hibernate:hibernate-core:5.2.10.Final"
+    compile "org.flywaydb:flyway-core:5.0.6"
+    compile "mysql:mysql-connector-java:8.0.8-dmr"
+    compile "org.hibernate:hibernate-core:5.2.12.Final"
 
-    compile "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.9.0.pr3"
-    compile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.9.0.pr3"
+    compile "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.9.3"
+    compile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.9.3"
 
     compile "org.springframework.boot:spring-boot-starter-web"
     compile "org.springframework.boot:spring-boot-starter-data-jpa"
@@ -33,11 +33,11 @@ dependencies {
     compile "org.springframework.boot:spring-boot-starter-hateoas"
     compile "org.springframework.boot:spring-boot-starter-actuator"
 
-    testCompile "io.rest-assured:rest-assured:3.0.2"
-    testCompile "io.rest-assured:spring-mock-mvc:3.0.2"
+    testCompile "io.rest-assured:rest-assured:3.0.6"
+    testCompile "io.rest-assured:spring-mock-mvc:3.0.6"
     testCompile "org.springframework.boot:spring-boot-starter-test"
 
-    testRuntime "com.h2database:h2:1.4.194"
+    testRuntime "com.h2database:h2:1.4.196"
 }
 
 springBoot  {
