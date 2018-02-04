@@ -9,7 +9,6 @@ plugins {
     id "net.ltgt.apt" version "0.10"
     id "org.flywaydb.flyway" version "5.0.6"
     id "org.springframework.boot" version "1.5.9.RELEASE"
-    id "com.gorylenko.gradle-git-properties" version "1.4.20"
 }
 
 repositories {
