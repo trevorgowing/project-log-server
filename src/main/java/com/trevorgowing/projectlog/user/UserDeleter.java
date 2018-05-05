@@ -14,7 +14,7 @@ public class UserDeleter {
 
   void deleteUser(long userId) {
     try {
-      userRepository.delete(userId);
+      userRepository.deleteById(userId);
     } catch (EmptyResultDataAccessException emptyResultDataAccessException) {
       throw identifiedUserNotFoundException(userId);
     }

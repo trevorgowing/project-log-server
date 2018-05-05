@@ -14,7 +14,8 @@ public class ProjectRetriever {
   private final ProjectRepository projectRepository;
 
   public Project findProject(long projectId) {
-    return ofNullable(projectRepository.findOne(projectId))
+    return projectRepository
+        .findById(projectId)
         .orElseThrow(() -> identifiedProjectNotFoundException(projectId));
   }
 

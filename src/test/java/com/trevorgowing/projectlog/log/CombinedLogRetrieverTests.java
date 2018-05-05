@@ -20,6 +20,7 @@ import com.trevorgowing.projectlog.log.risk.RiskDTOFactory;
 import com.trevorgowing.projectlog.log.risk.RiskRetriever;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -64,7 +65,7 @@ public class CombinedLogRetrieverTests extends AbstractTests {
   @Test(expected = LogNotFoundException.class)
   public void testGetLogDTOByIdWithNoMatchingLog_shouldThrowLogNotFoundException() {
     // Set up expectations
-    when(logRepository.findOne(1L)).thenReturn(null);
+    when(logRepository.findById(1L)).thenReturn(Optional.empty());
 
     // Exercise SUT
     combinedLogRetriever.getLogDTOById(1);
@@ -79,7 +80,7 @@ public class CombinedLogRetrieverTests extends AbstractTests {
     IdentifiedRiskDTO expectedLogDTO = anIdentifiedRiskDTO().id(1).build();
 
     // Set up expectations
-    when(logRepository.findOne(1L)).thenReturn(risk);
+    when(logRepository.findById(1L)).thenReturn(Optional.of(risk));
     when(riskDTOFactory.createIdentifiedRiskDTO(risk)).thenReturn(expectedLogDTO);
 
     // Exercise SUT
@@ -98,7 +99,7 @@ public class CombinedLogRetrieverTests extends AbstractTests {
     IdentifiedIssueDTO expectedLogDTO = anIdentifiedIssueDTO().id(1).build();
 
     // Set up expectations
-    when(logRepository.findOne(1L)).thenReturn(issue);
+    when(logRepository.findById(1L)).thenReturn(Optional.of(issue));
     when(issueDTOFactory.createIdentifiedIssueDTO(issue)).thenReturn(expectedLogDTO);
 
     // Exercise SUT

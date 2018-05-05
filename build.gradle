@@ -9,7 +9,8 @@ plugins {
   id "net.ltgt.apt" version "0.15"
   id "org.flywaydb.flyway" version "5.0.6"
   id "com.diffplug.gradle.spotless" version "3.10.0"
-  id "org.springframework.boot" version "1.5.9.RELEASE"
+  id "org.springframework.boot" version "2.0.1.RELEASE"
+  id "io.spring.dependency-management" version "1.0.5.RELEASE"
 }
 
 version = "0.0.1"
@@ -75,16 +76,11 @@ dependencies {
 
   compile "org.flywaydb:flyway-core:5.0.6"
   compile "mysql:mysql-connector-java:8.0.8-dmr"
-  compile "org.hibernate:hibernate-core:5.2.12.Final"
-
-  compile "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.9.3"
-  compile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.9.3"
-
-  compile "org.springframework.boot:spring-boot-starter-web"
-  compile "org.springframework.boot:spring-boot-starter-data-jpa"
 
   compile "org.springframework.boot:spring-boot-devtools"
-  compile "org.springframework.boot:spring-boot-starter-hateoas"
+  compile "org.springframework.boot:spring-boot-starter-web"
+  compile "org.springframework.boot:spring-boot-starter-json"
+  compile "org.springframework.boot:spring-boot-starter-data-jpa"
   compile "org.springframework.boot:spring-boot-starter-actuator"
 
   testCompile "io.rest-assured:rest-assured:3.0.6"

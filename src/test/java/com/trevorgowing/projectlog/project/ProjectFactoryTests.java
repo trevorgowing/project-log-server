@@ -1,17 +1,15 @@
 package com.trevorgowing.projectlog.project;
 
 import static com.trevorgowing.projectlog.project.ProjectBuilder.aProject;
-import static com.trevorgowing.projectlog.user.IdentifiedUserDTOBuilder.anIdentifiedUserDTO;
 import static com.trevorgowing.projectlog.user.UserBuilder.aUser;
 import static com.trevorgowing.projectlog.user.UserNotFoundException.identifiedUserNotFoundException;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.samePropertyValuesAs;
-import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.when;
+import static org.mockito.hamcrest.MockitoHamcrest.argThat;
 
 import com.trevorgowing.projectlog.common.types.AbstractTests;
-import com.trevorgowing.projectlog.user.IdentifiedUserDTO;
 import com.trevorgowing.projectlog.user.User;
 import com.trevorgowing.projectlog.user.UserNotFoundException;
 import com.trevorgowing.projectlog.user.UserRetriever;
@@ -26,13 +24,6 @@ public class ProjectFactoryTests extends AbstractTests {
   private static final long IRRELEVANT_PROJECT_ID = 1L;
   private static final String IRRELEVANT_PROJECT_CODE = "irrelevant.project.code";
   private static final String IRRELEVANT_PROJECT_NAME = "irrelevant.project.name";
-  private static final IdentifiedUserDTO IRRELEVANT_OWNER =
-      anIdentifiedUserDTO()
-          .id(IRRELEVANT_USER_ID)
-          .email(IRRELEVANT_USER_EMAIL)
-          .firstName(IRRELEVANT_USER_FIRST_NAME)
-          .lastName(IRRELEVANT_USER_LAST_NAME)
-          .build();
 
   @Mock private UserRetriever userRetriever;
   @Mock private ProjectRepository projectRepository;

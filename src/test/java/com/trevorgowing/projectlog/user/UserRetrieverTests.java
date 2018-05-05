@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 import com.trevorgowing.projectlog.common.types.AbstractTests;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -22,7 +23,7 @@ public class UserRetrieverTests extends AbstractTests {
   @Test(expected = UserNotFoundException.class)
   public void testFindUserWithNoMatchingUser_shouldThrowUserNotFoundException() {
     // Set up expectations
-    when(userRepository.findOne(IRRELEVANT_USER_ID)).thenReturn(null);
+    when(userRepository.findById(IRRELEVANT_USER_ID)).thenReturn(Optional.empty());
 
     // Exercise SUT
     userRetriever.findUser(IRRELEVANT_USER_ID);
@@ -34,7 +35,7 @@ public class UserRetrieverTests extends AbstractTests {
     User expectedUser = aUser().id(IRRELEVANT_USER_ID).build();
 
     // Set up expectations
-    when(userRepository.findOne(IRRELEVANT_USER_ID)).thenReturn(expectedUser);
+    when(userRepository.findById(IRRELEVANT_USER_ID)).thenReturn(Optional.of(expectedUser));
 
     // Exercise SUT
     User actualUser = userRetriever.findUser(IRRELEVANT_USER_ID);

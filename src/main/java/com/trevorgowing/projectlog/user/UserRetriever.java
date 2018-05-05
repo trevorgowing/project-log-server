@@ -14,7 +14,8 @@ public class UserRetriever {
   private final UserRepository userRepository;
 
   public User findUser(long userId) {
-    return ofNullable(userRepository.findOne(userId))
+    return userRepository
+        .findById(userId)
         .orElseThrow(() -> identifiedUserNotFoundException(userId));
   }
 

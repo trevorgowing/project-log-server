@@ -20,7 +20,8 @@ import org.springframework.data.domain.Persistable;
 @MappedSuperclass
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class AbstractPersistable<PK extends Serializable> implements Persistable<PK> {
+public abstract class AbstractPersistable<PK extends Serializable>
+    implements Serializable, Persistable<PK> {
 
   private static final long serialVersionUID = 5662590973333935284L;
 

@@ -14,7 +14,7 @@ class LogDeleter {
 
   void deleteLogById(long logId) {
     try {
-      logRepository.delete(logId);
+      logRepository.deleteById(logId);
     } catch (EmptyResultDataAccessException emptyResultDataAccessException) {
       throw identifiedLogNotFoundException(logId);
     }

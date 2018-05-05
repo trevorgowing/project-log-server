@@ -19,7 +19,9 @@ public class UserDeleterTests extends AbstractTests {
   public void
       testDeleteUserWithNoMatchingUser_shouldDelegateToUserRepositoryAndThrowUserNotFoundException() {
     // Set up expectations
-    doThrow(new EmptyResultDataAccessException(1)).when(userRepository).delete(IRRELEVANT_USER_ID);
+    doThrow(new EmptyResultDataAccessException(1))
+        .when(userRepository)
+        .deleteById(IRRELEVANT_USER_ID);
 
     // Exercise SUT
     userDeleter.deleteUser(IRRELEVANT_USER_ID);
@@ -28,7 +30,7 @@ public class UserDeleterTests extends AbstractTests {
   @Test
   public void testDeleteUserWithMatchingUser_shouldDelegateToUserRepositoryToDeleteUser() {
     // Set up expectations
-    doNothing().when(userRepository).delete(IRRELEVANT_USER_ID);
+    doNothing().when(userRepository).deleteById(IRRELEVANT_USER_ID);
 
     // Exercise SUT
     userDeleter.deleteUser(IRRELEVANT_USER_ID);

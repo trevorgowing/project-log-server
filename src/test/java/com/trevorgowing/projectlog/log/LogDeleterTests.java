@@ -18,7 +18,7 @@ public class LogDeleterTests extends AbstractTests {
   @Test(expected = LogNotFoundException.class)
   public void testDeleteLogByIdWithNoExistingLog_shouldThrowLogNotFoundException() {
     // Set up expectations
-    doThrow(new EmptyResultDataAccessException(1)).when(logRepository).delete(1L);
+    doThrow(new EmptyResultDataAccessException(1)).when(logRepository).deleteById(1L);
 
     // Exercise SUT
     logDeleter.deleteLogById(1L);
@@ -28,7 +28,7 @@ public class LogDeleterTests extends AbstractTests {
   public void testDeleteLogByIdWithExistingLog_shouldDelegateToLogRepositoryToDeleteLog()
       throws Exception {
     // Set up expectations
-    doNothing().when(logRepository).delete(1L);
+    doNothing().when(logRepository).deleteById(1L);
 
     // Exercise SUT
     logDeleter.deleteLogById(1L);

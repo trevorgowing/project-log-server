@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 import com.trevorgowing.projectlog.common.types.AbstractTests;
 import com.trevorgowing.projectlog.user.IdentifiedUserDTO;
 import java.util.List;
+import java.util.Optional;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -35,7 +36,7 @@ public class ProjectRetrieverTests extends AbstractTests {
   @Test(expected = ProjectNotFoundException.class)
   public void testFindProjectWithNoMatchingProject_shouldThrowProjectNotFoundException() {
     // Set up expectations
-    when(projectRepository.findOne(IRRELEVANT_PROJECT_ID)).thenReturn(null);
+    when(projectRepository.findById(IRRELEVANT_PROJECT_ID)).thenReturn(Optional.empty());
 
     // Exercise SUT
     projectRetriever.findProject(IRRELEVANT_PROJECT_ID);
@@ -47,7 +48,8 @@ public class ProjectRetrieverTests extends AbstractTests {
     Project expectedProject = aProject().id(IRRELEVANT_PROJECT_ID).build();
 
     // Set up expectations
-    when(projectRepository.findOne(IRRELEVANT_PROJECT_ID)).thenReturn(expectedProject);
+    when(projectRepository.findById(IRRELEVANT_PROJECT_ID))
+        .thenReturn(Optional.of(expectedProject));
 
     // Exercise SUT
     Project actualProject = projectRetriever.findProject(IRRELEVANT_PROJECT_ID);

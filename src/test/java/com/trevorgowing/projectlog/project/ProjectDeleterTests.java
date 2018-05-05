@@ -18,7 +18,7 @@ public class ProjectDeleterTests extends AbstractTests {
   @Test(expected = ProjectNotFoundException.class)
   public void testDeleteProjectWithNoMatchingProject_shouldThrowProjectNotFoundException() {
     // Set up expectations
-    doThrow(new EmptyResultDataAccessException(1)).when(projectRepository).delete(1L);
+    doThrow(new EmptyResultDataAccessException(1)).when(projectRepository).deleteById(1L);
 
     // Exercise SUT
     projectDeleter.deleteProject(1L);
@@ -28,7 +28,7 @@ public class ProjectDeleterTests extends AbstractTests {
   public void
       testDeleteProjectWithMatchingProject_shouldDelegateToProjectRepositoryToDeleteProject() {
     // Set up expectations
-    doNothing().when(projectRepository).delete(1L);
+    doNothing().when(projectRepository).deleteById(1L);
 
     // Exercise SUT
     projectDeleter.deleteProject(1L);

@@ -17,7 +17,8 @@ public class IssueRetriever implements LogRetriever {
   private final IssueRepository issueRepository;
 
   public Issue findIssue(long issueId) {
-    return ofNullable(issueRepository.findOne(issueId))
+    return issueRepository
+        .findById(issueId)
         .orElseThrow(() -> identifiedIssueNotFoundException(issueId));
   }
 

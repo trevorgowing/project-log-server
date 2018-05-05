@@ -1,7 +1,6 @@
 package com.trevorgowing.projectlog.log;
 
 import static com.trevorgowing.projectlog.log.LogNotFoundException.identifiedLogNotFoundException;
-import static java.util.Optional.ofNullable;
 
 import com.trevorgowing.projectlog.log.issue.Issue;
 import com.trevorgowing.projectlog.log.issue.IssueDTOFactory;
@@ -35,8 +34,7 @@ class CombinedLogRetriever implements LogRetriever {
   @Override
   public LogDTO getLogDTOById(long logId) {
     Log log =
-        ofNullable(logRepository.findOne(logId))
-            .orElseThrow(() -> identifiedLogNotFoundException(logId));
+        logRepository.findById(logId).orElseThrow(() -> identifiedLogNotFoundException(logId));
 
     LogDTO logDTO = null;
 

@@ -11,6 +11,7 @@ import com.trevorgowing.projectlog.common.types.AbstractTests;
 import com.trevorgowing.projectlog.log.LogDTO;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -24,7 +25,7 @@ public class IssueRetrieverTests extends AbstractTests {
   @Test(expected = IssueNotFoundException.class)
   public void testFindIssueWithNonExistentIssue_shouldThrowIssueNotFoundException() {
     // Set up expectations
-    when(issueRepository.findOne(1L)).thenReturn(null);
+    when(issueRepository.findById(1L)).thenReturn(Optional.empty());
 
     // Exercise SUT
     issueRetriever.findIssue(1L);
@@ -36,7 +37,7 @@ public class IssueRetrieverTests extends AbstractTests {
     Issue expectedIssue = anIssue().id(1L).build();
 
     // Set up expectations
-    when(issueRepository.findOne(1L)).thenReturn(expectedIssue);
+    when(issueRepository.findById(1L)).thenReturn(Optional.of(expectedIssue));
 
     // Exercise SUT
     Issue actualIssue = issueRetriever.findIssue(1L);

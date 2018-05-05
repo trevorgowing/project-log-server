@@ -14,7 +14,7 @@ public class ProjectDeleter {
 
   void deleteProject(long projectId) {
     try {
-      projectRepository.delete(projectId);
+      projectRepository.deleteById(projectId);
     } catch (EmptyResultDataAccessException emptyResultDataAccessException) {
       throw identifiedProjectNotFoundException(projectId);
     }

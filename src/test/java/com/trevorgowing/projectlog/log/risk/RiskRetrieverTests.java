@@ -12,6 +12,7 @@ import com.trevorgowing.projectlog.common.types.AbstractTests;
 import com.trevorgowing.projectlog.log.LogDTO;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -25,7 +26,7 @@ public class RiskRetrieverTests extends AbstractTests {
   @Test(expected = RiskNotFoundException.class)
   public void testFindRiskWithNonExistentRisk_shouldThrowRiskNotFoundException() {
     // Set up expectations
-    when(riskRepository.findOne(1L)).thenThrow(identifiedRiskNotFoundException(1L));
+    when(riskRepository.findById(1L)).thenThrow(identifiedRiskNotFoundException(1L));
 
     // Exercise SUT
     riskRetriever.findRisk(1L);
@@ -37,7 +38,7 @@ public class RiskRetrieverTests extends AbstractTests {
     Risk expectedRisk = aRisk().id(1L).build();
 
     // Set up expectations
-    when(riskRepository.findOne(1L)).thenReturn(expectedRisk);
+    when(riskRepository.findById(1L)).thenReturn(Optional.of(expectedRisk));
 
     // Exercise SUT
     Risk actualRisk = riskRetriever.findRisk(1L);

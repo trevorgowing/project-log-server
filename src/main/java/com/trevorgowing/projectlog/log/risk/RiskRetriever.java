@@ -19,7 +19,8 @@ public class RiskRetriever implements LogRetriever {
   }
 
   public Risk findRisk(long riskId) {
-    return ofNullable(riskRepository.findOne(riskId))
+    return riskRepository
+        .findById(riskId)
         .orElseThrow(() -> identifiedRiskNotFoundException(riskId));
   }
 
