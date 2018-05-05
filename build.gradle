@@ -37,8 +37,8 @@ flyway {
 
 jacocoTestReport {
   reports {
-    xml.enabled true
-    html.enabled false
+    xml.enabled = true
+    html.enabled = false
   }
 }
 
@@ -49,10 +49,16 @@ test {
   }
 }
 
-/**
- * Create a flyway sql migration in the default location, with a version of timestamp now and default description.
- */
+task resolveDependencies {
+  description = "Download and cache dependencies"
+  doLast {
+    configurations.compileOnly.resolve()
+    configurations.runtime.resolve()
+  }
+}
+
 task createSqlMigration {
+  description = "Create a flyway sql migration in the default location, with a version of timestamp now and default description."
   doLast {
     String version = LocalDate.now().toString().replace('-', '.').concat('.')
         .concat(LocalTime.now().toString().replace(':', '.'))

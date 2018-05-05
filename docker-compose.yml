@@ -1,0 +1,35 @@
+---
+version: "3"
+
+services:
+  mysql:
+    image: mysql:5.7
+    ports:
+      - "3306:3306"
+    networks:
+      - project-log
+    volumes:
+      - project-log-data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: "root"
+      MYSQL_USER: "projectlog"
+      MYSQL_PASSWORD: "projectlog"
+      MYSQL_DATABASE: "project_log"
+
+  project-log-server:
+    build: .
+    ports:
+      - "8080:8080"
+      - "5005:5005"
+    networks:
+      - project-log
+    depends_on:
+      - mysql
+    environment:
+      SPRING_DATASOURCE_URL: "jdbc:mysql://mysql:3306/project_log?useSSL=false"
+
+networks:
+  project-log:
+
+volumes:
+  project-log-data:
