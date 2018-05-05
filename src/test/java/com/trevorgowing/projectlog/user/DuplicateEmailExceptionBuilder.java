@@ -1,25 +1,26 @@
 package com.trevorgowing.projectlog.user;
 
-import com.trevorgowing.projectlog.common.builders.DomainObjectBuilder;
-
 import static com.trevorgowing.projectlog.user.DuplicateEmailException.causedDuplicateEmailException;
 
-public final class DuplicateEmailExceptionBuilder implements DomainObjectBuilder<DuplicateEmailException> {
+import com.trevorgowing.projectlog.common.builders.DomainObjectBuilder;
 
-    private String email;
-    private Throwable cause = new RuntimeException("Root cause exception");
+public final class DuplicateEmailExceptionBuilder
+    implements DomainObjectBuilder<DuplicateEmailException> {
 
-    public static DuplicateEmailExceptionBuilder aDuplicateEmailException() {
-        return new DuplicateEmailExceptionBuilder();
-    }
+  private String email;
+  private Throwable cause = new RuntimeException("Root cause exception");
 
-    @Override
-    public DuplicateEmailException build() {
-        return causedDuplicateEmailException(email, cause);
-    }
+  public static DuplicateEmailExceptionBuilder aDuplicateEmailException() {
+    return new DuplicateEmailExceptionBuilder();
+  }
 
-    public DuplicateEmailExceptionBuilder withEmail(String email) {
-        this.email = email;
-        return this;
-    }
+  @Override
+  public DuplicateEmailException build() {
+    return causedDuplicateEmailException(email, cause);
+  }
+
+  public DuplicateEmailExceptionBuilder withEmail(String email) {
+    this.email = email;
+    return this;
+  }
 }

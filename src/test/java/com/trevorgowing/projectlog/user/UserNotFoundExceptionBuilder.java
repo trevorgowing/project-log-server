@@ -1,23 +1,24 @@
 package com.trevorgowing.projectlog.user;
 
-import com.trevorgowing.projectlog.common.builders.DomainObjectBuilder;
-
 import static com.trevorgowing.projectlog.user.UserNotFoundException.identifiedUserNotFoundException;
 
-public final class UserNotFoundExceptionBuilder implements DomainObjectBuilder<UserNotFoundException> {
+import com.trevorgowing.projectlog.common.builders.DomainObjectBuilder;
 
-    private long userId;
+public final class UserNotFoundExceptionBuilder
+    implements DomainObjectBuilder<UserNotFoundException> {
 
-    public static UserNotFoundExceptionBuilder aUserNotFoundException() {
-        return new UserNotFoundExceptionBuilder();
-    }
+  private long userId;
 
-    public UserNotFoundException build() {
-        return identifiedUserNotFoundException(userId);
-    }
+  public static UserNotFoundExceptionBuilder aUserNotFoundException() {
+    return new UserNotFoundExceptionBuilder();
+  }
 
-    public UserNotFoundExceptionBuilder id(long userId) {
-        this.userId = userId;
-        return this;
-    }
+  public UserNotFoundException build() {
+    return identifiedUserNotFoundException(userId);
+  }
+
+  public UserNotFoundExceptionBuilder id(long userId) {
+    this.userId = userId;
+    return this;
+  }
 }

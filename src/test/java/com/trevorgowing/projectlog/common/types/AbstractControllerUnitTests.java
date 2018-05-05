@@ -7,10 +7,10 @@ import org.junit.experimental.categories.Category;
 @Category(ControllerUnitTests.class)
 public abstract class AbstractControllerUnitTests extends AbstractSpringTests {
 
-    protected abstract Object getController();
+  protected abstract Object getController();
 
-    @Before
-    public void setup() {
-        RestAssuredMockMvc.standaloneSetup(getController());
-    }
+  @Before
+  public void setup() {
+    RestAssuredMockMvc.standaloneSetup(getController());
+  }
 }

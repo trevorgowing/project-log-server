@@ -4,7 +4,7 @@ import java.util.List;
 
 public interface LogRetriever {
 
-    List<LogDTO> getLogDTOs();
+  List<LogDTO> getLogDTOs();
 
-    LogDTO getLogDTOById(long id);
+  LogDTO getLogDTOById(long id);
 }

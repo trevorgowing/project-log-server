@@ -7,11 +7,11 @@ import com.trevorgowing.projectlog.user.UserBuilder;
 
 public class EntityPersisterFactory {
 
-    public static AbstractEntityPersister<User> aUserPersister() {
-        return new UserBuilder().getPersister();
-    }
+  public static AbstractEntityPersister<User> aUserPersister() {
+    return new UserBuilder().getPersister();
+  }
 
-    public static AbstractEntityPersister<Project> aProjectPersister() {
-        return new ProjectBuilder().getPersister();
-    }
+  public static AbstractEntityPersister<Project> aProjectPersister() {
+    return new ProjectBuilder().getPersister();
+  }
 }

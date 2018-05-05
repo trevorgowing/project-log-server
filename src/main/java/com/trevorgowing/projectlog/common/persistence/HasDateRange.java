@@ -4,13 +4,13 @@ import java.time.LocalDate;
 
 public interface HasDateRange {
 
-    LocalDate getStartDate();
+  LocalDate getStartDate();
 
-    void setStartDate(LocalDate startDate);
+  void setStartDate(LocalDate startDate);
 
-    LocalDate getEndDate();
+  LocalDate getEndDate();
 
-    void setEndDate(LocalDate endDate);
+  void setEndDate(LocalDate endDate);
 
-    void ensureDateRange();
+  void ensureDateRange();
 }

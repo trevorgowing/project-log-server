@@ -12,21 +12,18 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 @SpringBootApplication
 public class Application {
 
-	public static void main(String[] args) {
-		SpringApplication.run(Application.class, args);
-	}
+  public static void main(String[] args) {
+    SpringApplication.run(Application.class, args);
+  }
 
-    /**
-     * https://spring.io/blog/2014/12/02/latest-jackson-integration-improvements-in-spring
-     */
+  /** https://spring.io/blog/2014/12/02/latest-jackson-integration-improvements-in-spring */
+  @Bean
+  public Module jdk8() {
+    return new Jdk8Module();
+  }
 
-    @Bean
-    public Module jdk8() {
-        return new Jdk8Module();
-    }
-
-    @Bean
-    public Module javaTimeModule() {
-	    return new JavaTimeModule();
-    }
+  @Bean
+  public Module javaTimeModule() {
+    return new JavaTimeModule();
+  }
 }

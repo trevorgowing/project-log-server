@@ -6,12 +6,7 @@ import com.trevorgowing.projectlog.log.constant.Impact;
 import com.trevorgowing.projectlog.log.constant.LogStatus;
 import com.trevorgowing.projectlog.project.Project;
 import com.trevorgowing.projectlog.user.User;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
+import java.time.LocalDate;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
@@ -23,7 +18,11 @@ import javax.persistence.InheritanceType;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import java.time.LocalDate;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "logs")
@@ -35,47 +34,54 @@ import java.time.LocalDate;
 @Setter
 public abstract class Log extends AbstractAuditable<User, Long> {
 
-    private static final long serialVersionUID = -4545843312415873005L;
+  private static final long serialVersionUID = -4545843312415873005L;
 
-    @Lob
-    @Basic(optional = false)
-    @Column(nullable = false)
-    private String summary;
+  @Lob
+  @Basic(optional = false)
+  @Column(nullable = false)
+  private String summary;
 
-    @Lob
-    private String description;
+  @Lob private String description;
 
-    @Enumerated(EnumType.STRING)
-    private Category category;
+  @Enumerated(EnumType.STRING)
+  private Category category;
 
-    @Basic(optional = false)
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private Impact impact;
+  @Basic(optional = false)
+  @Column(nullable = false)
+  @Enumerated(EnumType.STRING)
+  private Impact impact;
 
-    @Basic(optional = false)
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private LogStatus status = LogStatus.NEW;
+  @Basic(optional = false)
+  @Column(nullable = false)
+  @Enumerated(EnumType.STRING)
+  private LogStatus status = LogStatus.NEW;
 
-    private LocalDate dateClosed;
+  private LocalDate dateClosed;
 
-    @ManyToOne(optional = false)
-    private Project project;
+  @ManyToOne(optional = false)
+  private Project project;
 
-    @ManyToOne(optional = false)
-    private User owner;
+  @ManyToOne(optional = false)
+  private User owner;
 
-    protected Log(Long id, String summary, String description, Category category, Impact impact, LogStatus status,
-               LocalDate dateClosed, Project project, User owner) {
-        super(id);
-        this.summary = summary;
-        this.description = description;
-        this.category = category;
-        this.impact = impact;
-        this.status = status;
-        this.dateClosed = dateClosed;
-        this.project = project;
-        this.owner = owner;
-    }
+  protected Log(
+      Long id,
+      String summary,
+      String description,
+      Category category,
+      Impact impact,
+      LogStatus status,
+      LocalDate dateClosed,
+      Project project,
+      User owner) {
+    super(id);
+    this.summary = summary;
+    this.description = description;
+    this.category = category;
+    this.impact = impact;
+    this.status = status;
+    this.dateClosed = dateClosed;
+    this.project = project;
+    this.owner = owner;
+  }
 }

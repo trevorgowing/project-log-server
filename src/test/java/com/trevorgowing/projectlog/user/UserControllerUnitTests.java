@@ -1,16 +1,5 @@
 package com.trevorgowing.projectlog.user;
 
-import com.trevorgowing.projectlog.common.types.AbstractControllerUnitTests;
-import com.trevorgowing.projectlog.user.constant.UserConstants;
-import io.restassured.http.ContentType;
-import org.junit.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.springframework.http.HttpStatus;
-
-import java.util.Collections;
-import java.util.List;
-
 import static com.trevorgowing.projectlog.common.converters.ObjectToJSONConverter.convertToJSON;
 import static com.trevorgowing.projectlog.user.DuplicateEmailExceptionBuilder.aDuplicateEmailException;
 import static com.trevorgowing.projectlog.user.IdentifiedUserDTOBuilder.anIdentifiedUserDTO;
@@ -27,370 +16,421 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
+import com.trevorgowing.projectlog.common.types.AbstractControllerUnitTests;
+import com.trevorgowing.projectlog.user.constant.UserConstants;
+import io.restassured.http.ContentType;
+import java.util.Collections;
+import java.util.List;
+import org.junit.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.springframework.http.HttpStatus;
+
 public class UserControllerUnitTests extends AbstractControllerUnitTests {
 
-    @Mock
-    private UserFactory userFactory;
-    @Mock
-    private UserDeleter userDeleter;
-    @Mock
-    private UserModifier userModifier;
-    @Mock
-    private UserRetriever userRetriever;
-    @Mock
-    private UserDTOFactory userDTOFactory;
+  @Mock private UserFactory userFactory;
+  @Mock private UserDeleter userDeleter;
+  @Mock private UserModifier userModifier;
+  @Mock private UserRetriever userRetriever;
+  @Mock private UserDTOFactory userDTOFactory;
 
-    @InjectMocks
-    private UserController userController;
+  @InjectMocks private UserController userController;
 
-    @Override
-    protected Object getController() {
-        return userController;
-    }
+  @Override
+  protected Object getController() {
+    return userController;
+  }
 
-    @Test
-    public void testGetUsersWithNoExistingUsers_shouldRespondWithStatusOKAndReturnNoUsers() throws Exception {
-        // Set up expectations
-        when(userRetriever.findIdentifiedUserDTOs()).thenReturn(Collections.emptyList());
+  @Test
+  public void testGetUsersWithNoExistingUsers_shouldRespondWithStatusOKAndReturnNoUsers()
+      throws Exception {
+    // Set up expectations
+    when(userRetriever.findIdentifiedUserDTOs()).thenReturn(Collections.emptyList());
 
-        // Exercise SUT
-        given()
-                .accept(ContentType.JSON)
+    // Exercise SUT
+    given()
+        .accept(ContentType.JSON)
         .when()
-                .get(UserConstants.USERS_URL_PATH)
+        .get(UserConstants.USERS_URL_PATH)
         .then()
-                .log().all()
-                .statusCode(HttpStatus.OK.value())
-                .contentType(ContentType.JSON)
-                .body(is(convertToJSON(Collections.<IdentifiedUserDTO>emptyList())));
+        .log()
+        .all()
+        .statusCode(HttpStatus.OK.value())
+        .contentType(ContentType.JSON)
+        .body(is(convertToJSON(Collections.<IdentifiedUserDTO>emptyList())));
 
-        List<IdentifiedUserDTO> actualUsers = userController.getUsers();
+    List<IdentifiedUserDTO> actualUsers = userController.getUsers();
 
-        // Verify behaviour
-        assertThat(actualUsers, is(empty()));
-    }
+    // Verify behaviour
+    assertThat(actualUsers, is(empty()));
+  }
 
-    @Test
-    public void testGetUsersWithExistingUsers_shouldRespondWithStatusOKAndReturnUsers() throws Exception {
-        // Set up fixture
-        IdentifiedUserDTO identifiedUserOneDTO = anIdentifiedUserDTO()
-                .email(IRRELEVANT_USER_EMAIL)
-                .password(IRRELEVANT_USER_PASSWORD)
-                .firstName(IRRELEVANT_USER_FIRST_NAME)
-                .lastName(IRRELEVANT_USER_LAST_NAME)
-                .build();
+  @Test
+  public void testGetUsersWithExistingUsers_shouldRespondWithStatusOKAndReturnUsers()
+      throws Exception {
+    // Set up fixture
+    IdentifiedUserDTO identifiedUserOneDTO =
+        anIdentifiedUserDTO()
+            .email(IRRELEVANT_USER_EMAIL)
+            .password(IRRELEVANT_USER_PASSWORD)
+            .firstName(IRRELEVANT_USER_FIRST_NAME)
+            .lastName(IRRELEVANT_USER_LAST_NAME)
+            .build();
 
-        IdentifiedUserDTO identifiedUserTwoDTO = anIdentifiedUserDTO()
-                .email("usertwo@trevorgowing.com")
-                .password("usertwopassword")
-                .firstName("usertwo")
-                .lastName("gowing")
-                .build();
+    IdentifiedUserDTO identifiedUserTwoDTO =
+        anIdentifiedUserDTO()
+            .email("usertwo@trevorgowing.com")
+            .password("usertwopassword")
+            .firstName("usertwo")
+            .lastName("gowing")
+            .build();
 
-        List<IdentifiedUserDTO> expectedIdentifiedUserDTOs = asList(identifiedUserOneDTO, identifiedUserTwoDTO);
+    List<IdentifiedUserDTO> expectedIdentifiedUserDTOs =
+        asList(identifiedUserOneDTO, identifiedUserTwoDTO);
 
-        // Set up expectations
-        when(userRetriever.findIdentifiedUserDTOs()).thenReturn(expectedIdentifiedUserDTOs);
+    // Set up expectations
+    when(userRetriever.findIdentifiedUserDTOs()).thenReturn(expectedIdentifiedUserDTOs);
 
-        // Exercise SUT
-        given()
-                .accept(ContentType.JSON)
+    // Exercise SUT
+    given()
+        .accept(ContentType.JSON)
         .when()
-                .get(UserConstants.USERS_URL_PATH)
+        .get(UserConstants.USERS_URL_PATH)
         .then()
-                .log().all()
-                .statusCode(HttpStatus.OK.value())
-                .contentType(ContentType.JSON)
-                .body(is(convertToJSON(expectedIdentifiedUserDTOs)));
+        .log()
+        .all()
+        .statusCode(HttpStatus.OK.value())
+        .contentType(ContentType.JSON)
+        .body(is(convertToJSON(expectedIdentifiedUserDTOs)));
 
-        List<IdentifiedUserDTO> actualIdentifiedUserDTOs = userController.getUsers();
+    List<IdentifiedUserDTO> actualIdentifiedUserDTOs = userController.getUsers();
 
-        // Verify behaviour
-        assertThat(actualIdentifiedUserDTOs, is(expectedIdentifiedUserDTOs));
-    }
+    // Verify behaviour
+    assertThat(actualIdentifiedUserDTOs, is(expectedIdentifiedUserDTOs));
+  }
 
-    @Test(expected = UserNotFoundException.class)
-    public void testGetUserWithNoMatchingUser_shouldRespondWithStatusNotFound() {
-        // Set up expectations
-        when(userRetriever.findIdentifiedUserDTOById(IRRELEVANT_USER_ID))
-                .thenThrow(identifiedUserNotFoundException(IRRELEVANT_USER_ID));
+  @Test(expected = UserNotFoundException.class)
+  public void testGetUserWithNoMatchingUser_shouldRespondWithStatusNotFound() {
+    // Set up expectations
+    when(userRetriever.findIdentifiedUserDTOById(IRRELEVANT_USER_ID))
+        .thenThrow(identifiedUserNotFoundException(IRRELEVANT_USER_ID));
 
-        // Exercise SUT
-        given()
-                .accept(ContentType.JSON)
+    // Exercise SUT
+    given()
+        .accept(ContentType.JSON)
         .when()
-                .get(UserConstants.USERS_URL_PATH + "/" + IRRELEVANT_USER_ID)
+        .get(UserConstants.USERS_URL_PATH + "/" + IRRELEVANT_USER_ID)
         .then()
-                .log().all()
-                .statusCode(HttpStatus.NOT_FOUND.value());
+        .log()
+        .all()
+        .statusCode(HttpStatus.NOT_FOUND.value());
 
-        userController.getUser(IRRELEVANT_USER_ID);
-    }
+    userController.getUser(IRRELEVANT_USER_ID);
+  }
 
-    @Test
-    public void testGetUserWithMatchingUser_shouldRespondWithStatusOKAndReturnUser() throws Exception {
-        // Set up fixture
-        IdentifiedUserDTO expectedIdentifiedUserDTO = anIdentifiedUserDTO()
-                .email(IRRELEVANT_USER_EMAIL)
-                .password(IRRELEVANT_USER_PASSWORD)
-                .firstName(IRRELEVANT_USER_FIRST_NAME)
-                .lastName(IRRELEVANT_USER_LAST_NAME)
-                .build();
+  @Test
+  public void testGetUserWithMatchingUser_shouldRespondWithStatusOKAndReturnUser()
+      throws Exception {
+    // Set up fixture
+    IdentifiedUserDTO expectedIdentifiedUserDTO =
+        anIdentifiedUserDTO()
+            .email(IRRELEVANT_USER_EMAIL)
+            .password(IRRELEVANT_USER_PASSWORD)
+            .firstName(IRRELEVANT_USER_FIRST_NAME)
+            .lastName(IRRELEVANT_USER_LAST_NAME)
+            .build();
 
-        // Set up expectations
-        when(userRetriever.findIdentifiedUserDTOById(IRRELEVANT_USER_ID))
-                .thenReturn(expectedIdentifiedUserDTO);
+    // Set up expectations
+    when(userRetriever.findIdentifiedUserDTOById(IRRELEVANT_USER_ID))
+        .thenReturn(expectedIdentifiedUserDTO);
 
-        // Exercise SUT
-        given()
-                .accept(ContentType.JSON)
+    // Exercise SUT
+    given()
+        .accept(ContentType.JSON)
         .when()
-                .get(UserConstants.USERS_URL_PATH + "/" + IRRELEVANT_USER_ID)
+        .get(UserConstants.USERS_URL_PATH + "/" + IRRELEVANT_USER_ID)
         .then()
-                .log().all()
-                .statusCode(HttpStatus.OK.value())
-                .contentType(ContentType.JSON)
-                .body(is(convertToJSON(expectedIdentifiedUserDTO)));
+        .log()
+        .all()
+        .statusCode(HttpStatus.OK.value())
+        .contentType(ContentType.JSON)
+        .body(is(convertToJSON(expectedIdentifiedUserDTO)));
 
-        IdentifiedUserDTO actualIdentifiedUserDTO = userController.getUser(IRRELEVANT_USER_ID);
+    IdentifiedUserDTO actualIdentifiedUserDTO = userController.getUser(IRRELEVANT_USER_ID);
 
-        // Verify behaviour
-        assertThat(actualIdentifiedUserDTO, is(expectedIdentifiedUserDTO));
-    }
+    // Verify behaviour
+    assertThat(actualIdentifiedUserDTO, is(expectedIdentifiedUserDTO));
+  }
 
-    @Test(expected = DuplicateEmailException.class)
-    public void testPostUserWithDuplicateEmail_shouldRespondWithStatusConflict() throws Exception {
-        // Set up fixture
-        UnidentifiedUserDTO unidentifiedUserDTO = anUnidentifiedUserDTO()
-                .email(IRRELEVANT_USER_EMAIL)
-                .password(IRRELEVANT_USER_PASSWORD)
-                .firstName(IRRELEVANT_USER_FIRST_NAME)
-                .lastName(IRRELEVANT_USER_LAST_NAME)
-                .build();
+  @Test(expected = DuplicateEmailException.class)
+  public void testPostUserWithDuplicateEmail_shouldRespondWithStatusConflict() throws Exception {
+    // Set up fixture
+    UnidentifiedUserDTO unidentifiedUserDTO =
+        anUnidentifiedUserDTO()
+            .email(IRRELEVANT_USER_EMAIL)
+            .password(IRRELEVANT_USER_PASSWORD)
+            .firstName(IRRELEVANT_USER_FIRST_NAME)
+            .lastName(IRRELEVANT_USER_LAST_NAME)
+            .build();
 
-        DuplicateEmailException duplicateEmailException = aDuplicateEmailException()
-                .withEmail(IRRELEVANT_USER_EMAIL)
-                .build();
+    DuplicateEmailException duplicateEmailException =
+        aDuplicateEmailException().withEmail(IRRELEVANT_USER_EMAIL).build();
 
-        // Set up expectations
-        when(userFactory.createUser(IRRELEVANT_USER_EMAIL, IRRELEVANT_USER_PASSWORD, IRRELEVANT_USER_FIRST_NAME,
-                IRRELEVANT_USER_LAST_NAME)).thenThrow(duplicateEmailException);
+    // Set up expectations
+    when(userFactory.createUser(
+            IRRELEVANT_USER_EMAIL,
+            IRRELEVANT_USER_PASSWORD,
+            IRRELEVANT_USER_FIRST_NAME,
+            IRRELEVANT_USER_LAST_NAME))
+        .thenThrow(duplicateEmailException);
 
-        // Exercise SUT
-        given()
-                .accept(ContentType.JSON)
-                .contentType(ContentType.JSON)
-                .body(convertToJSON(unidentifiedUserDTO))
+    // Exercise SUT
+    given()
+        .accept(ContentType.JSON)
+        .contentType(ContentType.JSON)
+        .body(convertToJSON(unidentifiedUserDTO))
         .when()
-                .post(UserConstants.USERS_URL_PATH)
+        .post(UserConstants.USERS_URL_PATH)
         .then()
-                .log().all()
-                .statusCode(HttpStatus.CONFLICT.value());
+        .log()
+        .all()
+        .statusCode(HttpStatus.CONFLICT.value());
 
-        userController.postUser(unidentifiedUserDTO);
-    }
+    userController.postUser(unidentifiedUserDTO);
+  }
 
-    @Test
-    public void testPostUserWithUniqueEmail_shouldRespondWithStatusCreatedAndReturnCreatedUser()
-            throws Exception {
-        // Set up fixture
-        UnidentifiedUserDTO unidentifiedUserDTO = anUnidentifiedUserDTO()
-                .email(IRRELEVANT_USER_EMAIL)
-                .password(IRRELEVANT_USER_PASSWORD)
-                .firstName(IRRELEVANT_USER_FIRST_NAME)
-                .lastName(IRRELEVANT_USER_LAST_NAME)
-                .build();
+  @Test
+  public void testPostUserWithUniqueEmail_shouldRespondWithStatusCreatedAndReturnCreatedUser()
+      throws Exception {
+    // Set up fixture
+    UnidentifiedUserDTO unidentifiedUserDTO =
+        anUnidentifiedUserDTO()
+            .email(IRRELEVANT_USER_EMAIL)
+            .password(IRRELEVANT_USER_PASSWORD)
+            .firstName(IRRELEVANT_USER_FIRST_NAME)
+            .lastName(IRRELEVANT_USER_LAST_NAME)
+            .build();
 
-        User user = aUser()
-                .id(IRRELEVANT_USER_ID)
-                .email(IRRELEVANT_USER_EMAIL)
-                .password(IRRELEVANT_USER_PASSWORD)
-                .firstName(IRRELEVANT_USER_FIRST_NAME)
-                .lastName(IRRELEVANT_USER_LAST_NAME)
-                .build();
+    User user =
+        aUser()
+            .id(IRRELEVANT_USER_ID)
+            .email(IRRELEVANT_USER_EMAIL)
+            .password(IRRELEVANT_USER_PASSWORD)
+            .firstName(IRRELEVANT_USER_FIRST_NAME)
+            .lastName(IRRELEVANT_USER_LAST_NAME)
+            .build();
 
-        IdentifiedUserDTO expectedIdentifiedUserDTO = anIdentifiedUserDTO()
-                .id(IRRELEVANT_USER_ID)
-                .email(IRRELEVANT_USER_EMAIL)
-                .password(IRRELEVANT_USER_PASSWORD)
-                .firstName(IRRELEVANT_USER_FIRST_NAME)
-                .lastName(IRRELEVANT_USER_LAST_NAME)
-                .build();
+    IdentifiedUserDTO expectedIdentifiedUserDTO =
+        anIdentifiedUserDTO()
+            .id(IRRELEVANT_USER_ID)
+            .email(IRRELEVANT_USER_EMAIL)
+            .password(IRRELEVANT_USER_PASSWORD)
+            .firstName(IRRELEVANT_USER_FIRST_NAME)
+            .lastName(IRRELEVANT_USER_LAST_NAME)
+            .build();
 
-        // Set up expectations
-        when(userFactory.createUser(IRRELEVANT_USER_EMAIL, IRRELEVANT_USER_PASSWORD, IRRELEVANT_USER_FIRST_NAME,
-                IRRELEVANT_USER_LAST_NAME)).thenReturn(user);
-        when(userDTOFactory.createIdentifiedUserDTO(user))
-                .thenReturn(expectedIdentifiedUserDTO);
+    // Set up expectations
+    when(userFactory.createUser(
+            IRRELEVANT_USER_EMAIL,
+            IRRELEVANT_USER_PASSWORD,
+            IRRELEVANT_USER_FIRST_NAME,
+            IRRELEVANT_USER_LAST_NAME))
+        .thenReturn(user);
+    when(userDTOFactory.createIdentifiedUserDTO(user)).thenReturn(expectedIdentifiedUserDTO);
 
-        // Exercise SUT
-        given()
-                .accept(ContentType.JSON)
-                .contentType(ContentType.JSON)
-                .body(convertToJSON(unidentifiedUserDTO))
+    // Exercise SUT
+    given()
+        .accept(ContentType.JSON)
+        .contentType(ContentType.JSON)
+        .body(convertToJSON(unidentifiedUserDTO))
         .when()
-                .post(UserConstants.USERS_URL_PATH)
+        .post(UserConstants.USERS_URL_PATH)
         .then()
-                .log().all()
-                .contentType(ContentType.JSON)
-                .statusCode(HttpStatus.CREATED.value())
-                .body(is(convertToJSON(expectedIdentifiedUserDTO)));
+        .log()
+        .all()
+        .contentType(ContentType.JSON)
+        .statusCode(HttpStatus.CREATED.value())
+        .body(is(convertToJSON(expectedIdentifiedUserDTO)));
 
-        IdentifiedUserDTO actualIdentifiedUserDTO = userController.postUser(unidentifiedUserDTO);
+    IdentifiedUserDTO actualIdentifiedUserDTO = userController.postUser(unidentifiedUserDTO);
 
-        // Verify behaviour
-        assertThat(actualIdentifiedUserDTO, is(expectedIdentifiedUserDTO));
-    }
+    // Verify behaviour
+    assertThat(actualIdentifiedUserDTO, is(expectedIdentifiedUserDTO));
+  }
 
-    @Test(expected = UserNotFoundException.class)
-    public void testPutUserWithNoMatchingUser_shouldRespondWithStatusNotFound() throws Exception {
-        // Set up fixture
-        IdentifiedUserDTO identifiedUserDTO = anIdentifiedUserDTO()
-                .id(IRRELEVANT_USER_ID)
-                .email(IRRELEVANT_USER_EMAIL)
-                .password(IRRELEVANT_USER_PASSWORD)
-                .firstName(IRRELEVANT_USER_FIRST_NAME)
-                .lastName(IRRELEVANT_USER_LAST_NAME)
-                .build();
+  @Test(expected = UserNotFoundException.class)
+  public void testPutUserWithNoMatchingUser_shouldRespondWithStatusNotFound() throws Exception {
+    // Set up fixture
+    IdentifiedUserDTO identifiedUserDTO =
+        anIdentifiedUserDTO()
+            .id(IRRELEVANT_USER_ID)
+            .email(IRRELEVANT_USER_EMAIL)
+            .password(IRRELEVANT_USER_PASSWORD)
+            .firstName(IRRELEVANT_USER_FIRST_NAME)
+            .lastName(IRRELEVANT_USER_LAST_NAME)
+            .build();
 
-        UserNotFoundException userNotFoundException = aUserNotFoundException()
-                .id(IRRELEVANT_USER_ID)
-                .build();
+    UserNotFoundException userNotFoundException =
+        aUserNotFoundException().id(IRRELEVANT_USER_ID).build();
 
-        // Set up expectations
-        when(userModifier.updateUser(IRRELEVANT_USER_ID, IRRELEVANT_USER_EMAIL, IRRELEVANT_USER_PASSWORD, IRRELEVANT_USER_FIRST_NAME,
-                IRRELEVANT_USER_LAST_NAME)).thenThrow(userNotFoundException);
+    // Set up expectations
+    when(userModifier.updateUser(
+            IRRELEVANT_USER_ID,
+            IRRELEVANT_USER_EMAIL,
+            IRRELEVANT_USER_PASSWORD,
+            IRRELEVANT_USER_FIRST_NAME,
+            IRRELEVANT_USER_LAST_NAME))
+        .thenThrow(userNotFoundException);
 
-        // Exercise SUT
-        given()
-                .accept(ContentType.JSON)
-                .contentType(ContentType.JSON)
-                .body(convertToJSON(identifiedUserDTO))
+    // Exercise SUT
+    given()
+        .accept(ContentType.JSON)
+        .contentType(ContentType.JSON)
+        .body(convertToJSON(identifiedUserDTO))
         .when()
-                .put(UserConstants.USERS_URL_PATH + "/" + IRRELEVANT_USER_ID)
+        .put(UserConstants.USERS_URL_PATH + "/" + IRRELEVANT_USER_ID)
         .then()
-                .log().all()
-                .statusCode(HttpStatus.NOT_FOUND.value());
+        .log()
+        .all()
+        .statusCode(HttpStatus.NOT_FOUND.value());
 
+    userController.putUser(IRRELEVANT_USER_ID, identifiedUserDTO);
+  }
+
+  @Test(expected = DuplicateEmailException.class)
+  public void testPutUserWithDuplicateEmail_shouldRespondWithStatusConflict() throws Exception {
+    // Set up fixture
+    IdentifiedUserDTO identifiedUserDTO =
+        anIdentifiedUserDTO()
+            .id(IRRELEVANT_USER_ID)
+            .email(IRRELEVANT_USER_EMAIL)
+            .password(IRRELEVANT_USER_PASSWORD)
+            .firstName(IRRELEVANT_USER_FIRST_NAME)
+            .lastName(IRRELEVANT_USER_LAST_NAME)
+            .build();
+
+    DuplicateEmailException duplicateEmailException =
+        aDuplicateEmailException().withEmail(IRRELEVANT_USER_EMAIL).build();
+
+    // Set up expectations
+    when(userModifier.updateUser(
+            IRRELEVANT_USER_ID,
+            IRRELEVANT_USER_EMAIL,
+            IRRELEVANT_USER_PASSWORD,
+            IRRELEVANT_USER_FIRST_NAME,
+            IRRELEVANT_USER_LAST_NAME))
+        .thenThrow(duplicateEmailException);
+
+    // Exercise SUT
+    given()
+        .accept(ContentType.JSON)
+        .contentType(ContentType.JSON)
+        .body(convertToJSON(identifiedUserDTO))
+        .when()
+        .put(UserConstants.USERS_URL_PATH + "/" + IRRELEVANT_USER_ID)
+        .then()
+        .log()
+        .all()
+        .statusCode(HttpStatus.CONFLICT.value());
+
+    userController.putUser(IRRELEVANT_USER_ID, identifiedUserDTO);
+  }
+
+  @Test
+  public void testPutUserWithValidUser_shouldRespondWithStatusOKAndReturnTheUpdatedUser()
+      throws Exception {
+    // Set up fixture
+    IdentifiedUserDTO identifiedUserDTO =
+        anIdentifiedUserDTO()
+            .id(IRRELEVANT_USER_ID)
+            .email(IRRELEVANT_USER_EMAIL)
+            .password(IRRELEVANT_USER_PASSWORD)
+            .firstName(IRRELEVANT_USER_FIRST_NAME)
+            .lastName(IRRELEVANT_USER_LAST_NAME)
+            .build();
+
+    User user =
+        aUser()
+            .id(IRRELEVANT_USER_ID)
+            .email("email")
+            .password("password")
+            .firstName("first.name")
+            .lastName("last.name")
+            .build();
+
+    IdentifiedUserDTO expectedIdentifiedUserDTO =
+        anIdentifiedUserDTO()
+            .id(IRRELEVANT_USER_ID)
+            .email(IRRELEVANT_USER_EMAIL)
+            .password(IRRELEVANT_USER_PASSWORD)
+            .firstName(IRRELEVANT_USER_FIRST_NAME)
+            .lastName(IRRELEVANT_USER_LAST_NAME)
+            .build();
+
+    // Set up expectations
+    when(userModifier.updateUser(
+            IRRELEVANT_USER_ID,
+            IRRELEVANT_USER_EMAIL,
+            IRRELEVANT_USER_PASSWORD,
+            IRRELEVANT_USER_FIRST_NAME,
+            IRRELEVANT_USER_LAST_NAME))
+        .thenReturn(user);
+    when(userDTOFactory.createIdentifiedUserDTO(user)).thenReturn(expectedIdentifiedUserDTO);
+
+    // Exercise SUT
+    given()
+        .accept(ContentType.JSON)
+        .contentType(ContentType.JSON)
+        .body(convertToJSON(identifiedUserDTO))
+        .when()
+        .put(UserConstants.USERS_URL_PATH + "/" + IRRELEVANT_USER_ID)
+        .then()
+        .log()
+        .all()
+        .contentType(ContentType.JSON)
+        .statusCode(HttpStatus.OK.value())
+        .body(is(convertToJSON(expectedIdentifiedUserDTO)));
+
+    IdentifiedUserDTO actualIdentifiedUserDTO =
         userController.putUser(IRRELEVANT_USER_ID, identifiedUserDTO);
-    }
 
-    @Test(expected = DuplicateEmailException.class)
-    public void testPutUserWithDuplicateEmail_shouldRespondWithStatusConflict() throws Exception {
-        // Set up fixture
-        IdentifiedUserDTO identifiedUserDTO = anIdentifiedUserDTO()
-                .id(IRRELEVANT_USER_ID)
-                .email(IRRELEVANT_USER_EMAIL)
-                .password(IRRELEVANT_USER_PASSWORD)
-                .firstName(IRRELEVANT_USER_FIRST_NAME)
-                .lastName(IRRELEVANT_USER_LAST_NAME)
-                .build();
+    // Verify behaviour
+    assertThat(actualIdentifiedUserDTO, is(expectedIdentifiedUserDTO));
+  }
 
-        DuplicateEmailException duplicateEmailException = aDuplicateEmailException()
-                .withEmail(IRRELEVANT_USER_EMAIL)
-                .build();
+  @Test(expected = UserNotFoundException.class)
+  public void testDeleteUserWithNoMatchingUser_shouldRespondWithStatusNotFound() {
+    // Set up expectations
+    doThrow(identifiedUserNotFoundException(IRRELEVANT_USER_ID))
+        .when(userDeleter)
+        .deleteUser(IRRELEVANT_USER_ID);
 
-        // Set up expectations
-        when(userModifier.updateUser(IRRELEVANT_USER_ID, IRRELEVANT_USER_EMAIL, IRRELEVANT_USER_PASSWORD, IRRELEVANT_USER_FIRST_NAME,
-                IRRELEVANT_USER_LAST_NAME)).thenThrow(duplicateEmailException);
-
-        // Exercise SUT
-        given()
-                .accept(ContentType.JSON)
-                .contentType(ContentType.JSON)
-                .body(convertToJSON(identifiedUserDTO))
+    // Exercise SUT
+    given()
         .when()
-                .put(UserConstants.USERS_URL_PATH + "/" + IRRELEVANT_USER_ID)
+        .delete(UserConstants.USERS_URL_PATH + "/" + IRRELEVANT_USER_ID)
         .then()
-                .log().all()
-                .statusCode(HttpStatus.CONFLICT.value());
+        .log()
+        .all()
+        .statusCode(HttpStatus.NOT_FOUND.value());
 
-        userController.putUser(IRRELEVANT_USER_ID, identifiedUserDTO);
-    }
+    userController.deleteUser(IRRELEVANT_USER_ID);
+  }
 
-    @Test
-    public void testPutUserWithValidUser_shouldRespondWithStatusOKAndReturnTheUpdatedUser()
-            throws Exception {
-        // Set up fixture
-        IdentifiedUserDTO identifiedUserDTO = anIdentifiedUserDTO()
-                .id(IRRELEVANT_USER_ID)
-                .email(IRRELEVANT_USER_EMAIL)
-                .password(IRRELEVANT_USER_PASSWORD)
-                .firstName(IRRELEVANT_USER_FIRST_NAME)
-                .lastName(IRRELEVANT_USER_LAST_NAME)
-                .build();
+  @Test
+  public void testDeleteUserWithMatchingUser_shouldRespondWithStatusNoContent() {
+    // Set up expectations
+    doNothing().when(userDeleter).deleteUser(IRRELEVANT_USER_ID);
 
-        User user = aUser()
-                .id(IRRELEVANT_USER_ID)
-                .email("email")
-                .password("password")
-                .firstName("first.name")
-                .lastName("last.name")
-                .build();
-
-        IdentifiedUserDTO expectedIdentifiedUserDTO = anIdentifiedUserDTO()
-                .id(IRRELEVANT_USER_ID)
-                .email(IRRELEVANT_USER_EMAIL)
-                .password(IRRELEVANT_USER_PASSWORD)
-                .firstName(IRRELEVANT_USER_FIRST_NAME)
-                .lastName(IRRELEVANT_USER_LAST_NAME)
-                .build();
-
-        // Set up expectations
-        when(userModifier.updateUser(IRRELEVANT_USER_ID, IRRELEVANT_USER_EMAIL, IRRELEVANT_USER_PASSWORD,
-                IRRELEVANT_USER_FIRST_NAME, IRRELEVANT_USER_LAST_NAME)).thenReturn(user);
-        when(userDTOFactory.createIdentifiedUserDTO(user))
-                .thenReturn(expectedIdentifiedUserDTO);
-
-        // Exercise SUT
-        given()
-                .accept(ContentType.JSON)
-                .contentType(ContentType.JSON)
-                .body(convertToJSON(identifiedUserDTO))
+    // Exercise SUT
+    given()
         .when()
-                .put(UserConstants.USERS_URL_PATH + "/" + IRRELEVANT_USER_ID)
+        .delete(UserConstants.USERS_URL_PATH + "/" + IRRELEVANT_USER_ID)
         .then()
-                .log().all()
-                .contentType(ContentType.JSON)
-                .statusCode(HttpStatus.OK.value())
-                .body(is(convertToJSON(expectedIdentifiedUserDTO)));
+        .log()
+        .all()
+        .statusCode(HttpStatus.NO_CONTENT.value());
 
-        IdentifiedUserDTO actualIdentifiedUserDTO = userController.putUser(IRRELEVANT_USER_ID, identifiedUserDTO);
-
-        // Verify behaviour
-        assertThat(actualIdentifiedUserDTO, is(expectedIdentifiedUserDTO));
-    }
-
-    @Test(expected = UserNotFoundException.class)
-    public void testDeleteUserWithNoMatchingUser_shouldRespondWithStatusNotFound() {
-        // Set up expectations
-        doThrow(identifiedUserNotFoundException(IRRELEVANT_USER_ID))
-                .when(userDeleter).deleteUser(IRRELEVANT_USER_ID);
-
-        // Exercise SUT
-        given()
-        .when()
-                .delete(UserConstants.USERS_URL_PATH + "/" + IRRELEVANT_USER_ID)
-        .then()
-                .log().all()
-                .statusCode(HttpStatus.NOT_FOUND.value());
-
-        userController.deleteUser(IRRELEVANT_USER_ID);
-    }
-
-    @Test
-    public void testDeleteUserWithMatchingUser_shouldRespondWithStatusNoContent() {
-        // Set up expectations
-        doNothing().when(userDeleter).deleteUser(IRRELEVANT_USER_ID);
-
-        // Exercise SUT
-        given()
-        .when()
-                .delete(UserConstants.USERS_URL_PATH + "/" + IRRELEVANT_USER_ID)
-        .then()
-                .log().all()
-                .statusCode(HttpStatus.NO_CONTENT.value());
-
-        userController.deleteUser(IRRELEVANT_USER_ID);
-    }
+    userController.deleteUser(IRRELEVANT_USER_ID);
+  }
 }

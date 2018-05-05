@@ -8,31 +8,33 @@ import org.springframework.stereotype.Service;
 @Service
 class LogRetrieverFactory {
 
-    private final RiskRetriever riskRetriever;
-    private final IssueRetriever issueRetriever;
-    private final CombinedLogRetriever combinedLogRetriever;
+  private final RiskRetriever riskRetriever;
+  private final IssueRetriever issueRetriever;
+  private final CombinedLogRetriever combinedLogRetriever;
 
-    LogRetrieverFactory(RiskRetriever riskRetriever, IssueRetriever issueRetriever,
-                        CombinedLogRetriever combinedLogRetriever) {
-        this.riskRetriever = riskRetriever;
-        this.issueRetriever = issueRetriever;
-        this.combinedLogRetriever = combinedLogRetriever;
+  LogRetrieverFactory(
+      RiskRetriever riskRetriever,
+      IssueRetriever issueRetriever,
+      CombinedLogRetriever combinedLogRetriever) {
+    this.riskRetriever = riskRetriever;
+    this.issueRetriever = issueRetriever;
+    this.combinedLogRetriever = combinedLogRetriever;
+  }
+
+  LogRetriever getLogLookupService() {
+    return getLogLookupService(null);
+  }
+
+  LogRetriever getLogLookupService(LogType type) {
+    if (type != null) {
+      switch (type) {
+        case RISK:
+          return riskRetriever;
+        case ISSUE:
+          return issueRetriever;
+      }
     }
 
-    LogRetriever getLogLookupService() {
-        return getLogLookupService(null);
-    }
-
-    LogRetriever getLogLookupService(LogType type) {
-        if (type != null) {
-            switch (type) {
-                case RISK:
-                    return riskRetriever;
-                case ISSUE:
-                    return issueRetriever;
-            }
-        }
-
-        return combinedLogRetriever;
-    }
+    return combinedLogRetriever;
+  }
 }

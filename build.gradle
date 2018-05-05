@@ -2,14 +2,14 @@ import java.time.LocalDate
 import java.time.LocalTime
 
 plugins {
-    id "idea"
-    id "java"
-    id "jacoco"
-    id "application"
-    id "net.ltgt.apt" version "0.10"
-    id "org.flywaydb.flyway" version "5.0.6"
-    id "com.diffplug.gradle.spotless" version "3.10.0"
-    id "org.springframework.boot" version "1.5.9.RELEASE"
+  id "idea"
+  id "java"
+  id "jacoco"
+  id "application"
+  id "net.ltgt.apt" version "0.10"
+  id "org.flywaydb.flyway" version "5.0.6"
+  id "com.diffplug.gradle.spotless" version "3.10.0"
+  id "org.springframework.boot" version "1.5.9.RELEASE"
 }
 
 version = "0.0.1"
@@ -20,76 +20,76 @@ archivesBaseName = "project-log-server"
 mainClassName = "com.trevorgowing.projectlog.Application"
 
 spotless {
-    java {
-        googleJavaFormat()
-    }
+  java {
+    googleJavaFormat()
+  }
 }
 
-springBoot  {
-    buildInfo()
+springBoot {
+  buildInfo()
 }
 
 flyway {
-    baselineVersion = "2017.03.19.18.14.33.897"
-    outOfOrder = true
+  baselineVersion = "2017.03.19.18.14.33.897"
+  outOfOrder = true
 }
 
 jacocoTestReport {
-    reports {
-        xml.enabled true
-        html.enabled false
-    }
+  reports {
+    xml.enabled true
+    html.enabled false
+  }
 }
 
 test {
-    testLogging {
-        events "failed"
-        exceptionFormat "full"
-    }
+  testLogging {
+    events "failed"
+    exceptionFormat "full"
+  }
 }
 
 /**
  * Create a flyway sql migration in the default location, with a version of timestamp now and default description.
  */
 task createSqlMigration {
-    doLast {
-        String version = LocalDate.now().toString().replace('-', '.').concat('.')
-                .concat(LocalTime.now().toString().replace(':', '.'))
-        String fileName = 'V'.concat(version).concat('__').concat("description").concat(".sql")
-        String filePath = "src/main/resources/db/migration/".concat(fileName)
-        new File(filePath).createNewFile() ? println(filePath.concat(" migration created successfully"))
-                : println("Failed to create migration ".concat(filePath))
+  doLast {
+    String version = LocalDate.now().toString().replace('-', '.').concat('.')
+        .concat(LocalTime.now().toString().replace(':', '.'))
+    String fileName = 'V'.concat(version).concat('__').concat("description").concat(".sql")
+    String filePath = "src/main/resources/db/migration/".concat(fileName)
+    new File(filePath).createNewFile() ? println(filePath.concat(" migration created successfully"))
+        : println("Failed to create migration ".concat(filePath))
 
-    }
+  }
 }
 
 repositories {
-    jcenter()
+  jcenter()
 }
 
 dependencies {
-    apt "org.projectlombok:lombok:1.16.20"
-    compileOnly "org.projectlombok:lombok:1.16.20"
+  apt "org.projectlombok:lombok:1.16.20"
+  compileOnly "org.projectlombok:lombok:1.16.20"
 
-    compile 'com.trevorgowing:url-string-builder:1.1.0'
+  compile 'com.trevorgowing:url-string-builder:1.1.0'
 
-    compile "org.flywaydb:flyway-core:5.0.6"
-    compile "mysql:mysql-connector-java:8.0.8-dmr"
-    compile "org.hibernate:hibernate-core:5.2.12.Final"
+  compile "org.flywaydb:flyway-core:5.0.6"
+  compile "mysql:mysql-connector-java:8.0.8-dmr"
+  compile "org.hibernate:hibernate-core:5.2.12.Final"
 
-    compile "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.9.3"
-    compile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.9.3"
+  compile "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.9.3"
+  compile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.9.3"
 
-    compile "org.springframework.boot:spring-boot-starter-web"
-    compile "org.springframework.boot:spring-boot-starter-data-jpa"
+  compile "org.springframework.boot:spring-boot-starter-web"
+  compile "org.springframework.boot:spring-boot-starter-data-jpa"
 
-    compile "org.springframework.boot:spring-boot-devtools"
-    compile "org.springframework.boot:spring-boot-starter-hateoas"
-    compile "org.springframework.boot:spring-boot-starter-actuator"
+  compile "org.springframework.boot:spring-boot-devtools"
+  compile "org.springframework.boot:spring-boot-starter-hateoas"
+  compile "org.springframework.boot:spring-boot-starter-actuator"
 
-    testCompile "io.rest-assured:rest-assured:3.0.6"
-    testCompile "io.rest-assured:spring-mock-mvc:3.0.6"
-    testCompile "org.springframework.boot:spring-boot-starter-test"
+  testCompile "io.rest-assured:rest-assured:3.0.6"
+  testCompile "io.rest-assured:spring-mock-mvc:3.0.6"
+  testCompile "org.springframework.boot:spring-boot-starter-test"
 
-    testRuntime "com.h2database:h2:1.4.196"
+  testRuntime "com.h2database:h2:1.4.196"
 }

@@ -19,45 +19,52 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(LogConstants.LOGS_URL_PATH + LogConstants.RISKS_URL_PATH)
 class RiskController {
 
-    private final RiskFactory riskFactory;
-    private final RiskModifier riskModifier;
-    private final RiskDTOFactory riskDTOFactory;
+  private final RiskFactory riskFactory;
+  private final RiskModifier riskModifier;
+  private final RiskDTOFactory riskDTOFactory;
 
-    RiskController(RiskFactory riskFactory, RiskDTOFactory riskDTOFactory, RiskModifier riskModifier) {
-        this.riskFactory = riskFactory;
-        this.riskDTOFactory = riskDTOFactory;
-        this.riskModifier = riskModifier;
-    }
+  RiskController(
+      RiskFactory riskFactory, RiskDTOFactory riskDTOFactory, RiskModifier riskModifier) {
+    this.riskFactory = riskFactory;
+    this.riskDTOFactory = riskDTOFactory;
+    this.riskModifier = riskModifier;
+  }
 
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ResponseStatus(HttpStatus.CREATED)
-    IdentifiedRiskDTO postRisk(@RequestBody UnidentifiedRiskDTO unidentifiedRiskDTO) {
-        Risk risk = riskFactory.createRisk(unidentifiedRiskDTO);
-        return riskDTOFactory.createIdentifiedRiskDTO(risk);
-    }
+  @PostMapping(
+    consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
+    produces = MediaType.APPLICATION_JSON_UTF8_VALUE
+  )
+  @ResponseStatus(HttpStatus.CREATED)
+  IdentifiedRiskDTO postRisk(@RequestBody UnidentifiedRiskDTO unidentifiedRiskDTO) {
+    Risk risk = riskFactory.createRisk(unidentifiedRiskDTO);
+    return riskDTOFactory.createIdentifiedRiskDTO(risk);
+  }
 
-    @PutMapping(consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    IdentifiedRiskDTO putRisk(@RequestBody IdentifiedRiskDTO identifiedRiskDTO) {
-        Risk risk = riskModifier.updateRisk(identifiedRiskDTO);
-        return riskDTOFactory.createIdentifiedRiskDTO(risk);
-    }
+  @PutMapping(
+    consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
+    produces = MediaType.APPLICATION_JSON_UTF8_VALUE
+  )
+  @ResponseStatus(HttpStatus.OK)
+  IdentifiedRiskDTO putRisk(@RequestBody IdentifiedRiskDTO identifiedRiskDTO) {
+    Risk risk = riskModifier.updateRisk(identifiedRiskDTO);
+    return riskDTOFactory.createIdentifiedRiskDTO(risk);
+  }
 
-    @ExceptionHandler(RiskNotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public void handleRiskNotFoundException(RiskNotFoundException riskNotFoundException) {
-        log.warn(riskNotFoundException.getMessage(), riskNotFoundException);
-    }
+  @ExceptionHandler(RiskNotFoundException.class)
+  @ResponseStatus(HttpStatus.NOT_FOUND)
+  public void handleRiskNotFoundException(RiskNotFoundException riskNotFoundException) {
+    log.warn(riskNotFoundException.getMessage(), riskNotFoundException);
+  }
 
-    @ExceptionHandler(ProjectNotFoundException.class)
-    @ResponseStatus(code = HttpStatus.CONFLICT, reason = ProjectNotFoundException.REASON)
-    public void handleProjectNotFoundException(ProjectNotFoundException projectNotFoundException) {
-        log.warn(projectNotFoundException.getMessage(), projectNotFoundException);
-    }
+  @ExceptionHandler(ProjectNotFoundException.class)
+  @ResponseStatus(code = HttpStatus.CONFLICT, reason = ProjectNotFoundException.REASON)
+  public void handleProjectNotFoundException(ProjectNotFoundException projectNotFoundException) {
+    log.warn(projectNotFoundException.getMessage(), projectNotFoundException);
+  }
 
-    @ExceptionHandler(UserNotFoundException.class)
-    @ResponseStatus(code = HttpStatus.CONFLICT, reason = UserNotFoundException.REASON)
-    public void handleUserNotFoundException(UserNotFoundException userNotFoundException) {
-        log.warn(userNotFoundException.getMessage(), userNotFoundException);
-    }
+  @ExceptionHandler(UserNotFoundException.class)
+  @ResponseStatus(code = HttpStatus.CONFLICT, reason = UserNotFoundException.REASON)
+  public void handleUserNotFoundException(UserNotFoundException userNotFoundException) {
+    log.warn(userNotFoundException.getMessage(), userNotFoundException);
+  }
 }
