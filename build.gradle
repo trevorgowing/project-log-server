@@ -8,6 +8,7 @@ plugins {
     id "application"
     id "net.ltgt.apt" version "0.10"
     id "org.flywaydb.flyway" version "5.0.6"
+    id "com.diffplug.gradle.spotless" version "3.10.0"
     id "org.springframework.boot" version "1.5.9.RELEASE"
 }
 
@@ -17,6 +18,12 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 archivesBaseName = "project-log-server"
 mainClassName = "com.trevorgowing.projectlog.Application"
+
+spotless {
+    java {
+        googleJavaFormat()
+    }
+}
 
 springBoot  {
     buildInfo()
