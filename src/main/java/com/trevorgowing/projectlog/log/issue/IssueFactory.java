@@ -6,23 +6,16 @@ import com.trevorgowing.projectlog.project.Project;
 import com.trevorgowing.projectlog.project.ProjectRetriever;
 import com.trevorgowing.projectlog.user.User;
 import com.trevorgowing.projectlog.user.UserRetriever;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class IssueFactory {
 
   private final UserRetriever userRetriever;
-  private final ProjectRetriever projectRetriever;
   private final IssueRepository issueRepository;
-
-  public IssueFactory(
-      UserRetriever userRetriever,
-      ProjectRetriever projectRetriever,
-      IssueRepository issueRepository) {
-    this.userRetriever = userRetriever;
-    this.projectRetriever = projectRetriever;
-    this.issueRepository = issueRepository;
-  }
+  private final ProjectRetriever projectRetriever;
 
   public Issue createIssue(UnidentifiedIssueDTO unidentifiedIssueDTO) {
     Project project = projectRetriever.findProject(unidentifiedIssueDTO.getProject().getId());

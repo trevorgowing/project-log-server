@@ -4,10 +4,12 @@ import java.util.Objects;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
-@NoArgsConstructor
 @Getter
 @Setter
+@NoArgsConstructor
+@ToString(callSuper = true)
 public class IdentifiedUserDTO extends UnidentifiedUserDTO {
 
   private static final long serialVersionUID = -84805295469064090L;
@@ -59,17 +61,5 @@ public class IdentifiedUserDTO extends UnidentifiedUserDTO {
   @Override
   public int hashCode() {
     return Objects.hash(super.hashCode(), id);
-  }
-
-  @Override
-  public String toString() {
-    final StringBuilder toStringBuilder = new StringBuilder(getClass().getSimpleName());
-    toStringBuilder.append("{ id=").append(id);
-    toStringBuilder.append(", email='").append(email).append('\'');
-    toStringBuilder.append(", password='").append(password).append('\'');
-    toStringBuilder.append(", firstName='").append(firstName).append('\'');
-    toStringBuilder.append(", lastName='").append(lastName).append('\'');
-    toStringBuilder.append('}');
-    return toStringBuilder.toString();
   }
 }

@@ -23,15 +23,17 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
-@Entity
-@Table(name = "logs")
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "dtype")
-@NoArgsConstructor
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Setter
+@Entity
+@NoArgsConstructor
+@Table(name = "logs")
+@ToString(callSuper = true)
+@DiscriminatorColumn(name = "dtype")
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public abstract class Log extends AbstractAuditable<User, Long> {
 
   private static final long serialVersionUID = -4545843312415873005L;

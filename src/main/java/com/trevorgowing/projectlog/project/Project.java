@@ -19,13 +19,15 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
-@Entity
-@Table(name = "projects")
-@NoArgsConstructor
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 @Setter
+@Entity
+@NoArgsConstructor
+@ToString(callSuper = true)
+@Table(name = "projects")
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Project extends AbstractAuditable<User, Long> implements HasDateRange {
 
   private static final long serialVersionUID = -2208694199836258417L;

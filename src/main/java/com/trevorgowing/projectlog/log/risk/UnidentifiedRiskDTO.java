@@ -13,10 +13,12 @@ import java.util.Objects;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
-@NoArgsConstructor
 @Getter
 @Setter
+@NoArgsConstructor
+@ToString(callSuper = true)
 public class UnidentifiedRiskDTO extends LogDTO {
 
   private static final long serialVersionUID = 8964604470153989245L;
@@ -77,22 +79,5 @@ public class UnidentifiedRiskDTO extends LogDTO {
   @Override
   public int hashCode() {
     return Objects.hash(super.hashCode(), probability, riskResponse);
-  }
-
-  @Override
-  public String toString() {
-    final StringBuilder toStringBuilder = new StringBuilder(getClass().getSimpleName());
-    toStringBuilder.append("{ probability=").append(probability);
-    toStringBuilder.append(", riskResponse=").append(riskResponse);
-    toStringBuilder.append(", summary='").append(summary).append('\'');
-    toStringBuilder.append(", description='").append(description).append('\'');
-    toStringBuilder.append(", category=").append(category);
-    toStringBuilder.append(", impact=").append(impact);
-    toStringBuilder.append(", status=").append(status);
-    toStringBuilder.append(", dateClosed=").append(dateClosed);
-    toStringBuilder.append(", project=").append(project);
-    toStringBuilder.append(", owner=").append(owner);
-    toStringBuilder.append('}');
-    return toStringBuilder.toString();
   }
 }

@@ -3,6 +3,7 @@ package com.trevorgowing.projectlog.log.issue;
 import com.trevorgowing.projectlog.log.constant.LogConstants;
 import com.trevorgowing.projectlog.project.ProjectNotFoundException;
 import com.trevorgowing.projectlog.user.UserNotFoundException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -16,19 +17,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 @RequestMapping(LogConstants.LOGS_URL_PATH + LogConstants.ISSUES_URL_PATH)
 class IssueController {
 
   private final IssueFactory issueFactory;
   private final IssueModifier issueModifier;
   private final IssueDTOFactory issueDTOFactory;
-
-  IssueController(
-      IssueFactory issueFactory, IssueDTOFactory issueDTOFactory, IssueModifier issueModifier) {
-    this.issueFactory = issueFactory;
-    this.issueDTOFactory = issueDTOFactory;
-    this.issueModifier = issueModifier;
-  }
 
   @PostMapping(
     consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,

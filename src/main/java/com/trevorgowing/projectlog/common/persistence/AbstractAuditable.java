@@ -9,13 +9,19 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+@Getter
+@Setter
 @MappedSuperclass
 @NoArgsConstructor
+@ToString(callSuper = true)
 @EntityListeners(AuditingEntityListener.class)
 public abstract class AbstractAuditable<U, PK extends Serializable> extends AbstractPersistable<PK>
     implements Auditable<U, PK> {
@@ -41,45 +47,5 @@ public abstract class AbstractAuditable<U, PK extends Serializable> extends Abst
 
   protected AbstractAuditable(PK id) {
     super(id);
-  }
-
-  @Override
-  public U getCreatedBy() {
-    return createdBy;
-  }
-
-  @Override
-  public void setCreatedBy(U createdBy) {
-    this.createdBy = createdBy;
-  }
-
-  @Override
-  public Instant getCreatedDate() {
-    return createdDate;
-  }
-
-  @Override
-  public void setCreatedDate(Instant createdDate) {
-    this.createdDate = createdDate;
-  }
-
-  @Override
-  public U getLastModifiedBy() {
-    return lastModifiedBy;
-  }
-
-  @Override
-  public void setLastModifiedBy(U lastModifiedBy) {
-    this.lastModifiedBy = lastModifiedBy;
-  }
-
-  @Override
-  public Instant getLastModifiedDate() {
-    return lastModifiedDate;
-  }
-
-  @Override
-  public void setLastModifiedDate(Instant lastModifiedDate) {
-    this.lastModifiedDate = lastModifiedDate;
   }
 }

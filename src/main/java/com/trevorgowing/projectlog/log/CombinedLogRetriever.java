@@ -11,29 +11,18 @@ import com.trevorgowing.projectlog.log.risk.RiskDTOFactory;
 import com.trevorgowing.projectlog.log.risk.RiskRetriever;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 class CombinedLogRetriever implements LogRetriever {
 
   private final LogRepository logRepository;
+  private final RiskRetriever riskRetriever;
   private final IssueRetriever issueRetriever;
   private final RiskDTOFactory riskDTOFactory;
-  private final RiskRetriever riskRetriever;
   private final IssueDTOFactory issueDTOFactory;
-
-  public CombinedLogRetriever(
-      LogRepository logRepository,
-      IssueRetriever issueRetriever,
-      RiskDTOFactory riskDTOFactory,
-      RiskRetriever riskRetriever,
-      IssueDTOFactory issueDTOFactory) {
-    this.logRepository = logRepository;
-    this.issueRetriever = issueRetriever;
-    this.riskDTOFactory = riskDTOFactory;
-    this.riskRetriever = riskRetriever;
-    this.issueDTOFactory = issueDTOFactory;
-  }
 
   @Override
   public List<LogDTO> getLogDTOs() {

@@ -7,11 +7,13 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
-@NoArgsConstructor
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Setter
+@NoArgsConstructor
+@ToString(callSuper = true)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class UnidentifiedUserDTO implements Serializable {
 
   private static final long serialVersionUID = 1507127704121652160L;
@@ -40,16 +42,5 @@ public class UnidentifiedUserDTO implements Serializable {
   @Override
   public int hashCode() {
     return Objects.hash(email, password, firstName, lastName);
-  }
-
-  @Override
-  public String toString() {
-    final StringBuilder toStringBuilder = new StringBuilder(getClass().getSimpleName());
-    toStringBuilder.append("{ email='").append(email).append('\'');
-    toStringBuilder.append(", password='").append(password).append('\'');
-    toStringBuilder.append(", firstName='").append(firstName).append('\'');
-    toStringBuilder.append(", lastName='").append(lastName).append('\'');
-    toStringBuilder.append('}');
-    return toStringBuilder.toString();
   }
 }

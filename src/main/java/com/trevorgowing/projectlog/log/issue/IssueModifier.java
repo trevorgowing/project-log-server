@@ -2,26 +2,17 @@ package com.trevorgowing.projectlog.log.issue;
 
 import com.trevorgowing.projectlog.project.ProjectRetriever;
 import com.trevorgowing.projectlog.user.UserRetriever;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class IssueModifier {
 
   private final UserRetriever userRetriever;
   private final IssueRetriever issueRetriever;
   private final IssueRepository issueRepository;
   private final ProjectRetriever projectRetriever;
-
-  public IssueModifier(
-      UserRetriever userRetriever,
-      IssueRetriever issueRetriever,
-      IssueRepository issueRepository,
-      ProjectRetriever projectRetriever) {
-    this.userRetriever = userRetriever;
-    this.issueRetriever = issueRetriever;
-    this.issueRepository = issueRepository;
-    this.projectRetriever = projectRetriever;
-  }
 
   public Issue updateIssue(IdentifiedIssueDTO identifiedIssueDTO) {
     Issue issue = issueRetriever.findIssue(identifiedIssueDTO.getId());

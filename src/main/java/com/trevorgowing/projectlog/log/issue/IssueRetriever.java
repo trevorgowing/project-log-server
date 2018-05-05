@@ -7,16 +7,14 @@ import com.trevorgowing.projectlog.log.LogDTO;
 import com.trevorgowing.projectlog.log.LogRetriever;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class IssueRetriever implements LogRetriever {
 
   private final IssueRepository issueRepository;
-
-  public IssueRetriever(IssueRepository issueRepository) {
-    this.issueRepository = issueRepository;
-  }
 
   public Issue findIssue(long issueId) {
     return ofNullable(issueRepository.findOne(issueId))

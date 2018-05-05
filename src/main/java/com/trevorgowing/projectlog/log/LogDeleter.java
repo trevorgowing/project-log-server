@@ -2,17 +2,15 @@ package com.trevorgowing.projectlog.log;
 
 import static com.trevorgowing.projectlog.log.LogNotFoundException.identifiedLogNotFoundException;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 class LogDeleter {
 
   private final LogRepository logRepository;
-
-  LogDeleter(LogRepository logRepository) {
-    this.logRepository = logRepository;
-  }
 
   void deleteLogById(long logId) {
     try {

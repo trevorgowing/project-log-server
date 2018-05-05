@@ -5,6 +5,7 @@ import static com.trevorgowing.projectlog.log.LogTypeParsingException.causedLogT
 import com.trevorgowing.projectlog.log.constant.LogConstants;
 import com.trevorgowing.projectlog.log.constant.LogType;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -19,16 +20,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 @RequestMapping(LogConstants.LOGS_URL_PATH)
 class LogController {
 
   private final LogDeleter logDeleter;
   private final LogRetrieverFactory logRetrieverFactory;
-
-  LogController(LogDeleter logDeleter, LogRetrieverFactory logRetrieverFactory) {
-    this.logDeleter = logDeleter;
-    this.logRetrieverFactory = logRetrieverFactory;
-  }
 
   @GetMapping(produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)

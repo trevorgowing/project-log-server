@@ -12,8 +12,8 @@ import javax.persistence.Entity;
 import lombok.NoArgsConstructor;
 
 @Entity
-@DiscriminatorValue("issue")
 @NoArgsConstructor
+@DiscriminatorValue("issue")
 public class Issue extends Log {
 
   private static final long serialVersionUID = 1984300132708207255L;

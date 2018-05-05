@@ -6,18 +6,15 @@ import com.trevorgowing.projectlog.project.IdentifiedProjectDTO;
 import com.trevorgowing.projectlog.project.ProjectDTOFactory;
 import com.trevorgowing.projectlog.user.IdentifiedUserDTO;
 import com.trevorgowing.projectlog.user.UserDTOFactory;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class IssueDTOFactory {
 
   private final UserDTOFactory userDTOFactory;
   private final ProjectDTOFactory projectDTOFactory;
-
-  public IssueDTOFactory(UserDTOFactory userDTOFactory, ProjectDTOFactory projectDTOFactory) {
-    this.userDTOFactory = userDTOFactory;
-    this.projectDTOFactory = projectDTOFactory;
-  }
 
   public IdentifiedIssueDTO createIdentifiedIssueDTO(Issue issue) {
     IdentifiedUserDTO identifiedUserDTO = userDTOFactory.createIdentifiedUserDTO(issue.getOwner());

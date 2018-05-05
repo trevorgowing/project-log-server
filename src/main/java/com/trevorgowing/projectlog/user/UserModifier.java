@@ -2,19 +2,16 @@ package com.trevorgowing.projectlog.user;
 
 import static com.trevorgowing.projectlog.user.DuplicateEmailException.causedDuplicateEmailException;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class UserModifier {
 
   private final UserRetriever userRetriever;
   private final UserRepository userRepository;
-
-  UserModifier(UserRetriever userRetriever, UserRepository userRepository) {
-    this.userRetriever = userRetriever;
-    this.userRepository = userRepository;
-  }
 
   User updateUser(long userId, String email, String password, String firstName, String lastName) {
     User userToUpdate = userRetriever.findUser(userId);

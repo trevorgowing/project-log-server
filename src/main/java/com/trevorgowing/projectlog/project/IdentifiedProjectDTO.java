@@ -8,10 +8,12 @@ import java.util.Objects;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
-@NoArgsConstructor
 @Getter
 @Setter
+@NoArgsConstructor
+@ToString(callSuper = true)
 public class IdentifiedProjectDTO extends UnidentifiedProjectDTO {
 
   private static final long serialVersionUID = 5757020105419667746L;
@@ -83,18 +85,5 @@ public class IdentifiedProjectDTO extends UnidentifiedProjectDTO {
   @Override
   public int hashCode() {
     return Objects.hash(super.hashCode(), id);
-  }
-
-  @Override
-  public String toString() {
-    final StringBuilder toStringBuilder = new StringBuilder(getClass().getSimpleName());
-    toStringBuilder.append("{ id=").append(id);
-    toStringBuilder.append(", code='").append(code).append('\'');
-    toStringBuilder.append(", name='").append(name).append('\'');
-    toStringBuilder.append(", owner=").append(owner);
-    toStringBuilder.append(", startDate=").append(startDate);
-    toStringBuilder.append(", endDate=").append(endDate);
-    toStringBuilder.append('}');
-    return toStringBuilder.toString();
   }
 }

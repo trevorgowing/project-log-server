@@ -2,6 +2,7 @@ package com.trevorgowing.projectlog.user;
 
 import com.trevorgowing.projectlog.user.constant.UserConstants;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 @RequestMapping(UserConstants.USERS_URL_PATH)
 class UserController {
 
@@ -26,19 +28,6 @@ class UserController {
   private final UserModifier userModifier;
   private final UserRetriever userRetriever;
   private final UserDTOFactory userDTOFactory;
-
-  public UserController(
-      UserFactory userFactory,
-      UserDeleter userDeleter,
-      UserModifier userModifier,
-      UserRetriever userRetriever,
-      UserDTOFactory userDTOFactory) {
-    this.userFactory = userFactory;
-    this.userDeleter = userDeleter;
-    this.userModifier = userModifier;
-    this.userRetriever = userRetriever;
-    this.userDTOFactory = userDTOFactory;
-  }
 
   @GetMapping(produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(HttpStatus.OK)

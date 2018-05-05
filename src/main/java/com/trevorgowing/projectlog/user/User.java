@@ -8,12 +8,14 @@ import javax.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
-@Entity
-@Table(name = "users")
-@NoArgsConstructor
 @Getter
 @Setter
+@Entity
+@NoArgsConstructor
+@Table(name = "users")
+@ToString(callSuper = true)
 public class User extends AbstractAuditable<User, Long> {
 
   private static final long serialVersionUID = 2138197451190291396L;

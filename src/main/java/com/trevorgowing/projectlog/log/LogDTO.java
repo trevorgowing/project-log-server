@@ -13,11 +13,13 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
-@NoArgsConstructor
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Setter
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class LogDTO implements Serializable {
 
   private static final long serialVersionUID = 2791426410861030730L;
@@ -47,20 +49,5 @@ public abstract class LogDTO implements Serializable {
   @Override
   public int hashCode() {
     return Objects.hash(summary, impact, status, dateClosed, project, owner);
-  }
-
-  @Override
-  public String toString() {
-    final StringBuilder toStringBuilder = new StringBuilder(getClass().getSimpleName());
-    toStringBuilder.append("{ summary='").append(summary).append('\'');
-    toStringBuilder.append(", description='").append(description).append('\'');
-    toStringBuilder.append(", category=").append(category);
-    toStringBuilder.append(", impact=").append(impact);
-    toStringBuilder.append(", status=").append(status);
-    toStringBuilder.append(", dateClosed=").append(dateClosed);
-    toStringBuilder.append(", project=").append(project);
-    toStringBuilder.append(", owner=").append(owner);
-    toStringBuilder.append('}');
-    return toStringBuilder.toString();
   }
 }

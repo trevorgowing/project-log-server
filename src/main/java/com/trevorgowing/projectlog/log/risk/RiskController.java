@@ -3,6 +3,7 @@ package com.trevorgowing.projectlog.log.risk;
 import com.trevorgowing.projectlog.log.constant.LogConstants;
 import com.trevorgowing.projectlog.project.ProjectNotFoundException;
 import com.trevorgowing.projectlog.user.UserNotFoundException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -16,19 +17,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 @RequestMapping(LogConstants.LOGS_URL_PATH + LogConstants.RISKS_URL_PATH)
 class RiskController {
 
   private final RiskFactory riskFactory;
   private final RiskModifier riskModifier;
   private final RiskDTOFactory riskDTOFactory;
-
-  RiskController(
-      RiskFactory riskFactory, RiskDTOFactory riskDTOFactory, RiskModifier riskModifier) {
-    this.riskFactory = riskFactory;
-    this.riskDTOFactory = riskDTOFactory;
-    this.riskModifier = riskModifier;
-  }
 
   @PostMapping(
     consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,

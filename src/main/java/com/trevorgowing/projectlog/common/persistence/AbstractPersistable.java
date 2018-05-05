@@ -10,9 +10,13 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.Transient;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.springframework.data.domain.Persistable;
 
+@Getter
+@ToString
 @MappedSuperclass
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
@@ -25,11 +29,6 @@ public abstract class AbstractPersistable<PK extends Serializable> implements Pe
   @Column(nullable = false, unique = true)
   @GeneratedValue
   private PK id;
-
-  @Override
-  public PK getId() {
-    return id;
-  }
 
   @Override
   @Transient
@@ -48,13 +47,5 @@ public abstract class AbstractPersistable<PK extends Serializable> implements Pe
   @Override
   public int hashCode() {
     return Objects.hash(id);
-  }
-
-  @Override
-  public String toString() {
-    final StringBuilder toStringBuilder = new StringBuilder(getClass().getSimpleName() + "{");
-    toStringBuilder.append("id=").append(id);
-    toStringBuilder.append('}');
-    return toStringBuilder.toString();
   }
 }

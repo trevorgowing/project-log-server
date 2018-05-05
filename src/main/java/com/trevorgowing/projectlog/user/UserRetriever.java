@@ -4,16 +4,14 @@ import static com.trevorgowing.projectlog.user.UserNotFoundException.identifiedU
 import static java.util.Optional.ofNullable;
 
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class UserRetriever {
 
   private final UserRepository userRepository;
-
-  public UserRetriever(UserRepository userRepository) {
-    this.userRepository = userRepository;
-  }
 
   public User findUser(long userId) {
     return ofNullable(userRepository.findOne(userId))

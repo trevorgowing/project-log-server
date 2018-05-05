@@ -4,16 +4,14 @@ import static com.trevorgowing.projectlog.project.ProjectNotFoundException.ident
 import static java.util.Optional.ofNullable;
 
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class ProjectRetriever {
 
   private final ProjectRepository projectRepository;
-
-  public ProjectRetriever(ProjectRepository projectRepository) {
-    this.projectRepository = projectRepository;
-  }
 
   public Project findProject(long projectId) {
     return ofNullable(projectRepository.findOne(projectId))
