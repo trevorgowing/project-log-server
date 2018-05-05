@@ -1,5 +1,3 @@
-*.class
-
 # Package Files #
 *.jar
 *.war
@@ -13,3 +11,4 @@ hs_err_pid*
 /build
 /out
 /application.properties
+*.iml
