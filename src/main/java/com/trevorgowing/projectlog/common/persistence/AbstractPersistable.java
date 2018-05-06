@@ -5,6 +5,7 @@ import java.util.Objects;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Transient;
@@ -13,6 +14,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.domain.Persistable;
 
 @Getter
@@ -28,7 +30,8 @@ public abstract class AbstractPersistable<PK extends Serializable>
   @Id
   @Basic(optional = false)
   @Column(nullable = false, unique = true)
-  @GeneratedValue
+  @GenericGenerator(name = "native", strategy = "native")
+  @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
   private PK id;
 
   @Override
