@@ -11,10 +11,13 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 
 import com.trevorgowing.projectlog.common.exception.ExceptionResponse;
+import com.trevorgowing.projectlog.common.validation.Create;
+import com.trevorgowing.projectlog.common.validation.Update;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -52,7 +55,8 @@ class UserController {
 
   @PostMapping(consumes = APPLICATION_JSON_UTF8_VALUE, produces = APPLICATION_JSON_UTF8_VALUE)
   @ResponseStatus(CREATED)
-  IdentifiedUserDTO postUser(@RequestBody UnidentifiedUserDTO unidentifiedUserDTO) {
+  IdentifiedUserDTO postUser(
+      @RequestBody @Validated(Create.class) UnidentifiedUserDTO unidentifiedUserDTO) {
     User user =
         userFactory.createUser(
             unidentifiedUserDTO.getEmail(),
@@ -69,7 +73,8 @@ class UserController {
   )
   @ResponseStatus(OK)
   IdentifiedUserDTO putUser(
-      @PathVariable long userId, @RequestBody IdentifiedUserDTO identifiedUserDTO) {
+      @PathVariable long userId,
+      @RequestBody @Validated(Update.class) IdentifiedUserDTO identifiedUserDTO) {
     User updatedUser =
         userModifier.updateUser(
             userId,

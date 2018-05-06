@@ -5,6 +5,9 @@ import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -20,16 +23,23 @@ public class User extends AbstractAuditable<User, Long> {
 
   private static final long serialVersionUID = 2138197451190291396L;
 
+  @Email
+  @NotEmpty
+  @Size(max = 256)
   @Basic(optional = false)
   @Column(nullable = false, unique = true)
   private String email;
 
+  @NotEmpty
   @Basic(optional = false)
   @Column(nullable = false)
+  @Size(min = 8, max = 256)
   private String password;
 
+  @Size(min = 1, max = 256)
   private String firstName;
 
+  @Size(min = 1, max = 256)
   private String lastName;
 
   private User(String email, String password, String firstName, String lastName) {

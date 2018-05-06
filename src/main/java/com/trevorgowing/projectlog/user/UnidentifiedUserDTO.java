@@ -1,7 +1,11 @@
 package com.trevorgowing.projectlog.user;
 
+import com.trevorgowing.projectlog.common.validation.Create;
 import java.io.Serializable;
 import java.util.Objects;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,9 +22,19 @@ public class UnidentifiedUserDTO implements Serializable {
 
   private static final long serialVersionUID = 1507127704121652160L;
 
+  @Email
+  @Size(max = 256)
+  @NotEmpty(groups = Create.class)
   protected String email;
+
+  @Size(min = 8, max = 256)
+  @NotEmpty(groups = Create.class)
   protected String password;
+
+  @Size(max = 256)
   protected String firstName;
+
+  @Size(max = 256)
   protected String lastName;
 
   public static UnidentifiedUserDTO completeUnidentifiedUser(

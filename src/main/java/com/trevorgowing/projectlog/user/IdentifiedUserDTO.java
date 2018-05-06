@@ -1,6 +1,7 @@
 package com.trevorgowing.projectlog.user;
 
 import java.util.Objects;
+import javax.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,7 +15,7 @@ public class IdentifiedUserDTO extends UnidentifiedUserDTO {
 
   private static final long serialVersionUID = -84805295469064090L;
 
-  private long id;
+  @NotNull private long id;
 
   private IdentifiedUserDTO(long id, String email, String firstName, String lastName) {
     this.id = id;
