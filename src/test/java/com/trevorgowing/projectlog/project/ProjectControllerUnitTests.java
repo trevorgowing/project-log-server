@@ -13,11 +13,15 @@ import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpStatus.CONFLICT;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 
+import com.trevorgowing.projectlog.common.exception.ExceptionResponse;
 import com.trevorgowing.projectlog.common.types.AbstractControllerUnitTests;
 import com.trevorgowing.projectlog.project.constant.ProjectConstants;
 import com.trevorgowing.projectlog.user.IdentifiedUserDTO;
@@ -58,8 +62,7 @@ public class ProjectControllerUnitTests extends AbstractControllerUnitTests {
   }
 
   @Test
-  public void testGetProjectsWithNoExistingProjects_shouldRespondWithStatusOKAndReturnNoProjects()
-      throws Exception {
+  public void testGetProjectsWithNoExistingProjects_shouldRespondWithStatusOKAndReturnNoProjects() {
     // Set up expectations
     when(projectRetriever.getIdentifiedProjectDTOs()).thenReturn(Collections.emptyList());
 
@@ -82,8 +85,7 @@ public class ProjectControllerUnitTests extends AbstractControllerUnitTests {
   }
 
   @Test
-  public void testGetProjectsWithExistingUsers_shouldRespondWithStatusOKAndReturnProjects()
-      throws Exception {
+  public void testGetProjectsWithExistingUsers_shouldRespondWithStatusOKAndReturnProjects() {
     // Set up fixture
     IdentifiedProjectDTO identifiedProjectOneDTO =
         anIdentifiedProjectDTO()
@@ -131,6 +133,13 @@ public class ProjectControllerUnitTests extends AbstractControllerUnitTests {
 
   @Test(expected = ProjectNotFoundException.class)
   public void testGetProjectByIdWithNoMatchingProject_shouldRespondWithStatusNotFound() {
+    // Set up fixture
+    ExceptionResponse exceptionResponse =
+        ExceptionResponse.builder()
+            .status(NOT_FOUND)
+            .message("Project not found for id: " + IRRELEVANT_PROJECT_ID)
+            .build();
+
     // Set up expectations
     when(projectRetriever.getIdentifiedProjectDTOById(IRRELEVANT_PROJECT_ID))
         .thenThrow(identifiedProjectNotFoundException(IRRELEVANT_PROJECT_ID));
@@ -143,14 +152,14 @@ public class ProjectControllerUnitTests extends AbstractControllerUnitTests {
         .then()
         .log()
         .all()
-        .statusCode(HttpStatus.NOT_FOUND.value());
+        .statusCode(NOT_FOUND.value())
+        .body(is(equalTo(convertToJSON(exceptionResponse))));
 
     projectController.getProjectById(IRRELEVANT_PROJECT_ID);
   }
 
   @Test
-  public void testGetProjectByIdWithMatchingProject_shouldRespondWithStatusOKAndReturnProject()
-      throws Exception {
+  public void testGetProjectByIdWithMatchingProject_shouldRespondWithStatusOKAndReturnProject() {
     // Set up fixture
     IdentifiedProjectDTO expectedIdentifiedProjectDTO =
         anIdentifiedProjectDTO()
@@ -185,7 +194,7 @@ public class ProjectControllerUnitTests extends AbstractControllerUnitTests {
   }
 
   @Test(expected = DuplicateProjectCodeException.class)
-  public void testPostProjectWithDuplicateCode_shouldRespondWithStatusConflict() throws Exception {
+  public void testPostProjectWithDuplicateCode_shouldRespondWithStatusConflict() {
     // Set up fixture
     String duplicateProjectCode = IRRELEVANT_PROJECT_CODE;
     LocalDate startDate = IRRELEVANT_DATE;
@@ -198,6 +207,12 @@ public class ProjectControllerUnitTests extends AbstractControllerUnitTests {
             .owner(anIdentifiedUserDTO().id(IRRELEVANT_USER_ID).build())
             .startDate(startDate)
             .endDate(endDate)
+            .build();
+
+    ExceptionResponse exceptionResponse =
+        ExceptionResponse.builder()
+            .status(CONFLICT)
+            .message("Duplicate project found with code: " + IRRELEVANT_PROJECT_CODE)
             .build();
 
     // Set up expectations
@@ -215,14 +230,14 @@ public class ProjectControllerUnitTests extends AbstractControllerUnitTests {
         .then()
         .log()
         .all()
-        .statusCode(HttpStatus.CONFLICT.value());
+        .statusCode(HttpStatus.CONFLICT.value())
+        .body(is(equalTo(convertToJSON(exceptionResponse))));
 
     projectController.postProject(unidentifiedProjectDTO);
   }
 
   @Test(expected = UserNotFoundException.class)
-  public void testPostProjectWithNonExistentUser_shouldRespondWithStatusConflict()
-      throws Exception {
+  public void testPostProjectWithNonExistentUser_shouldRespondWithStatusConflict() {
     // Set up fixture
     long nonExistentUserId = 111L;
 
@@ -261,8 +276,7 @@ public class ProjectControllerUnitTests extends AbstractControllerUnitTests {
 
   @Test
   public void
-      testPostProjectWithValidProject_shouldRespondWithStatusCreatedAndReturnCreatedProject()
-          throws Exception {
+      testPostProjectWithValidProject_shouldRespondWithStatusCreatedAndReturnCreatedProject() {
     // Set up fixture
     UnidentifiedProjectDTO unidentifiedProjectDTO =
         anUnidentifiedProjectDTO()
@@ -326,7 +340,7 @@ public class ProjectControllerUnitTests extends AbstractControllerUnitTests {
   }
 
   @Test(expected = DuplicateProjectCodeException.class)
-  public void testPutProjectWithDuplicateCode_shouldRespondWithStatusConflict() throws Exception {
+  public void testPutProjectWithDuplicateCode_shouldRespondWithStatusConflict() {
     // Set up fixture
     String duplicateProjectCode = IRRELEVANT_PROJECT_CODE;
 
@@ -338,6 +352,12 @@ public class ProjectControllerUnitTests extends AbstractControllerUnitTests {
             .owner(anIdentifiedUserDTO().id(IRRELEVANT_USER_ID).build())
             .startDate(IRRELEVANT_DATE)
             .endDate(IRRELEVANT_DATE)
+            .build();
+
+    ExceptionResponse exceptionResponse =
+        ExceptionResponse.builder()
+            .status(CONFLICT)
+            .message("Duplicate project found with code: " + IRRELEVANT_PROJECT_CODE)
             .build();
 
     // Set up expectations
@@ -360,13 +380,14 @@ public class ProjectControllerUnitTests extends AbstractControllerUnitTests {
         .then()
         .log()
         .all()
-        .statusCode(HttpStatus.CONFLICT.value());
+        .statusCode(HttpStatus.CONFLICT.value())
+        .body(is(equalTo(convertToJSON(exceptionResponse))));
 
     projectController.putProject(IRRELEVANT_PROJECT_ID, identifiedProjectDTO);
   }
 
   @Test(expected = UserNotFoundException.class)
-  public void testPutProjectWithNonExistentUser_shouldRespondWithStatusConflict() throws Exception {
+  public void testPutProjectWithNonExistentUser_shouldRespondWithStatusConflict() {
     // Set up fixture
     long nonExistentUserId = IRRELEVANT_USER_ID;
 
@@ -378,6 +399,12 @@ public class ProjectControllerUnitTests extends AbstractControllerUnitTests {
             .owner(anIdentifiedUserDTO().id(nonExistentUserId).build())
             .startDate(IRRELEVANT_DATE)
             .endDate(IRRELEVANT_DATE)
+            .build();
+
+    ExceptionResponse exceptionResponse =
+        ExceptionResponse.builder()
+            .status(CONFLICT)
+            .message("User not found for id: " + IRRELEVANT_USER_ID)
             .build();
 
     // Set up expectations
@@ -400,14 +427,14 @@ public class ProjectControllerUnitTests extends AbstractControllerUnitTests {
         .then()
         .log()
         .all()
-        .statusCode(HttpStatus.CONFLICT.value());
+        .statusCode(HttpStatus.CONFLICT.value())
+        .body(is(equalTo(convertToJSON(exceptionResponse))));
 
     projectController.putProject(IRRELEVANT_PROJECT_ID, identifiedProjectDTO);
   }
 
   @Test
-  public void testPutProjectWithValidProject_shouldRespondWithStatusOKAndReturnUpdatedProject()
-      throws Exception {
+  public void testPutProjectWithValidProject_shouldRespondWithStatusOKAndReturnUpdatedProject() {
     // Set up fixture
     IdentifiedProjectDTO identifiedProjectDTO =
         anIdentifiedProjectDTO()
@@ -474,6 +501,13 @@ public class ProjectControllerUnitTests extends AbstractControllerUnitTests {
 
   @Test(expected = ProjectNotFoundException.class)
   public void testDeleteProjectWithNoMatchingProject_shouldRespondWithStatusNotFound() {
+    // Set up fixture
+    ExceptionResponse exceptionResponse =
+        ExceptionResponse.builder()
+            .status(NOT_FOUND)
+            .message("Project not found for id: " + IRRELEVANT_PROJECT_ID)
+            .build();
+
     // Set up expectations
     doThrow(identifiedProjectNotFoundException(IRRELEVANT_PROJECT_ID))
         .when(projectDeleter)
@@ -486,7 +520,8 @@ public class ProjectControllerUnitTests extends AbstractControllerUnitTests {
         .then()
         .log()
         .all()
-        .statusCode(HttpStatus.NOT_FOUND.value());
+        .statusCode(NOT_FOUND.value())
+        .body(is(equalTo(convertToJSON(exceptionResponse))));
 
     projectController.deleteProject(IRRELEVANT_PROJECT_ID);
   }

@@ -1,14 +1,22 @@
 package com.trevorgowing.projectlog.log;
 
 import static com.trevorgowing.projectlog.log.LogTypeParsingException.causedLogTypeParsingException;
+import static com.trevorgowing.projectlog.log.constant.LogConstants.LOGS_URL_PATH;
+import static com.trevorgowing.projectlog.log.constant.LogConstants.LOG_ID_URL_PATH;
+import static com.trevorgowing.projectlog.log.constant.LogConstants.TYPE_QUERY_PARAMETER;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 
-import com.trevorgowing.projectlog.log.constant.LogConstants;
+import com.trevorgowing.projectlog.common.exception.ExceptionResponse;
 import com.trevorgowing.projectlog.log.constant.LogType;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,24 +29,21 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(LogConstants.LOGS_URL_PATH)
+@RequestMapping(LOGS_URL_PATH)
 class LogController {
 
   private final LogDeleter logDeleter;
   private final LogRetrieverFactory logRetrieverFactory;
 
-  @GetMapping(produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-  @ResponseStatus(HttpStatus.OK)
+  @GetMapping(produces = APPLICATION_JSON_UTF8_VALUE)
+  @ResponseStatus(OK)
   List<LogDTO> getLogs() {
     return logRetrieverFactory.getLogLookupService().getLogDTOs();
   }
 
-  @GetMapping(
-    params = LogConstants.TYPE_QUERY_PARAMETER,
-    produces = MediaType.APPLICATION_JSON_UTF8_VALUE
-  )
-  @ResponseStatus(HttpStatus.OK)
-  List<LogDTO> getLogs(@RequestParam(name = LogConstants.TYPE_QUERY_PARAMETER) String type) {
+  @GetMapping(params = TYPE_QUERY_PARAMETER, produces = APPLICATION_JSON_UTF8_VALUE)
+  @ResponseStatus(OK)
+  List<LogDTO> getLogs(@RequestParam(name = TYPE_QUERY_PARAMETER) String type) {
     LogType logType;
 
     try {
@@ -54,27 +59,33 @@ class LogController {
     return LogType.valueOf(type.trim().toUpperCase());
   }
 
-  @GetMapping(path = LogConstants.LOG_ID_URL_PATH, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-  @ResponseStatus(HttpStatus.OK)
+  @GetMapping(path = LOG_ID_URL_PATH, produces = APPLICATION_JSON_UTF8_VALUE)
+  @ResponseStatus(OK)
   LogDTO getLogById(@PathVariable long logId) {
     return logRetrieverFactory.getLogLookupService().getLogDTOById(logId);
   }
 
-  @DeleteMapping(path = LogConstants.LOG_ID_URL_PATH)
-  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @DeleteMapping(path = LOG_ID_URL_PATH)
+  @ResponseStatus(NO_CONTENT)
   void deleteLogById(@PathVariable long logId) {
     logDeleter.deleteLogById(logId);
   }
 
   @ExceptionHandler(LogTypeParsingException.class)
-  @ResponseStatus(code = HttpStatus.BAD_REQUEST, reason = LogTypeParsingException.REASON)
-  public void handleLogTypeParsingException(LogTypeParsingException logTypeParsingException) {
-    log.warn(logTypeParsingException.getMessage(), logTypeParsingException);
+  public ResponseEntity<ExceptionResponse> handleLogTypeParsingException(
+      LogTypeParsingException logTypeParsingException) {
+    log.debug(logTypeParsingException.getMessage(), logTypeParsingException);
+    return ResponseEntity.status(BAD_REQUEST)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .body(ExceptionResponse.from(BAD_REQUEST, logTypeParsingException.getMessage()));
   }
 
   @ExceptionHandler(LogNotFoundException.class)
-  @ResponseStatus(code = HttpStatus.NOT_FOUND, reason = LogNotFoundException.REASON)
-  public void handleLogNotFoundException(LogNotFoundException logNotFoundException) {
-    log.warn(logNotFoundException.getMessage(), logNotFoundException);
+  public ResponseEntity<ExceptionResponse> handleLogNotFoundException(
+      LogNotFoundException logNotFoundException) {
+    log.debug(logNotFoundException.getMessage(), logNotFoundException);
+    return ResponseEntity.status(NOT_FOUND)
+        .contentType(MediaType.APPLICATION_JSON_UTF8)
+        .body(ExceptionResponse.from(NOT_FOUND, logNotFoundException.getMessage()));
   }
 }

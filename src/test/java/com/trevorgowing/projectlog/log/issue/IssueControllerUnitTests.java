@@ -12,9 +12,13 @@ import static com.trevorgowing.projectlog.user.IdentifiedUserDTOBuilder.anIdenti
 import static com.trevorgowing.projectlog.user.UserNotFoundException.identifiedUserNotFoundException;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpStatus.CONFLICT;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 
+import com.trevorgowing.projectlog.common.exception.ExceptionResponse;
 import com.trevorgowing.projectlog.common.types.AbstractControllerUnitTests;
 import com.trevorgowing.projectlog.log.constant.LogConstants;
 import com.trevorgowing.projectlog.project.ProjectNotFoundException;
@@ -39,11 +43,13 @@ public class IssueControllerUnitTests extends AbstractControllerUnitTests {
   }
 
   @Test(expected = ProjectNotFoundException.class)
-  public void testPostIssueWithNonExistentProject_shouldRespondWithStatusConflict()
-      throws Exception {
+  public void testPostIssueWithNonExistentProject_shouldRespondWithStatusConflict() {
     // Set up fixture
     UnidentifiedIssueDTO unidentifiedIssueDTO =
         anUnidentifiedIssueDTO().project(anIdentifiedProjectDTO().id(1L).build()).build();
+
+    ExceptionResponse exceptionResponse =
+        ExceptionResponse.builder().status(CONFLICT).message("Project not found for id: 1").build();
 
     // Set up expectations
     when(issueFactory.createIssue(unidentifiedIssueDTO))
@@ -62,16 +68,20 @@ public class IssueControllerUnitTests extends AbstractControllerUnitTests {
         .then()
         .log()
         .all()
-        .statusCode(HttpStatus.CONFLICT.value());
+        .statusCode(CONFLICT.value())
+        .body(is(equalTo(convertToJSON(exceptionResponse))));
 
     issueController.postIssue(unidentifiedIssueDTO);
   }
 
   @Test(expected = UserNotFoundException.class)
-  public void testPostIssueWithNonExistentOwner_shouldRespondWithStatusConflict() throws Exception {
+  public void testPostIssueWithNonExistentOwner_shouldRespondWithStatusConflict() {
     // Set up fixture
     UnidentifiedIssueDTO unidentifiedIssueDTO =
         anUnidentifiedIssueDTO().owner(anIdentifiedUserDTO().id(1L).build()).build();
+
+    ExceptionResponse exceptionResponse =
+        ExceptionResponse.builder().status(CONFLICT).message("User not found for id: 1").build();
 
     // Set up expectations
     when(issueFactory.createIssue(unidentifiedIssueDTO))
@@ -90,15 +100,15 @@ public class IssueControllerUnitTests extends AbstractControllerUnitTests {
         .then()
         .log()
         .all()
-        .statusCode(HttpStatus.CONFLICT.value());
+        .statusCode(CONFLICT.value())
+        .body(is(equalTo(convertToJSON(exceptionResponse))));
 
     issueController.postIssue(unidentifiedIssueDTO);
   }
 
   @Test
   public void
-      testPostIssueWithValidIssue_shouldRespondWithStatusCreatedAndReturnIdentifiedIssueDTO()
-          throws Exception {
+      testPostIssueWithValidIssue_shouldRespondWithStatusCreatedAndReturnIdentifiedIssueDTO() {
     // Set up fixture
     UnidentifiedIssueDTO unidentifiedIssueDTO = anUnidentifiedIssueDTO().build();
 
@@ -134,9 +144,12 @@ public class IssueControllerUnitTests extends AbstractControllerUnitTests {
   }
 
   @Test(expected = IssueNotFoundException.class)
-  public void testPutIssueWithNoExistingIssue_shouldRespondWithStatusNotFound() throws Exception {
+  public void testPutIssueWithNoExistingIssue_shouldRespondWithStatusNotFound() {
     // Set up fixture
     IdentifiedIssueDTO identifiedIssueDTO = anIdentifiedIssueDTO().id(1L).build();
+
+    ExceptionResponse exceptionResponse =
+        ExceptionResponse.builder().status(NOT_FOUND).message("Issue not found for id: 1").build();
 
     // Set up expectations
     when(issueModifier.updateIssue(identifiedIssueDTO))
@@ -155,17 +168,20 @@ public class IssueControllerUnitTests extends AbstractControllerUnitTests {
         .then()
         .log()
         .all()
-        .statusCode(HttpStatus.NOT_FOUND.value());
+        .statusCode(HttpStatus.NOT_FOUND.value())
+        .body(is(equalTo(convertToJSON(exceptionResponse))));
 
     issueController.putIssue(identifiedIssueDTO);
   }
 
   @Test(expected = ProjectNotFoundException.class)
-  public void testPutIssueWithNonExistentProject_shouldRespondWithStatusConflict()
-      throws Exception {
+  public void testPutIssueWithNonExistentProject_shouldRespondWithStatusConflict() {
     // Set up fixture
     IdentifiedIssueDTO identifiedIssueDTO =
         anIdentifiedIssueDTO().project(anIdentifiedProjectDTO().id(1L).build()).build();
+
+    ExceptionResponse exceptionResponse =
+        ExceptionResponse.builder().status(CONFLICT).message("Project not found for id: 1").build();
 
     // Set up expectations
     when(issueModifier.updateIssue(identifiedIssueDTO))
@@ -184,16 +200,20 @@ public class IssueControllerUnitTests extends AbstractControllerUnitTests {
         .then()
         .log()
         .all()
-        .statusCode(HttpStatus.CONFLICT.value());
+        .statusCode(CONFLICT.value())
+        .body(is(equalTo(convertToJSON(exceptionResponse))));
 
     issueController.putIssue(identifiedIssueDTO);
   }
 
   @Test(expected = UserNotFoundException.class)
-  public void testPutIssueWithNonExistentOwner_shouldRespondWithStatusConflict() throws Exception {
+  public void testPutIssueWithNonExistentOwner_shouldRespondWithStatusConflict() {
     // Set up fixture
     IdentifiedIssueDTO identifiedIssueDTO =
         anIdentifiedIssueDTO().owner(anIdentifiedUserDTO().id(1L).build()).build();
+
+    ExceptionResponse exceptionResponse =
+        ExceptionResponse.builder().status(CONFLICT).message("User not found for id: 1").build();
 
     // Set up expectations
     when(issueModifier.updateIssue(identifiedIssueDTO))
@@ -212,14 +232,14 @@ public class IssueControllerUnitTests extends AbstractControllerUnitTests {
         .then()
         .log()
         .all()
-        .statusCode(HttpStatus.CONFLICT.value());
+        .statusCode(CONFLICT.value())
+        .body(is(equalTo(convertToJSON(exceptionResponse))));
 
     issueController.putIssue(identifiedIssueDTO);
   }
 
   @Test
-  public void testPutIssueWithValidIssue_shouldRespondWithStatusOkAndReturnIdentifiedIssueDTO()
-      throws Exception {
+  public void testPutIssueWithValidIssue_shouldRespondWithStatusOkAndReturnIdentifiedIssueDTO() {
     // Set up fixture
     IdentifiedIssueDTO identifiedIssueDTO = anIdentifiedIssueDTO().build();
 

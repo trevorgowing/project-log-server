@@ -1,12 +1,21 @@
 package com.trevorgowing.projectlog.project;
 
-import com.trevorgowing.projectlog.project.constant.ProjectConstants;
+import static com.trevorgowing.projectlog.project.constant.ProjectConstants.PROJECTS_URL_PATH;
+import static com.trevorgowing.projectlog.project.constant.ProjectConstants.PROJECT_ID_VARIABLE_URL_PATH;
+import static org.springframework.http.HttpStatus.CONFLICT;
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8;
+import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
+
+import com.trevorgowing.projectlog.common.exception.ExceptionResponse;
 import com.trevorgowing.projectlog.user.UserNotFoundException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,7 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(ProjectConstants.PROJECTS_URL_PATH)
+@RequestMapping(PROJECTS_URL_PATH)
 class ProjectController {
 
   private final ProjectFactory projectFactory;
@@ -30,26 +39,20 @@ class ProjectController {
   private final ProjectRetriever projectRetriever;
   private final ProjectDTOFactory projectDTOFactory;
 
-  @GetMapping(produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-  @ResponseStatus(HttpStatus.OK)
+  @GetMapping(produces = APPLICATION_JSON_UTF8_VALUE)
+  @ResponseStatus(OK)
   List<IdentifiedProjectDTO> getProjects() {
     return projectRetriever.getIdentifiedProjectDTOs();
   }
 
-  @GetMapping(
-    path = ProjectConstants.PROJECT_ID_VARIABLE_URL_PATH,
-    produces = MediaType.APPLICATION_JSON_UTF8_VALUE
-  )
-  @ResponseStatus(HttpStatus.OK)
+  @GetMapping(path = PROJECT_ID_VARIABLE_URL_PATH, produces = APPLICATION_JSON_UTF8_VALUE)
+  @ResponseStatus(OK)
   IdentifiedProjectDTO getProjectById(@PathVariable long projectId) {
     return projectRetriever.getIdentifiedProjectDTOById(projectId);
   }
 
-  @PostMapping(
-    consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
-    produces = MediaType.APPLICATION_JSON_UTF8_VALUE
-  )
-  @ResponseStatus(HttpStatus.CREATED)
+  @PostMapping(consumes = APPLICATION_JSON_UTF8_VALUE, produces = APPLICATION_JSON_UTF8_VALUE)
+  @ResponseStatus(CREATED)
   IdentifiedProjectDTO postProject(@RequestBody UnidentifiedProjectDTO unidentifiedProjectDTO) {
     Project project =
         projectFactory.createProject(
@@ -62,11 +65,11 @@ class ProjectController {
   }
 
   @PutMapping(
-    path = ProjectConstants.PROJECT_ID_VARIABLE_URL_PATH,
-    consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
-    produces = MediaType.APPLICATION_JSON_UTF8_VALUE
+    path = PROJECT_ID_VARIABLE_URL_PATH,
+    consumes = APPLICATION_JSON_UTF8_VALUE,
+    produces = APPLICATION_JSON_UTF8_VALUE
   )
-  @ResponseStatus(HttpStatus.OK)
+  @ResponseStatus(OK)
   IdentifiedProjectDTO putProject(
       @PathVariable long projectId, @RequestBody IdentifiedProjectDTO identifiedProjectDTO) {
     Project project =
@@ -80,28 +83,36 @@ class ProjectController {
     return projectDTOFactory.createIdentifiedProjectDTO(project);
   }
 
-  @DeleteMapping(path = ProjectConstants.PROJECT_ID_VARIABLE_URL_PATH)
-  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @DeleteMapping(path = PROJECT_ID_VARIABLE_URL_PATH)
+  @ResponseStatus(NO_CONTENT)
   void deleteProject(@PathVariable long projectId) {
     projectDeleter.deleteProject(projectId);
   }
 
   @ExceptionHandler(ProjectNotFoundException.class)
-  @ResponseStatus(code = HttpStatus.NOT_FOUND, reason = ProjectNotFoundException.REASON)
-  public void handleProjectNotFoundException(ProjectNotFoundException projectNotFoundException) {
-    log.warn(projectNotFoundException.getMessage(), projectNotFoundException);
+  public ResponseEntity<ExceptionResponse> handleProjectNotFoundException(
+      ProjectNotFoundException projectNotFoundException) {
+    log.debug(projectNotFoundException.getMessage(), projectNotFoundException);
+    return ResponseEntity.status(NOT_FOUND)
+        .contentType(APPLICATION_JSON_UTF8)
+        .body(ExceptionResponse.from(NOT_FOUND, projectNotFoundException.getMessage()));
   }
 
   @ExceptionHandler(DuplicateProjectCodeException.class)
-  @ResponseStatus(code = HttpStatus.CONFLICT, reason = DuplicateProjectCodeException.REASON)
-  public void handleDuplicateCodeException(
+  public ResponseEntity<ExceptionResponse> handleDuplicateCodeException(
       DuplicateProjectCodeException duplicateProjectCodeException) {
-    log.warn(duplicateProjectCodeException.getMessage(), duplicateProjectCodeException);
+    log.debug(duplicateProjectCodeException.getMessage(), duplicateProjectCodeException);
+    return ResponseEntity.status(CONFLICT)
+        .contentType(APPLICATION_JSON_UTF8)
+        .body(ExceptionResponse.from(CONFLICT, duplicateProjectCodeException.getMessage()));
   }
 
   @ExceptionHandler(UserNotFoundException.class)
-  @ResponseStatus(code = HttpStatus.CONFLICT, reason = UserNotFoundException.REASON)
-  public void handleUserNotFoundException(UserNotFoundException userNotFoundException) {
-    log.warn(userNotFoundException.getMessage(), userNotFoundException);
+  public ResponseEntity<ExceptionResponse> handleUserNotFoundException(
+      UserNotFoundException userNotFoundException) {
+    log.debug(userNotFoundException.getMessage(), userNotFoundException);
+    return ResponseEntity.status(CONFLICT)
+        .contentType(APPLICATION_JSON_UTF8)
+        .body(ExceptionResponse.from(CONFLICT, userNotFoundException.getMessage()));
   }
 }

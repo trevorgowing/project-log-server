@@ -11,11 +11,15 @@ import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpStatus.CONFLICT;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 
+import com.trevorgowing.projectlog.common.exception.ExceptionResponse;
 import com.trevorgowing.projectlog.common.types.AbstractControllerUnitTests;
 import com.trevorgowing.projectlog.user.constant.UserConstants;
 import io.restassured.http.ContentType;
@@ -42,8 +46,7 @@ public class UserControllerUnitTests extends AbstractControllerUnitTests {
   }
 
   @Test
-  public void testGetUsersWithNoExistingUsers_shouldRespondWithStatusOKAndReturnNoUsers()
-      throws Exception {
+  public void testGetUsersWithNoExistingUsers_shouldRespondWithStatusOKAndReturnNoUsers() {
     // Set up expectations
     when(userRetriever.findIdentifiedUserDTOs()).thenReturn(Collections.emptyList());
 
@@ -66,8 +69,7 @@ public class UserControllerUnitTests extends AbstractControllerUnitTests {
   }
 
   @Test
-  public void testGetUsersWithExistingUsers_shouldRespondWithStatusOKAndReturnUsers()
-      throws Exception {
+  public void testGetUsersWithExistingUsers_shouldRespondWithStatusOKAndReturnUsers() {
     // Set up fixture
     IdentifiedUserDTO identifiedUserOneDTO =
         anIdentifiedUserDTO()
@@ -111,6 +113,13 @@ public class UserControllerUnitTests extends AbstractControllerUnitTests {
 
   @Test(expected = UserNotFoundException.class)
   public void testGetUserWithNoMatchingUser_shouldRespondWithStatusNotFound() {
+    // Set up fixture
+    ExceptionResponse exceptionResponse =
+        ExceptionResponse.builder()
+            .status(NOT_FOUND)
+            .message("User not found for id: " + IRRELEVANT_USER_ID)
+            .build();
+
     // Set up expectations
     when(userRetriever.findIdentifiedUserDTOById(IRRELEVANT_USER_ID))
         .thenThrow(identifiedUserNotFoundException(IRRELEVANT_USER_ID));
@@ -123,14 +132,14 @@ public class UserControllerUnitTests extends AbstractControllerUnitTests {
         .then()
         .log()
         .all()
-        .statusCode(HttpStatus.NOT_FOUND.value());
+        .statusCode(NOT_FOUND.value())
+        .body(is(equalTo(convertToJSON(exceptionResponse))));
 
     userController.getUser(IRRELEVANT_USER_ID);
   }
 
   @Test
-  public void testGetUserWithMatchingUser_shouldRespondWithStatusOKAndReturnUser()
-      throws Exception {
+  public void testGetUserWithMatchingUser_shouldRespondWithStatusOKAndReturnUser() {
     // Set up fixture
     IdentifiedUserDTO expectedIdentifiedUserDTO =
         anIdentifiedUserDTO()
@@ -163,7 +172,7 @@ public class UserControllerUnitTests extends AbstractControllerUnitTests {
   }
 
   @Test(expected = DuplicateEmailException.class)
-  public void testPostUserWithDuplicateEmail_shouldRespondWithStatusConflict() throws Exception {
+  public void testPostUserWithDuplicateEmail_shouldRespondWithStatusConflict() {
     // Set up fixture
     UnidentifiedUserDTO unidentifiedUserDTO =
         anUnidentifiedUserDTO()
@@ -175,6 +184,12 @@ public class UserControllerUnitTests extends AbstractControllerUnitTests {
 
     DuplicateEmailException duplicateEmailException =
         aDuplicateEmailException().withEmail(IRRELEVANT_USER_EMAIL).build();
+
+    ExceptionResponse exceptionResponse =
+        ExceptionResponse.builder()
+            .status(CONFLICT)
+            .message("Duplicate user found with email address: " + IRRELEVANT_USER_EMAIL)
+            .build();
 
     // Set up expectations
     when(userFactory.createUser(
@@ -194,14 +209,14 @@ public class UserControllerUnitTests extends AbstractControllerUnitTests {
         .then()
         .log()
         .all()
-        .statusCode(HttpStatus.CONFLICT.value());
+        .statusCode(HttpStatus.CONFLICT.value())
+        .body(is(equalTo(convertToJSON(exceptionResponse))));
 
     userController.postUser(unidentifiedUserDTO);
   }
 
   @Test
-  public void testPostUserWithUniqueEmail_shouldRespondWithStatusCreatedAndReturnCreatedUser()
-      throws Exception {
+  public void testPostUserWithUniqueEmail_shouldRespondWithStatusCreatedAndReturnCreatedUser() {
     // Set up fixture
     UnidentifiedUserDTO unidentifiedUserDTO =
         anUnidentifiedUserDTO()
@@ -259,7 +274,7 @@ public class UserControllerUnitTests extends AbstractControllerUnitTests {
   }
 
   @Test(expected = UserNotFoundException.class)
-  public void testPutUserWithNoMatchingUser_shouldRespondWithStatusNotFound() throws Exception {
+  public void testPutUserWithNoMatchingUser_shouldRespondWithStatusNotFound() {
     // Set up fixture
     IdentifiedUserDTO identifiedUserDTO =
         anIdentifiedUserDTO()
@@ -272,6 +287,12 @@ public class UserControllerUnitTests extends AbstractControllerUnitTests {
 
     UserNotFoundException userNotFoundException =
         aUserNotFoundException().id(IRRELEVANT_USER_ID).build();
+
+    ExceptionResponse exceptionResponse =
+        ExceptionResponse.builder()
+            .status(NOT_FOUND)
+            .message("User not found for id: " + IRRELEVANT_USER_ID)
+            .build();
 
     // Set up expectations
     when(userModifier.updateUser(
@@ -292,13 +313,14 @@ public class UserControllerUnitTests extends AbstractControllerUnitTests {
         .then()
         .log()
         .all()
-        .statusCode(HttpStatus.NOT_FOUND.value());
+        .statusCode(NOT_FOUND.value())
+        .body(is(equalTo(convertToJSON(exceptionResponse))));
 
     userController.putUser(IRRELEVANT_USER_ID, identifiedUserDTO);
   }
 
   @Test(expected = DuplicateEmailException.class)
-  public void testPutUserWithDuplicateEmail_shouldRespondWithStatusConflict() throws Exception {
+  public void testPutUserWithDuplicateEmail_shouldRespondWithStatusConflict() {
     // Set up fixture
     IdentifiedUserDTO identifiedUserDTO =
         anIdentifiedUserDTO()
@@ -337,8 +359,7 @@ public class UserControllerUnitTests extends AbstractControllerUnitTests {
   }
 
   @Test
-  public void testPutUserWithValidUser_shouldRespondWithStatusOKAndReturnTheUpdatedUser()
-      throws Exception {
+  public void testPutUserWithValidUser_shouldRespondWithStatusOKAndReturnTheUpdatedUser() {
     // Set up fixture
     IdentifiedUserDTO identifiedUserDTO =
         anIdentifiedUserDTO()
@@ -400,6 +421,13 @@ public class UserControllerUnitTests extends AbstractControllerUnitTests {
 
   @Test(expected = UserNotFoundException.class)
   public void testDeleteUserWithNoMatchingUser_shouldRespondWithStatusNotFound() {
+    // Set up fixture
+    ExceptionResponse exceptionResponse =
+        ExceptionResponse.builder()
+            .status(NOT_FOUND)
+            .message("User not found for id: " + IRRELEVANT_USER_ID)
+            .build();
+
     // Set up expectations
     doThrow(identifiedUserNotFoundException(IRRELEVANT_USER_ID))
         .when(userDeleter)
@@ -412,7 +440,8 @@ public class UserControllerUnitTests extends AbstractControllerUnitTests {
         .then()
         .log()
         .all()
-        .statusCode(HttpStatus.NOT_FOUND.value());
+        .statusCode(NOT_FOUND.value())
+        .body(is(equalTo(convertToJSON(exceptionResponse))));
 
     userController.deleteUser(IRRELEVANT_USER_ID);
   }

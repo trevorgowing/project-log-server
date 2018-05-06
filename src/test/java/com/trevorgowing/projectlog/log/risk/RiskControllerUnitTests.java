@@ -12,9 +12,13 @@ import static com.trevorgowing.projectlog.user.IdentifiedUserDTOBuilder.anIdenti
 import static com.trevorgowing.projectlog.user.UserNotFoundException.identifiedUserNotFoundException;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpStatus.CONFLICT;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 
+import com.trevorgowing.projectlog.common.exception.ExceptionResponse;
 import com.trevorgowing.projectlog.common.types.AbstractControllerUnitTests;
 import com.trevorgowing.projectlog.log.constant.LogConstants;
 import com.trevorgowing.projectlog.project.ProjectNotFoundException;
@@ -39,11 +43,13 @@ public class RiskControllerUnitTests extends AbstractControllerUnitTests {
   }
 
   @Test(expected = ProjectNotFoundException.class)
-  public void testPostRiskWithNonExistentProject_shouldRespondWithStatusConflict()
-      throws Exception {
+  public void testPostRiskWithNonExistentProject_shouldRespondWithStatusConflict() {
     // Set up fixture
     UnidentifiedRiskDTO unidentifiedRiskDTO =
         anUnidentifiedRiskDTO().project(anIdentifiedProjectDTO().id(1L).build()).build();
+
+    ExceptionResponse exceptionResponse =
+        ExceptionResponse.builder().status(CONFLICT).message("Project not found for id: 1").build();
 
     // Set up expectations
     when(riskFactory.createRisk(unidentifiedRiskDTO))
@@ -62,16 +68,20 @@ public class RiskControllerUnitTests extends AbstractControllerUnitTests {
         .then()
         .log()
         .all()
-        .statusCode(HttpStatus.CONFLICT.value());
+        .statusCode(CONFLICT.value())
+        .body(is(equalTo(convertToJSON(exceptionResponse))));
 
     riskController.postRisk(unidentifiedRiskDTO);
   }
 
   @Test(expected = UserNotFoundException.class)
-  public void testPostRiskWithNonExistentOwner_shouldRespondWithStatusConflict() throws Exception {
+  public void testPostRiskWithNonExistentOwner_shouldRespondWithStatusConflict() {
     // Set up fixture
     UnidentifiedRiskDTO unidentifiedRiskDTO =
         anUnidentifiedRiskDTO().owner(anIdentifiedUserDTO().id(1L).build()).build();
+
+    ExceptionResponse exceptionResponse =
+        ExceptionResponse.builder().status(CONFLICT).message("User not found for id: 1").build();
 
     // Set up expectations
     when(riskFactory.createRisk(unidentifiedRiskDTO))
@@ -90,14 +100,14 @@ public class RiskControllerUnitTests extends AbstractControllerUnitTests {
         .then()
         .log()
         .all()
-        .statusCode(HttpStatus.CONFLICT.value());
+        .statusCode(CONFLICT.value())
+        .body(is(equalTo(convertToJSON(exceptionResponse))));
 
     riskController.postRisk(unidentifiedRiskDTO);
   }
 
   @Test
-  public void testPostRiskWithValidRisk_shouldRespondWithStatusCreatedAndReturnIdentifiedRiskDTO()
-      throws Exception {
+  public void testPostRiskWithValidRisk_shouldRespondWithStatusCreatedAndReturnIdentifiedRiskDTO() {
     // Set up fixture
     UnidentifiedRiskDTO unidentifiedRiskDTO = anUnidentifiedRiskDTO().build();
 
@@ -133,9 +143,12 @@ public class RiskControllerUnitTests extends AbstractControllerUnitTests {
   }
 
   @Test(expected = RiskNotFoundException.class)
-  public void testPutRiskWithNonExistentRisk_shouldRespondWithStatusNotFound() throws Exception {
+  public void testPutRiskWithNonExistentRisk_shouldRespondWithStatusNotFound() {
     // Set up fixture
     IdentifiedRiskDTO identifiedRiskDTO = anIdentifiedRiskDTO().id(1L).build();
+
+    ExceptionResponse exceptionResponse =
+        ExceptionResponse.builder().status(NOT_FOUND).message("Risk not found for id: 1").build();
 
     // Set up expectations
     when(riskModifier.updateRisk(identifiedRiskDTO)).thenThrow(identifiedRiskNotFoundException(1L));
@@ -153,15 +166,19 @@ public class RiskControllerUnitTests extends AbstractControllerUnitTests {
         .then()
         .log()
         .all()
-        .statusCode(HttpStatus.NOT_FOUND.value());
+        .statusCode(HttpStatus.NOT_FOUND.value())
+        .body(is(equalTo(convertToJSON(exceptionResponse))));
 
     riskController.putRisk(identifiedRiskDTO);
   }
 
   @Test(expected = ProjectNotFoundException.class)
-  public void testPutRiskWithNonExistentProject_shouldRespondWithStatusConflict() throws Exception {
+  public void testPutRiskWithNonExistentProject_shouldRespondWithStatusConflict() {
     // Set up fixture
     IdentifiedRiskDTO identifiedRiskDTO = anIdentifiedRiskDTO().id(1L).build();
+
+    ExceptionResponse exceptionResponse =
+        ExceptionResponse.builder().status(CONFLICT).message("Project not found for id: 1").build();
 
     // Set up expectations
     when(riskModifier.updateRisk(identifiedRiskDTO))
@@ -180,15 +197,19 @@ public class RiskControllerUnitTests extends AbstractControllerUnitTests {
         .then()
         .log()
         .all()
-        .statusCode(HttpStatus.CONFLICT.value());
+        .statusCode(CONFLICT.value())
+        .body(is(equalTo(convertToJSON(exceptionResponse))));
 
     riskController.putRisk(identifiedRiskDTO);
   }
 
   @Test(expected = UserNotFoundException.class)
-  public void testPutRiskWithNonExistentOwner_shouldRespondWithStatusConflict() throws Exception {
+  public void testPutRiskWithNonExistentOwner_shouldRespondWithStatusConflict() {
     // Set up fixture
     IdentifiedRiskDTO identifiedRiskDTO = anIdentifiedRiskDTO().id(1L).build();
+
+    ExceptionResponse exceptionResponse =
+        ExceptionResponse.builder().status(CONFLICT).message("User not found for id: 1").build();
 
     // Set up expectations
     when(riskModifier.updateRisk(identifiedRiskDTO)).thenThrow(identifiedUserNotFoundException(1L));
@@ -206,14 +227,14 @@ public class RiskControllerUnitTests extends AbstractControllerUnitTests {
         .then()
         .log()
         .all()
-        .statusCode(HttpStatus.CONFLICT.value());
+        .statusCode(CONFLICT.value())
+        .body(is(equalTo(convertToJSON(exceptionResponse))));
 
     riskController.putRisk(identifiedRiskDTO);
   }
 
   @Test
-  public void testPutRiskWithValidRisk_shouldRespondWithStatusOkAndReturnUpdatedRisk()
-      throws Exception {
+  public void testPutRiskWithValidRisk_shouldRespondWithStatusOkAndReturnUpdatedRisk() {
     // Set up fixture
     IdentifiedRiskDTO identifiedRiskDTO = anIdentifiedRiskDTO().id(1L).build();
 

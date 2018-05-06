@@ -10,11 +10,15 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 
+import com.trevorgowing.projectlog.common.exception.ExceptionResponse;
 import com.trevorgowing.projectlog.common.types.AbstractControllerUnitTests;
 import com.trevorgowing.projectlog.log.constant.LogConstants;
 import com.trevorgowing.projectlog.log.constant.LogType;
@@ -42,8 +46,7 @@ public class LogControllerUnitTests extends AbstractControllerUnitTests {
   }
 
   @Test
-  public void testGetAllLogsWithNoExistingLogs_shouldRespondWithStatusOkAndReturnNoLogs()
-      throws Exception {
+  public void testGetAllLogsWithNoExistingLogs_shouldRespondWithStatusOkAndReturnNoLogs() {
     // Set up expectations
     when(logRetrieverFactory.getLogLookupService()).thenReturn(logRetriever);
     when(logRetriever.getLogDTOs()).thenReturn(emptyList());
@@ -67,8 +70,7 @@ public class LogControllerUnitTests extends AbstractControllerUnitTests {
   }
 
   @Test
-  public void testGetAllLogsWithExistingLogs_shouldRespondWithStatusOkAndReturnAllLogs()
-      throws Exception {
+  public void testGetAllLogsWithExistingLogs_shouldRespondWithStatusOkAndReturnAllLogs() {
     // Set up fixture
     List<LogDTO> expectedLogDTOs =
         asList(anIdentifiedIssueDTO().build(), anIdentifiedRiskDTO().build());
@@ -97,6 +99,13 @@ public class LogControllerUnitTests extends AbstractControllerUnitTests {
 
   @Test(expected = LogTypeParsingException.class)
   public void testGetLogsWithInvalidType_shouldRespondWithBadRequest() {
+    // Set up fixture
+    ExceptionResponse exceptionResponse =
+        ExceptionResponse.builder()
+            .status(BAD_REQUEST)
+            .message("Unable to parse LogType, expected \"RISK\" or \"ISSUE\" but found: invalid")
+            .build();
+
     // Exercise SUT
     given()
         .accept(ContentType.JSON)
@@ -108,15 +117,15 @@ public class LogControllerUnitTests extends AbstractControllerUnitTests {
         .then()
         .log()
         .all()
-        .statusCode(HttpStatus.BAD_REQUEST.value());
+        .statusCode(BAD_REQUEST.value())
+        .body(is(equalTo(convertToJSON(exceptionResponse))));
 
     logController.getLogs("invalid");
   }
 
   @Test
   public void
-      testGetLogsWithValidTypeRiskAndNoExistingRisks_shouldRespondWithStatusOkAndReturnNoRisks()
-          throws Exception {
+      testGetLogsWithValidTypeRiskAndNoExistingRisks_shouldRespondWithStatusOkAndReturnNoRisks() {
     // Set up expectations
     when(logRetrieverFactory.getLogLookupService(LogType.RISK)).thenReturn(logRetriever);
     when(logRetriever.getLogDTOs()).thenReturn(emptyList());
@@ -143,8 +152,8 @@ public class LogControllerUnitTests extends AbstractControllerUnitTests {
   }
 
   @Test
-  public void testGetLogsWithValidTypeRiskAndExistingRisk_shouldRespondWithStatusOkAndReturnRisks()
-      throws Exception {
+  public void
+      testGetLogsWithValidTypeRiskAndExistingRisk_shouldRespondWithStatusOkAndReturnRisks() {
     // Set up fixture
     List<LogDTO> expectedLogDTOs =
         asList(anIdentifiedRiskDTO().build(), anIdentifiedRiskDTO().build());
@@ -176,8 +185,7 @@ public class LogControllerUnitTests extends AbstractControllerUnitTests {
 
   @Test
   public void
-      testGetLogsWithValidTypeIssuesAndNoExistingIssue_shouldRespondWithStatusOkAndReturnNoIssues()
-          throws Exception {
+      testGetLogsWithValidTypeIssuesAndNoExistingIssue_shouldRespondWithStatusOkAndReturnNoIssues() {
     // Set up expectations
     when(logRetrieverFactory.getLogLookupService(LogType.ISSUE)).thenReturn(logRetriever);
     when(logRetriever.getLogDTOs()).thenReturn(emptyList());
@@ -205,8 +213,7 @@ public class LogControllerUnitTests extends AbstractControllerUnitTests {
 
   @Test
   public void
-      testGetLogsWithValidTypeIssueAndExistingIssues_shouldRespondWithStatusOkAndReturnIssues()
-          throws Exception {
+      testGetLogsWithValidTypeIssueAndExistingIssues_shouldRespondWithStatusOkAndReturnIssues() {
     // Set up fixture
     List<LogDTO> expectedLogDTOs =
         asList(anIdentifiedIssueDTO().build(), anIdentifiedIssueDTO().build());
@@ -238,6 +245,10 @@ public class LogControllerUnitTests extends AbstractControllerUnitTests {
 
   @Test(expected = LogNotFoundException.class)
   public void testGetLogDTOByIdWithNoMatchingLog_shouldRespondWithStatusNotFound() {
+    // Set up fixture
+    ExceptionResponse exceptionResponse =
+        ExceptionResponse.builder().status(NOT_FOUND).message("Log not found for id: 1").build();
+
     // Set up expectations
     when(logRetrieverFactory.getLogLookupService()).thenReturn(logRetriever);
     when(logRetriever.getLogDTOById(1)).thenThrow(identifiedLogNotFoundException(1));
@@ -250,14 +261,14 @@ public class LogControllerUnitTests extends AbstractControllerUnitTests {
         .then()
         .log()
         .all()
-        .statusCode(HttpStatus.NOT_FOUND.value());
+        .statusCode(HttpStatus.NOT_FOUND.value())
+        .body(is(equalTo(convertToJSON(exceptionResponse))));
 
     logController.getLogById(1);
   }
 
   @Test
-  public void testGetLogByIdWithMatchingLog_shouldRespondWithStatusOkAndReturnLog()
-      throws Exception {
+  public void testGetLogByIdWithMatchingLog_shouldRespondWithStatusOkAndReturnLog() {
     // Set up fixture
     IdentifiedRiskDTO expectedLogDTO = anIdentifiedRiskDTO().id(1).build();
 
@@ -284,6 +295,10 @@ public class LogControllerUnitTests extends AbstractControllerUnitTests {
 
   @Test(expected = LogNotFoundException.class)
   public void testDeleteLogByIdWithNonExistentLog_shouldRespondWithStatusNotFound() {
+    // Set up fixture
+    ExceptionResponse exceptionResponse =
+        ExceptionResponse.builder().status(NOT_FOUND).message("Log not found for id: 1").build();
+
     // Set up expectations
     doThrow(identifiedLogNotFoundException(1L)).when(logDeleter).deleteLogById(1L);
 
@@ -294,7 +309,8 @@ public class LogControllerUnitTests extends AbstractControllerUnitTests {
         .then()
         .log()
         .all()
-        .statusCode(HttpStatus.NOT_FOUND.value());
+        .statusCode(HttpStatus.NOT_FOUND.value())
+        .body(is(equalTo(convertToJSON(exceptionResponse))));
 
     logController.deleteLogById(1L);
   }
