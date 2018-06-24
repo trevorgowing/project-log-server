@@ -75,8 +75,8 @@ repositories {
 }
 
 dependencies {
-  annotationProcessor "org.projectlombok:lombok:1.16.20"
-  compileOnly "org.projectlombok:lombok:1.16.20"
+  compileOnly "org.projectlombok:lombok:1.18.0"
+  annotationProcessor "org.projectlombok:lombok:1.18.0"
 
   compile 'com.trevorgowing:url-string-builder:1.1.0'
 
@@ -88,6 +88,9 @@ dependencies {
   compile "org.springframework.boot:spring-boot-starter-json"
   compile "org.springframework.boot:spring-boot-starter-data-jpa"
   compile "org.springframework.boot:spring-boot-starter-actuator"
+
+  testCompileOnly "org.projectlombok:lombok:1.18.0"
+  testAnnotationProcessor "org.projectlombok:lombok:1.18.0"
 
   testCompile "io.rest-assured:rest-assured:3.1.0"
   testCompile "io.rest-assured:spring-mock-mvc:3.1.0"
